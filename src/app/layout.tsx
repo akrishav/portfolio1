@@ -13,8 +13,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://akrishav-portfolio-2026.netlify.app"),
   title: "Ashish Rishav | Product Manager",
   description: "Product Manager | Data-driven | 0→1 & Scale",
+  openGraph: {
+    title: "Ashish Rishav | Product Manager",
+    description: "Product Manager | Data-driven | 0→1 & Scale",
+    url: "https://akrishav-portfolio-2026.netlify.app",
+    siteName: "Ashish Rishav Portfolio",
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
