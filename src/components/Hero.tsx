@@ -44,10 +44,13 @@ export default function Hero() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                        <button className="px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-full font-semibold transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.5)] flex items-center justify-center gap-2">
+                        <a
+                            href="#case-studies"
+                            className="px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-full font-semibold transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.5)] flex items-center justify-center gap-2"
+                        >
                             View Case Studies
                             <Sparkles className="w-4 h-4" />
-                        </button>
+                        </a>
                         <a
                             href="https://drive.google.com/file/d/14P9kyzRr71-Q6ks5mFrboYK3GNU1eKAG/view?usp=sharing"
                             target="_blank"

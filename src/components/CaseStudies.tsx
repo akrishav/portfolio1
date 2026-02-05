@@ -118,7 +118,7 @@ export default function CaseStudies() {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
 
     return (
-        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-black/40">
+        <section id="case-studies" className="py-24 px-4 sm:px-6 lg:px-8 bg-black/40">
             <div className="container max-w-5xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
