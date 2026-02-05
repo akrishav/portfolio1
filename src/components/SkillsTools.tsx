@@ -6,40 +6,42 @@ import {
     Trello,
     Database,
     BarChart,
-    MessageSquare,
     Slack,
     Globe,
-    Terminal,
     Zap,
-    Layout
+    Layout,
+    Activity,
+    LineChart
 } from "lucide-react";
 
 // Lucide doesn't have all specific brand logos so I'll use generic approximations or existing ones
 // Figma -> Figma
 // Jira -> Trello (closest generic)
 // SQL -> Database
-// Mixpanel/Amplitude -> BarChart
+// Mixpanel -> BarChart
+// Google Analytics -> Activity
+// Amplitude -> LineChart
 // Notion -> Layout
 // Slack -> Slack
-// Postman -> Globe/Terminal
+// Postman -> Globe
 // Optimizely -> Zap
 
 const skillCategories = [
     {
         title: "Product Thinking",
-        skills: ["User Research", "Roadmapping", "PRD Writing", "Prioritization"]
+        skills: ["0→1 Product Development", "User Research & Validation", "PRD & Spec Writing", "Product Strategy & Roadmapping", "Problem Definition & Prioritization", "Feature Scoping & Trade-offs"]
     },
     {
         title: "Execution & Delivery",
-        skills: ["Agile/Scrum", "Sprint Planning", "A/B Testing", "QA Testing"]
+        skills: ["Agile/Scrum Methodologies", "Cross-functional Leadership", "Release Planning & QA", "Sprint Planning & Execution", "Stakeholder Management", "Technical Feasibility Assessment"]
     },
     {
         title: "Analytics & Data",
-        skills: ["SQL Queries", "Funnel Analysis", "Cohort Retention", "Data Viz"]
+        skills: ["SQL & Data Analysis", "Funnel Analysis & Metrics", "Dashboard Design", "A/B Testing & Experimentation", "User Behavior Analytics", "Data-driven Decision Making"]
     },
     {
-        title: "Collaboration",
-        skills: ["Stakeholder Mgmt", "Workshop Facilitation", "Tech Specs", "Mentorship"]
+        title: "Collaboration & Communication",
+        skills: ["Engineering Partnership", "Customer Interviews", "Documentation & Knowledge Sharing", "Design Collaboration", "Executive Presentations", "Conflict Resolution"]
     }
 ];
 
@@ -48,19 +50,30 @@ const tools = [
     { name: "Jira", icon: Trello, color: "text-blue-500" },
     { name: "SQL", icon: Database, color: "text-slate-300" },
     { name: "Mixpanel", icon: BarChart, color: "text-indigo-400" },
+    { name: "Google Analytics", icon: Activity, color: "text-yellow-500" },
+    { name: "Amplitude", icon: LineChart, color: "text-teal-400" },
     { name: "Notion", icon: Layout, color: "text-white" },
     { name: "Slack", icon: Slack, color: "text-emerald-400" },
     { name: "Postman", icon: Globe, color: "text-orange-500" },
-    { name: "Optimizely", icon: Zap, color: "text-yellow-400" },
+    { name: "Optimizely", icon: Zap, color: "text-blue-400" },
 ];
 
 export default function SkillsTools() {
     return (
         <section className="py-24 px-4 sm:px-6 lg:px-8">
             <div className="container max-w-6xl mx-auto">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="text-center mb-16"
+                >
+                    <h2 className="text-3xl md:text-5xl font-bold mb-4">Skills & Tools</h2>
+                    <p className="text-muted">Battle-tested capabilities used to ship real products at scale</p>
+                </motion.div>
 
                 {/* Skills Grid */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
+                <div className="grid md:grid-cols-2 gap-6 mb-24">
                     {skillCategories.map((category, index) => (
                         <motion.div
                             key={index}
@@ -68,17 +81,27 @@ export default function SkillsTools() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1 }}
-                            className="p-6 rounded-2xl bg-white/5 border border-glass-border hover:border-primary/50 transition-colors"
+                            className="p-8 rounded-3xl bg-white/5 border border-glass-border hover:border-primary/50 transition-colors"
                         >
-                            <h3 className="text-lg font-bold mb-4 text-primary">{category.title}</h3>
-                            <ul className="space-y-2">
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="p-3 rounded-xl bg-primary/20 text-primary">
+                                    {/* Icons based on category index for visual distinction */}
+                                    {index === 0 && <Zap className="w-6 h-6" />}
+                                    {index === 1 && <Trello className="w-6 h-6" />}
+                                    {index === 2 && <BarChart className="w-6 h-6" />}
+                                    {index === 3 && <Slack className="w-6 h-6" />}
+                                </div>
+                                <h3 className="text-xl font-bold text-white">{category.title}</h3>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
                                 {category.skills.map(skill => (
-                                    <li key={skill} className="flex items-center gap-2 text-sm text-slate-300">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-secondary" />
+                                    <div key={skill} className="flex items-center gap-2 text-sm text-slate-300">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/70 flex-shrink-0" />
                                         {skill}
-                                    </li>
+                                    </div>
                                 ))}
-                            </ul>
+                            </div>
                         </motion.div>
                     ))}
                 </div>
@@ -90,19 +113,17 @@ export default function SkillsTools() {
                     viewport={{ once: true }}
                     className="text-center"
                 >
-                    <h3 className="text-2xl font-bold mb-10">Tools I Use Daily</h3>
+                    <h3 className="text-2xl font-bold mb-10">Toolbelt</h3>
 
-                    <div className="flex flex-wrap justify-center gap-8 max-w-4xl mx-auto">
+                    <div className="flex flex-wrap justify-center gap-4 md:gap-6 max-w-5xl mx-auto">
                         {tools.map((tool, index) => (
                             <motion.div
                                 key={index}
-                                whileHover={{ scale: 1.1, y: -5 }}
-                                className="flex flex-col items-center gap-3 group"
+                                whileHover={{ scale: 1.05 }}
+                                className="flex items-center gap-3 px-5 py-3 rounded-xl bg-white/5 border border-glass-border hover:bg-white/10 transition-colors"
                             >
-                                <div className={`p-5 rounded-2xl bg-white/5 border border-glass-border group-hover:bg-white/10 group-hover:border-primary/30 transition-all ${tool.color}`}>
-                                    <tool.icon className="w-8 h-8" />
-                                </div>
-                                <span className="text-xs font-medium text-slate-400 group-hover:text-white transition-colors">
+                                <tool.icon className={`w-5 h-5 ${tool.color}`} />
+                                <span className="text-sm font-medium text-slate-200">
                                     {tool.name}
                                 </span>
                             </motion.div>

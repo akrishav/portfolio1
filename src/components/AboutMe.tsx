@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { User, Heart, Globe, Book, Languages } from "lucide-react";
-import Image from "next/image";
+
 
 export default function AboutMe() {
     return (
@@ -26,11 +26,13 @@ export default function AboutMe() {
                             <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent z-10" />
 
                             {/* Placeholder for About Image */}
-                            <Image
-                                src="/travel-world.png"
-                                alt="Travel Adventures"
-                                fill
-                                className="object-cover"
+                            <video
+                                src="/travel-video-new.mp4"
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                className="object-cover w-full h-full"
                             />
 
                             {/* Floating Cards */}

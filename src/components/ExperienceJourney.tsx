@@ -7,25 +7,40 @@ const experiences = [
     {
         company: "B&B Gastro",
         role: "Product Manager",
-        period: "Jan 2024 - Present",
-        description: "Leading the product vision for restaurant management solutions. Focused on scaling operations and improving user retention.",
-        metrics: ["Increased checkout speed by 20%", "Reduced manual review time by 30%"],
+        period: "2022 - Present",
+        category: "Restaurant Management SaaS",
+        description: "Leading product development for a comprehensive restaurant management platform serving multi-outlet chains",
+        metrics: [
+            "Launched analytics dashboard improving multi-outlet visibility by 34%",
+            "Automated workflow processes increasing service efficiency by 42%",
+            "Drove supply chain optimization boosting efficiency by 12%"
+        ],
         tags: ["SaaS", "Hospitality", "Product Strategy"]
     },
     {
         company: "Media.net",
-        role: "Senior Associate PM",
-        period: "Jun 2022 - Dec 2023",
-        description: "Optimized ad-tech algorithms to maximize revenue per session. Collaborated with engineering to reduce latency by 15%.",
-        metrics: ["Launched analytics dashboard", "Improved multi-outlet visibility by 34%"],
+        role: "Senior Associate Product Manager",
+        period: "2020 - 2022",
+        category: "AdTech Platform",
+        description: "Managed ad targeting and analytics products for a leading contextual advertising platform",
+        metrics: [
+            "Enhanced data precision in ad targeting by 21%",
+            "Reduced manual review time by 30% through ML integration",
+            "Shipped features impacting 500K+ daily active users"
+        ],
         tags: ["AdTech", "Algorithms", "Optimization"]
     },
     {
         company: "GoodMinds",
-        role: "Associate PM",
-        period: "Aug 2021 - May 2022",
-        description: "Launched the MVP for a mental wellness platform. Grew user base to 10k+ within the first 6 months.",
-        metrics: ["Achieved 4.8 App Store Rating", "Grew DAU by 300%"],
+        role: "Associate Product Manager",
+        period: "2019 - 2020",
+        category: "0→1 Consumer Startup",
+        description: "Built consumer-facing mental wellness products from ground up",
+        metrics: [
+            "Launched MVP serving 50K+ users in first 6 months",
+            "Designed onboarding flow with 65% completion rate",
+            "Established product analytics framework from scratch"
+        ],
         tags: ["Consumer App", "Mental Health", "MVP"]
     }
 ];
@@ -41,7 +56,7 @@ export default function ExperienceJourney() {
                     className="text-center mb-16"
                 >
                     <h2 className="text-3xl md:text-5xl font-bold mb-4">Experience Journey</h2>
-                    <p className="text-muted">A timeline of my professional growth.</p>
+                    <p className="text-muted">4.5+ years building products across B2B SaaS, AdTech, and 0→1 consumer startups</p>
                 </motion.div>
 
                 <div className="relative border-l border-glass-border ml-4 md:ml-12 space-y-12">
@@ -62,9 +77,14 @@ export default function ExperienceJourney() {
                                     <h3 className="text-2xl font-bold text-white group-hover:text-primary transition-colors">
                                         {exp.company}
                                     </h3>
-                                    <div className="flex items-center gap-2 text-primary font-medium mt-1">
-                                        <Briefcase className="w-4 h-4" />
-                                        <span>{exp.role}</span>
+                                    <div className="flex flex-col gap-2 mt-1">
+                                        <div className="flex items-center gap-2 text-primary font-medium">
+                                            <Briefcase className="w-4 h-4" />
+                                            <span>{exp.role}</span>
+                                        </div>
+                                        <span className="inline-block px-3 py-1 rounded-full border border-glass-border bg-glass-bg text-xs text-muted w-fit">
+                                            {exp.category}
+                                        </span>
                                     </div>
                                 </div>
                                 <span className="text-sm font-mono text-muted bg-white/5 px-3 py-1 rounded-full whitespace-nowrap">
@@ -72,25 +92,20 @@ export default function ExperienceJourney() {
                                 </span>
                             </div>
 
-                            <p className="text-slate-300 mb-4 leading-relaxed max-w-2xl">
+                            <p className="text-slate-300 mb-4 leading-relaxed max-w-2xl mt-4">
                                 {exp.description}
                             </p>
 
-                            <ul className="mb-4 space-y-1">
-                                {exp.metrics && exp.metrics.map((metric, i) => (
-                                    <li key={i} className="text-sm text-slate-400 flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-secondary/70"></span>
-                                        {metric}
-                                    </li>
-                                ))}
-                            </ul>
-
-                            <div className="flex flex-wrap gap-2">
-                                {exp.tags.map((tag, i) => (
-                                    <span key={i} className="text-xs font-semibold px-3 py-1 rounded-full border border-glass-border bg-glass-bg text-muted">
-                                        {tag}
-                                    </span>
-                                ))}
+                            <div className="mb-4">
+                                <h4 className="text-sm font-semibold text-primary mb-2">Key Achievements:</h4>
+                                <ul className="space-y-1">
+                                    {exp.metrics && exp.metrics.map((metric, i) => (
+                                        <li key={i} className="text-sm text-slate-400 flex items-start gap-2">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-secondary/70 mt-1.5 flex-shrink-0"></span>
+                                            {metric}
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
                         </motion.div>
                     ))}
