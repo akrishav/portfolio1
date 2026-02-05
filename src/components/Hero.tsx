@@ -31,7 +31,7 @@ export default function Hero() {
                     </motion.div>
 
                     <h1 className="text-5xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight">
-                        Ashish <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Rishav</span>
+                        Ashish <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent pb-2 pr-2">Rishav</span>
                     </h1>
 
                     <h2 className="text-xl lg:text-2xl text-muted font-light mb-8">

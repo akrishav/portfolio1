@@ -70,7 +70,7 @@ export default function AboutMe() {
 
                         <h2 className="text-3xl md:text-5xl font-bold mb-6">
                             More than just a <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Product Manager</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent pb-1 pr-1">Product Manager</span>
                         </h2>
 
                         <div className="space-y-6 text-lg text-slate-300 leading-relaxed">
