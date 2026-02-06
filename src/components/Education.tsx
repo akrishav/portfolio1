@@ -1,98 +1,113 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { GraduationCap, Calendar } from "lucide-react";
+import { GraduationCap, Award, ArrowUpRight } from "lucide-react";
 
 const educationData = [
     {
-        degree: "MS (Data Science)",
+        degree: "MS in Data Science",
         institution: "University of Europe",
         year: "2025",
         grade: "7.9 CGPA",
-        description: "Specialized in Machine Learning, Statistical Analysis, and Big Data Technologies."
+        description: "Specialized in Machine Learning, Statistical Analysis, and Big Data Technologies.",
+        tags: ["Machine Learning", "Big Data", "Statistics"]
     },
     {
-        degree: "B.Tech (Computer Science)",
+        degree: "B.Tech in Computer Science",
         institution: "Rajasthan Technical University",
         year: "2020",
         grade: "7.8 CGPA",
-        description: "Foundation in Computer Science, Algorithms, Data Structures, and Software Engineering."
+        description: "Foundation in Computer Science, Algorithms, Data Structures, and Software Engineering.",
+        tags: ["Algorithms", "Software Engineering", "Data Structures"]
     }
 ];
 
 export default function Education() {
     return (
         <section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            {/* Background decoration */}
-            <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+            {/* Subtle background glow */}
+            <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
-            <div className="container max-w-3xl mx-auto">
+            <div className="container max-w-4xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="text-center mb-16"
+                    className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6"
                 >
-                    <h2 className="text-3xl md:text-5xl font-bold mb-4">Education</h2>
-                    <p className="text-muted">Academic background and qualifications</p>
+                    <div>
+                        <h2 className="text-3xl md:text-5xl font-bold mb-4">Education</h2>
+                        <p className="text-muted text-lg">Academic background & qualifications</p>
+                    </div>
+
+                    <div className="h-px bg-glass-border flex-1 mx-8 hidden md:block" />
+
+                    <div className="flex items-center gap-2 text-primary/80 font-mono text-sm">
+                        <span>2 DEGREES EARNED</span>
+                        <Award className="w-4 h-4" />
+                    </div>
                 </motion.div>
 
-                <div className="relative pl-8 md:pl-0">
-                    {/* Vertical Timeline Line */}
-                    <div className="absolute left-0 md:left-1/2 top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-glass-border to-transparent hidden md:block" />
-                    <div className="absolute left-[7px] top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-glass-border to-transparent md:hidden" />
+                <div className="space-y-6">
+                    {educationData.map((edu, index) => (
+                        <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: index * 0.1 }}
+                            className="group relative p-8 md:p-10 rounded-3xl bg-glass-bg border border-glass-border hover:border-primary/30 transition-all duration-500 overflow-hidden"
+                        >
+                            {/* Hover Gradient */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                    <div className="space-y-12">
-                        {educationData.map((edu, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.2 }}
-                                className={`relative flex flex-col md:flex-row gap-8 ${index % 2 === 0 ? "md:flex-row-reverse" : ""
-                                    }`}
-                            >
-                                {/* Timeline Dot */}
-                                <div className="absolute left-0 md:left-1/2 top-0 w-4 h-4 rounded-full border-2 border-primary bg-background shadow-[0_0_10px_rgba(124,58,237,0.5)] transform -translate-x-[5px] md:-translate-x-1/2 z-10" />
+                            {/* Watermark Year */}
+                            <div className="absolute right-0 top-0 -translate-y-1/2 translate-x-1/4 text-[12rem] md:text-[15rem] font-bold text-white/[0.02] group-hover:text-white/[0.04] transition-colors pointer-events-none select-none leading-none">
+                                {edu.year}
+                            </div>
 
-                                {/* Content Side */}
-                                <div className="flex-1 w-full md:w-1/2">
-                                    <div className={`p-6 rounded-2xl bg-white/5 border border-glass-border hover:border-primary/30 transition-all duration-300 relative group overflow-hidden ${index % 2 === 0 ? "md:text-left" : "md:text-right"
-                                        }`}>
-                                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="relative z-10 grid md:grid-cols-[1fr_auto] gap-6 items-start">
+                                <div>
+                                    <div className="flex flex-wrap items-center gap-3 mb-4">
+                                        <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-slate-300 backdrop-blur-sm">
+                                            {edu.year}
+                                        </span>
+                                        <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-xs font-medium text-amber-400 backdrop-blur-sm flex items-center gap-1.5">
+                                            <Award className="w-3 h-3" />
+                                            {edu.grade}
+                                        </span>
+                                    </div>
 
-                                        <div className={`flex items-center gap-3 mb-3 text-primary ${index % 2 === 0 ? "flex-row" : "md:flex-row-reverse"
-                                            }`}>
-                                            <Calendar className="w-4 h-4" />
-                                            <span className="text-sm font-mono tracking-wider">{edu.year}</span>
-                                        </div>
+                                    <h3 className="text-3xl md:text-4xl font-bold text-white mb-2 group-hover:text-primary transition-colors">
+                                        {edu.degree}
+                                    </h3>
 
-                                        <h3 className="text-xl md:text-2xl font-bold text-white mb-1 group-hover:text-primary transition-colors">
-                                            {edu.degree}
-                                        </h3>
+                                    <p className="text-lg text-primary/80 font-medium mb-6 flex items-center gap-2">
+                                        <GraduationCap className="w-5 h-5" />
+                                        {edu.institution}
+                                    </p>
 
-                                        <p className="text-lg text-slate-300 font-medium mb-3">
-                                            {edu.institution}
-                                        </p>
+                                    <p className="text-slate-400 leading-relaxed max-w-2xl mb-6">
+                                        {edu.description}
+                                    </p>
 
-                                        <p className="text-sm text-muted leading-relaxed mb-4">
-                                            {edu.description}
-                                        </p>
-
-                                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-xs font-semibold text-primary ${index % 2 === 0 ? "mr-auto" : "md:ml-auto"
-                                            }`}>
-                                            <GraduationCap className="w-3.5 h-3.5" />
-                                            <span>Grade: {edu.grade}</span>
-                                        </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {edu.tags.map((tag, i) => (
+                                            <span key={i} className="text-sm text-muted/60 font-mono">
+                                                #{tag}
+                                            </span>
+                                        ))}
                                     </div>
                                 </div>
 
-                                {/* Spacer Side - to balance the grid on desktop */}
-                                <div className="flex-1 hidden md:block" />
-                            </motion.div>
-                        ))}
-                    </div>
+                                <div className="hidden md:flex flex-col items-end justify-between h-full">
+                                    <div className="p-3 rounded-full bg-white/5 text-white/50 group-hover:bg-primary group-hover:text-white transition-all duration-300 transform group-hover:-rotate-45">
+                                        <ArrowUpRight className="w-6 h-6" />
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
                 </div>
             </div>
         </section>
