@@ -236,7 +236,7 @@ export default function CaseStudies() {
                                                     <div className="grid md:grid-cols-2 gap-4">
                                                         {project.impact_stats.map((stat, i) => (
                                                             <div key={i} className="flex items-start gap-3">
-                                                                <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0 mt-2" />
+                                                                <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0 mt-1.5" />
                                                                 <p className="text-white font-medium">{stat}</p>
                                                             </div>
                                                         ))}
