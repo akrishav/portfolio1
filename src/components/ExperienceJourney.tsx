@@ -7,7 +7,7 @@ const experiences = [
     {
         company: "B&B Gastro",
         role: "Product Manager",
-        period: "2022 - Present",
+        period: "Sep 2024 - Present",
         category: "Restaurant Management SaaS",
         description: "Leading product development for a comprehensive restaurant management platform serving multi-outlet chains",
         metrics: [
@@ -19,8 +19,8 @@ const experiences = [
     },
     {
         company: "Media.net",
-        role: "Senior Associate Product Manager",
-        period: "2020 - 2022",
+        role: "Associate Product Manager",
+        period: "Feb 2021 - July 2024",
         category: "AdTech Platform",
         description: "Managed ad targeting and analytics products for a leading contextual advertising platform",
         metrics: [
@@ -32,8 +32,8 @@ const experiences = [
     },
     {
         company: "GoodMinds",
-        role: "Associate Product Manager",
-        period: "2019 - 2020",
+        role: "Co-Founder & Product Lead",
+        period: "Mar 2019 - Dec 2020",
         category: "0→1 Consumer Startup",
         description: "Built consumer-facing mental wellness products from ground up",
         metrics: [
@@ -42,6 +42,18 @@ const experiences = [
             "Established product analytics framework from scratch"
         ],
         tags: ["Consumer App", "Mental Health", "MVP"]
+    },
+    {
+        company: "Moodcafe",
+        role: "Summer Internship (Product Analyst)",
+        period: "Mar 2019 - Aug 2019",
+        category: "Mental Health App",
+        description: "Conducted UX research and experimentation for a mental health app.",
+        metrics: [
+            "Enhanced onboarding journeys through UX research with 1,000+ users",
+            "Raised retention by 20% by establishing automated CRM workflows"
+        ],
+        tags: ["UX Research", "Analytics", "Growth"]
     }
 ];
 
