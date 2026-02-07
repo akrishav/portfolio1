@@ -82,7 +82,7 @@ export default function ExperienceJourney() {
                             className="relative pl-8 md:pl-12 group"
                         >
                             {/* Timeline Dot */}
-                            <div className="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-background group-hover:bg-accent transition-colors" />
+                            <div className="absolute -left-[5px] top-3 w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-background group-hover:bg-accent transition-colors" />
 
                             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-2">
                                 <div>
@@ -99,7 +99,7 @@ export default function ExperienceJourney() {
                                         </span>
                                     </div>
                                 </div>
-                                <span className="text-sm font-mono text-muted bg-white/5 px-3 py-1 rounded-full whitespace-nowrap">
+                                <span className="text-sm font-mono text-muted bg-white/5 px-3 py-1 rounded-full whitespace-nowrap mt-1">
                                     {exp.period}
                                 </span>
                             </div>
