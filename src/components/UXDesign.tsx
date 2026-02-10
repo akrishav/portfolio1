@@ -12,7 +12,7 @@ export default function UXDesign() {
     const [activeMedia, setActiveMedia] = useState<{ type: 'video' | 'image', src: string } | null>(null);
 
     // Show only the first 1 project on the home page
-    const displayedProjects = uxProjects;
+    const displayedProjects = uxProjects.slice(0, 1);
 
     const getYouTubeEmbedUrl = (url: string) => {
         if (!url) return null;

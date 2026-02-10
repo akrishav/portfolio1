@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowLeft, Play, X, User, Maximize2 } from "lucide-react";
+import { ArrowLeft, Play, X, User, Maximize2, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -79,6 +79,15 @@ export default function ProjectPage() {
                         <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
                             {project.description}
                         </p>
+                        <div className="pt-8 flex justify-center">
+                            <button
+                                className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white text-black hover:bg-purple-50 transition-all font-medium"
+                                onClick={() => window.open(project.link || "https://bounce-fluid-02802409.figma.site", "_blank")}
+                            >
+                                View Figma Prototype
+                                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </button>
+                        </div>
                     </motion.div>
 
                     {/* Video Player */}
