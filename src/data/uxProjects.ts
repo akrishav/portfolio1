@@ -36,7 +36,7 @@ export const uxProjects = [
         tags: ["UX Research", "Mobile App"],
         cover: "/goodbrainy/cover.png",
         video: "https://youtu.be/OFKfGL-670E",
-        link: "https://bounce-fluid-02802409.figma.site",
+        link: "https://badger-broil-08935021.figma.site",
         screens: [
             { src: "/goodbrainy/screen3.png", alt: "Splash Screen" },
             { src: "/goodbrainy/screen1.png", alt: "Welcome Screen" },
