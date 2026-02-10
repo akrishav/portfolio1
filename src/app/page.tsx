@@ -7,6 +7,7 @@ import Hero from "@/components/Hero";
 import ImpactSnapshot from "@/components/ImpactSnapshot";
 import ExperienceJourney from "@/components/ExperienceJourney";
 import CaseStudies from "@/components/CaseStudies";
+import UXDesign from "@/components/UXDesign";
 import Education from "@/components/Education";
 import SkillsTools from "@/components/SkillsTools";
 import AboutMe from "@/components/AboutMe";
@@ -19,6 +20,7 @@ export default function Home() {
       <ImpactSnapshot />
       <ExperienceJourney />
       <CaseStudies />
+      <UXDesign />
       <Education />
       <SkillsTools />
       <AboutMe />
