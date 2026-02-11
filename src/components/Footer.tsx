@@ -38,7 +38,7 @@ export default function Footer() {
                         </a>
 
                         <a
-                            href="https://drive.google.com/file/d/1zB13tY35H-LgRj-La7rhtZVe7VAuwAng/view?usp=sharing"
+                            href="https://drive.google.com/file/d/1WrCFyG4m3jG4V7dDVO-mYSN6CJIE-lfF/view?usp=sharing"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-8 py-4 rounded-full border border-glass-border bg-glass-bg hover:bg-white/5 text-white font-semibold transition-all flex items-center gap-2"
