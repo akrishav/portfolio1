@@ -18,7 +18,7 @@ export const caseStudies: CaseStudy[] = [
     {
         id: "restaurant-saas",
         title: "Restaurant SaaS Transformation",
-        company: "B&B Gastro",
+        company: "Gastronovi",
         subtitle: "Scaling multi-outlet restaurant operations through intelligent automation",
         problem: "Restaurant chains struggled with fragmented data across outlets, manual workflows, and lack of real-time visibility into operations and inventory.",
         context: "Operating in a competitive F&B tech market with limited engineering resources. Needed to balance feature velocity with technical debt while serving 100+ restaurant chains.",

@@ -5,7 +5,7 @@ import { Briefcase } from "lucide-react";
 
 const experiences = [
     {
-        company: "B&B Gastro",
+        company: "Gastronovi",
         role: "Product Manager",
         period: "Sep 2024 - Present",
         category: "Restaurant Management SaaS",
