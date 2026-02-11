@@ -52,7 +52,7 @@ export default function Hero() {
                             <Sparkles className="w-4 h-4" />
                         </a>
                         <a
-                            href="https://drive.google.com/file/d/1VUoZWX-OZ8wk33UR9S7UsHcLACMLi5l8/view?usp=sharing"
+                            href="https://drive.google.com/file/d/1rBtAu6a3M6rS74d1fahEd-4ZPkZr_Ey2/view?usp=sharing"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-8 py-4 border border-glass-border bg-glass-bg hover:bg-white/5 text-white rounded-full font-semibold transition-all backdrop-blur-md flex items-center justify-center gap-2"
