@@ -22,38 +22,44 @@ const experiences = [
     {
         company: "Media.net",
         role: "Associate Product Manager",
-        period: "Feb 2021 - July 2024",
-        category: "AdTech Platform",
-        description: "Managed ad targeting and analytics products for a leading contextual advertising platform",
+        period: "Feb 2021 – Jul 2024",
+        category: "AdTech Platform | Bangalore, India",
+        description: "Managed ad targeting, algorithmic categorization, and analytics products for a leading contextual advertising platform.",
         metrics: [
-            "Enhanced data precision in ad targeting by 21%",
-            "Reduced manual review time by 30% through ML integration",
-            "Shipped features impacting 500K+ daily active users"
+            "Drove 2% revenue growth and boosted data precision by 21% by mapping 500K+ ad URLs, enhancing contextual ad-targeting",
+            "Cut manual review time by 30% by designing and automating image/video classification workflows",
+            "Optimized ad-matching by 18% across key categories by analyzing 100K+ high-revenue keywords to refine algorithm-targeting",
+            "Improved supply efficiency by 12% by identifying 8 under-utilized monetization funnels through custom Power BI dashboards"
         ],
         tags: ["AdTech", "Algorithms", "Optimization"]
     },
     {
         company: "GoodMinds",
         role: "Co-Founder & Product Lead",
-        period: "Mar 2019 - Dec 2020",
-        category: "0→1 Consumer Startup",
-        description: "Built consumer-facing mental wellness products from ground up",
+        period: "Mar 2019 – Dec 2020",
+        category: "0→1 Consumer Startup | Bangalore, India",
+        description: "Co-founded and scaled a video-first learning platform summarizing key non-fiction insights.",
         metrics: [
-            "Launched MVP serving 50K+ users in first 6 months",
-            "Designed onboarding flow with 65% completion rate",
-            "Established product analytics framework from scratch"
+            "Validated early demand (5K+ views, 340 subscribers in <30 days) by creating a 0→1 MVP and testing it via YouTube",
+            "Defined product-market fit strategy by analyzing 20+ global competitors",
+            "Managed end-to-end product roadmap, aligning development resources with immediate market feedback",
+            "Led research with 200+ users, identifying core value propositions in learning & habit formation",
+            "Optimized YouTube ad performance (CPV ↓ to ₹0.7) through funnel optimization"
         ],
-        tags: ["Consumer App", "Mental Health", "MVP"]
+        tags: ["Consumer App", "EdTech", "MVP"]
     },
     {
         company: "Moodcafe",
-        role: "Summer Internship (Product Analyst)",
-        period: "Mar 2019 - Aug 2019",
-        category: "Mental Health App",
-        description: "Conducted UX research and experimentation for a mental health app.",
+        role: "Product Analyst (Internship)",
+        period: "Mar 2019 – Aug 2019",
+        category: "Mental Health App | Ahmedabad, India",
+        description: "Conducted UX research, prototyping, and acquisition experiments for a mental health platform (conferred PPO).",
         metrics: [
-            "Enhanced onboarding journeys through UX research with 1,000+ users",
-            "Raised retention by 20% by establishing automated CRM workflows"
+            "Enhanced onboarding and mental-health journeys through UX research with 1,000+ users",
+            "Raised retention by 20% by establishing automated CRM workflows and funnels",
+            "Lowered drop-offs by 22% by creating Balsamiq prototypes leveraging behavioral psychology",
+            "Reduced CAC by 30% by executing 19-channel acquisition experiments",
+            "Amplified organic discovery by 25% via SEO using Moz, SEMrush, and Ubersuggest"
         ],
         tags: ["UX Research", "Analytics", "Growth"]
     }

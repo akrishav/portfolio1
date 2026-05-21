@@ -50,7 +50,7 @@ export const caseStudies: CaseStudy[] = [
         id: "adtech-intelligence",
         title: "AdTech Intelligence Platform",
         company: "Media.net",
-        subtitle: "Enhancing contextual ad targeting through ML-driven precision",
+        subtitle: "Enhancing contextual ad targeting through ML-driven precision | Bangalore, India",
         problem: "Manual ad review processes created bottlenecks. Ad targeting lacked precision, leading to poor campaign performance and advertiser churn.",
         context: "Large-scale AdTech platform serving 500K+ users daily. Competing with Google/Facebook required differentiation through contextual intelligence.",
         decisions: [
@@ -65,10 +65,10 @@ export const caseStudies: CaseStudy[] = [
             "Established SLA monitoring and alerting systems"
         ],
         impact_stats: [
-            "+21% improvement in data precision for ad targeting",
-            "-30% reduction in manual review time",
-            "Decreased ad rejection rate by 18%",
-            "Improved campaign ROI for advertisers by 15%"
+            "Drove 2% revenue growth and boosted data precision by 21% by mapping 500K+ ad URLs",
+            "Cut manual review time by 30% by designing and automating image/video classification workflows",
+            "Optimized ad-matching by 18% across key categories by analyzing 100K+ high-revenue keywords",
+            "Improved supply efficiency by 12% by identifying 8 under-utilized monetization funnels"
         ],
         learnings: [
             "ML models need constant monitoring and retraining in production",
@@ -82,7 +82,7 @@ export const caseStudies: CaseStudy[] = [
         id: "goodminds-video",
         title: "GoodMinds: Video Book Platform",
         company: "GoodMinds",
-        subtitle: "Video Book Platform | 0→1 MVP",
+        subtitle: "Video Book Platform | 0→1 MVP | Bangalore, India",
         problem: "Readers struggle to finish non-fiction books due to time constraints, leading to low completion rates and lost knowledge.",
         context: "Co-founded a video-first learning platform to summarize key insights from books into engaging visual formats.",
         decisions: [
@@ -96,10 +96,10 @@ export const caseStudies: CaseStudy[] = [
             "Led research with 200+ users to identify learning habits"
         ],
         impact_stats: [
-            "Validated early demand with 5K+ views",
-            "Acquired 340 subscribers in <30 days",
-            "Minimized YouTube ad performance (CPV down to ₹0.7)",
-            "Defined product-market fit strategy by analyzing 20+ competitors"
+            "Validated early demand (5K+ views, 340 subscribers in <30 days) by creating a 0→1 MVP and testing it via YouTube",
+            "Defined product-market fit strategy by analyzing 20+ global competitors",
+            "Managed end-to-end product roadmap aligning development with immediate feedback",
+            "Optimized YouTube ad performance (CPV ↓ to ₹0.7) through funnel optimization"
         ],
         learnings: [
             "Video content drives higher engagement/retention than text",
@@ -113,7 +113,7 @@ export const caseStudies: CaseStudy[] = [
         id: "moodcafe",
         title: "Moodcafe: Mental Wellness App",
         company: "Moodcafe",
-        subtitle: "Mental Health App | 0→1",
+        subtitle: "Mental Health App | 0→1 | Ahmedabad, India",
         problem: "Mental wellness stigma prevented users from seeking help. Existing solutions were expensive, clinical, and lacked accessibility.",
         context: "Internship at a mental health startup. Focused on improving onboarding and retention through UX research and experimentation.",
         decisions: [
@@ -127,10 +127,11 @@ export const caseStudies: CaseStudy[] = [
             "Optimized landing pages for organic traffic conversion"
         ],
         impact_stats: [
-            "Enhanced onboarding journeys through UX research with 1,000+ users",
-            "Raised retention by 20% by establishing automated CRM workflows",
-            "Lowered drop-offs by 22% by creating Balsamiq prototypes",
-            "Reduced CAC by 30% by executing 19-channel acquisition experiments"
+            "Enhanced onboarding and mental-health journeys through UX research with 1,000+ users",
+            "Raised retention by 20% by establishing automated CRM workflows and funnels",
+            "Lowered drop-offs by 22% by creating Balsamiq prototypes leveraging behavioral psychology",
+            "Reduced CAC by 30% by executing 19-channel acquisition experiments",
+            "Amplified organic discovery by 25% via SEO using Moz, SEMrush, and Ubersuggest"
         ],
         learnings: [
             "Trust is the most critical currency in mental health products",
