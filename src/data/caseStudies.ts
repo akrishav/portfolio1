@@ -16,36 +16,35 @@ export interface CaseStudy {
 
 export const caseStudies: CaseStudy[] = [
     {
-        id: "restaurant-saas",
-        title: "Restaurant SaaS Transformation",
-        company: "Gastronovi",
-        subtitle: "Scaling multi-outlet restaurant operations through intelligent automation",
-        problem: "Restaurant chains struggled with fragmented data across outlets, manual workflows, and lack of real-time visibility into operations and inventory.",
-        context: "Operating in a competitive F&B tech market with limited engineering resources. Needed to balance feature velocity with technical debt while serving 100+ restaurant chains.",
+        id: "faktoros-saas",
+        title: "Agentic-AI Ad Platform (0→1)",
+        company: "FaktorOS",
+        subtitle: "Designing a compliant, patent-pending agentic advertising platform that leverages real-time decision frameworks.",
+        problem: "Ad agencies and enterprise brands wanted to utilize autonomous AI agents to manage campaigns across networks, but faced severe CISO compliance hurdles around PII and lack of trust in agent behaviors.",
+        context: "Operating in a high-privacy regulation era. Shipped a 0→1 MVP across Meta, Google, and TikTok to 3 design partners with dual-tier monetization ($325 SME / $2,700 agency).",
         decisions: [
-            "Prioritized analytics dashboard over CRM features based on customer interviews",
-            "Built workflow automation engine to reduce manual overhead",
-            "Implemented modular architecture for faster feature deployment"
+            "Pivoted engineering resources toward cryptographically attested pause-reallocate systems rather than simple recommendations based on 12+ agency interviews",
+            "Decided to file a provisional patent (IN202631054993) on zero-retention orchestration to protect the core intellectual property of the agent framework",
+            "Established a dual-tier GTM pricing strategy of $325/month for SMEs and $2,700/month for agencies based on validation of a 30-60 day sales cycle"
         ],
         execution: [
-            "Created comprehensive PRDs with user flows and acceptance criteria",
-            "Set up analytics tracking for all critical user journeys",
-            "Ran A/B tests on onboarding flow to optimize activation",
-            "Established weekly sprint cycles with engineering and design"
+            "Led the 0→1 design and shipping of the Agentic Decision Framework featuring real-time budget pause-and-reallocate mechanics",
+            "Ran exhaustive compliance reviews with corporate CISOs to define zero-retention infrastructure requirements",
+            "Negotiated and secured signed Letters of Intent (LOIs) from 3 major design partners during early GTM campaigns"
         ],
         impact_stats: [
-            "+42% increase in service efficiency through automated workflows",
-            "+34% improvement in multi-outlet visibility via analytics dashboard",
-            "+12% boost in supply chain efficiency",
-            "Reduced customer support tickets by 25%"
+            "15–20% average ROAS lift for design partners using the Agentic Decision Framework",
+            "3 signed Letters of Intent (LOIs) secured during GTM validation",
+            "1 provisional patent filed on zero-retention orchestration (IN202631054993)",
+            "30–60 day sales cycle validated with dual-tier SME and agency pricing model"
         ],
         learnings: [
-            "Early customer validation prevents building wrong features",
-            "Incremental releases with strong analytics beat big-bang launches",
-            "Technical debt must be explicitly prioritized, not deferred indefinitely"
+            "CISO compliance is a primary, not secondary, adoption blocker for AI tools in enterprise AdTech",
+            "Active real-time agent control (such as attested pause-reallocate) drives higher performance and brand safety trust than static suggestion dashboards",
+            "Securing LOIs early is critical to validating pricing models and sales cycle lengths before a full public launch"
         ],
-        tags: ["SaaS", "UX Redesign", "B2B"],
-        gradient: "from-purple-500 to-indigo-500"
+        tags: ["Agentic AI", "AdTech", "SaaS", "GTM"],
+        gradient: "from-sky-500 to-violet-600"
     },
     {
         id: "adtech-intelligence",

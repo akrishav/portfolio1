@@ -5,17 +5,19 @@ import { Briefcase } from "lucide-react";
 
 const experiences = [
     {
-        company: "Gastronovi",
+        company: "FaktorOS",
         role: "Product Manager",
-        period: "Sep 2024 - Present",
-        category: "Restaurant Management SaaS",
-        description: "Leading product development for a comprehensive restaurant management platform serving multi-outlet chains",
+        period: "Sep 2024 – Apr 2026",
+        category: "Agentic-AI Ad Platform | Berlin, Germany",
+        description: "Led the 0→1 product development and compliance strategy for a privacy-first, agentic-AI advertising platform.",
         metrics: [
-            "Launched analytics dashboard improving multi-outlet visibility by 34%",
-            "Automated workflow processes increasing service efficiency by 42%",
-            "Drove supply chain optimization boosting efficiency by 12%"
+            "Ran 12+ agency interviews; identified CISO compliance as #1 adoption blocker, shaping zero-retention infrastructure roadmap",
+            "Filed provisional patent (IN202631054993) on zero-retention orchestration enabling compliant AI agents in AdTech",
+            "Led 0→1 Agentic-AI Ad Platform — shipped attested MVP across Meta, Google, TikTok to 3 design partners",
+            "Built Agentic Decision Framework with real-time monitoring and attested pause-reallocate — 15–20% ROAS lift",
+            "Defined GTM and dual-tier pricing ($325 SME / $2,700 agency) — validated 30–60 day sales cycle and secured 3 signed LOIs"
         ],
-        tags: ["SaaS", "Hospitality", "Product Strategy"]
+        tags: ["Agentic AI", "AdTech", "SaaS", "Product Strategy"]
     },
     {
         company: "Media.net",
