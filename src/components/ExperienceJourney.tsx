@@ -6,7 +6,7 @@ import { Briefcase } from "lucide-react";
 const experiences = [
     {
         company: "FaktorOS",
-        role: "Product Manager",
+        role: "0→1 Builder",
         period: "Sep 2024 – Apr 2026",
         category: "Agentic-AI Ad Platform | Berlin, Germany",
         description: "Led the 0→1 product development and compliance strategy for a privacy-first, agentic-AI advertising platform.",
