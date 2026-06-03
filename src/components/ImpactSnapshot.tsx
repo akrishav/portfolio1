@@ -6,44 +6,44 @@ import { TrendingUp, Users, Clock, Database, Eye, Zap } from "lucide-react";
 const stats = [
     {
         icon: Zap,
-        value: "+42%",
-        label: "Service Efficiency",
-        description: "Improved operational efficiency through workflow automation.",
+        value: "15-20%",
+        label: "Client ROAS Lift",
+        description: "Boosted advertising returns by building the FaktorOS Agentic Decision Framework with real-time optimization.",
         color: "text-yellow-400"
     },
     {
-        icon: Eye,
-        value: "+34%",
-        label: "Multi-outlet Visibility",
-        description: "Enhanced real-time tracking across multiple locations.",
+        icon: Users,
+        value: "+20%",
+        label: "User Retention",
+        description: "Raised product retention rate by establishing automated CRM workflows and funnels for mental health apps.",
         color: "text-blue-400"
     },
     {
         icon: Database,
         value: "+21%",
         label: "Data Precision",
-        description: "Improved accuracy in reporting and analytics for better decisions.",
+        description: "Enhanced contextual targeting accuracy at Media.net by programmatically mapping ad URLs.",
         color: "text-green-400"
     },
     {
         icon: Clock,
         value: "-30%",
         label: "Manual Review Time",
-        description: "Automated core processes to save hours of manual work.",
+        description: "Reduced hours of manual work by designing automated content classification pipelines.",
         color: "text-red-400"
     },
     {
         icon: TrendingUp,
         value: "+12%",
         label: "Supply Efficiency",
-        description: "Streamlined inventory and logistics management.",
+        description: "Streamlined publisher yield by identifying under-utilized monetization funnels via custom dashboards.",
         color: "text-purple-400"
     },
     {
-        icon: Users,
+        icon: Eye,
         value: "500K+",
-        label: "Users Impacted",
-        description: "Scalable solutions reaching a mass audience effectively.",
+        label: "Ad URLs Mapped",
+        description: "Classified and indexed high-revenue URLs to scale ad relevancy across key search queries.",
         color: "text-orange-400"
     }
 ];

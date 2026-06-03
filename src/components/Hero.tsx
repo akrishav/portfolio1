@@ -39,7 +39,7 @@ export default function Hero() {
                     </h2>
 
                     <p className="text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 mb-10 leading-relaxed">
-                        Data-driven Product Manager with over 4.5 years of experience across B2B SaaS, AdTech, and consumer products.
+                        Data-driven Product Manager with over 5 years of experience across B2B SaaS, AdTech, and consumer products.
                         I bridge the gap between user needs and business goals through data and empathy.
                     </p>
 

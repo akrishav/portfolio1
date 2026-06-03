@@ -76,7 +76,7 @@ export default function ExperienceJourney() {
                     className="text-center mb-16"
                 >
                     <h2 className="text-3xl md:text-5xl font-bold mb-4">Experience Journey</h2>
-                    <p className="text-muted">4.5+ years building products across B2B SaaS, AdTech, and 0→1 consumer startups</p>
+                    <p className="text-muted">5+ years building products across B2B SaaS, AdTech, and 0→1 consumer startups</p>
                 </motion.div>
 
                 <div className="relative border-l border-glass-border ml-4 md:ml-12 space-y-12">
