@@ -9,7 +9,7 @@ export default function CaseStudies() {
     const displayedCases = caseStudies.slice(0, 3);
 
     return (
-        <section id="case-studies" className="py-24 px-4 sm:px-6 lg:px-8 bg-transparent">
+        <section id="projects" className="py-24 px-4 sm:px-6 lg:px-8 bg-transparent">
             <div className="container max-w-5xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -17,7 +17,7 @@ export default function CaseStudies() {
                     viewport={{ once: true }}
                     className="text-center mb-16"
                 >
-                    <h2 className="text-3xl md:text-5xl font-bold mb-4 text-foreground">Case Studies</h2>
+                    <h2 className="text-3xl md:text-5xl font-bold mb-4 text-foreground">Projects</h2>
                     <p className="text-muted">Deep dives into product challenges, decisions, and measurable outcomes</p>
                 </motion.div>
 
@@ -175,7 +175,7 @@ export default function CaseStudies() {
                         href="/case-studies"
                         className="inline-flex items-center gap-3 px-10 py-5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-500 hover:to-teal-500 transition-all font-semibold text-lg shadow-lg hover:shadow-emerald-500/25 group"
                     >
-                        View All Case Studies
+                        View Case Studies Below
                         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>

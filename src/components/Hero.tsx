@@ -48,7 +48,7 @@ export default function Hero() {
 
                     <div className="flex flex-row flex-nowrap gap-2 sm:gap-4 justify-center lg:justify-start items-center w-full overflow-x-auto no-scrollbar py-1">
                         <a
-                            href="#case-studies"
+                            href="#projects"
                             className="flex-shrink-0 px-3 sm:px-6 py-2.5 sm:py-3.5 bg-primary hover:bg-primary/90 text-white rounded-full font-semibold text-[11px] sm:text-sm md:text-base transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] flex items-center justify-center gap-1 sm:gap-2 cursor-pointer"
                         >
                             View Projects
