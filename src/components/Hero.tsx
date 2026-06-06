@@ -8,7 +8,7 @@ export default function Hero() {
     return (
         <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 pt-20">
             {/* Background Glow Effects */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
 
             <div className="container max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
 
@@ -30,7 +30,7 @@ export default function Hero() {
                         </span>
                     </motion.div>
 
-                    <h1 className="text-5xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight">
+                    <h1 className="text-5xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight text-foreground">
                         Ashish <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent pb-2 pr-2">Rishav</span>
                     </h1>
 
@@ -38,7 +38,7 @@ export default function Hero() {
                         Data-driven | 0→1 & Scale
                     </h2>
 
-                    <p className="text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 mb-10 leading-relaxed">
+                    <p className="text-lg text-muted max-w-2xl mx-auto lg:mx-0 mb-10 leading-relaxed">
                         Data-driven Product Manager with over 5 years of experience across B2B SaaS, AdTech, and consumer products.
                         I bridge the gap between user needs and business goals through data and empathy.
                     </p>
@@ -46,7 +46,7 @@ export default function Hero() {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                         <a
                             href="#case-studies"
-                            className="px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-full font-semibold transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.5)] flex items-center justify-center gap-2"
+                            className="px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-full font-semibold transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] flex items-center justify-center gap-2"
                         >
                             View Case Studies
                             <Sparkles className="w-4 h-4" />
@@ -55,7 +55,7 @@ export default function Hero() {
                             href="https://drive.google.com/file/d/1rBtAu6a3M6rS74d1fahEd-4ZPkZr_Ey2/view?usp=sharing"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-8 py-4 border border-glass-border bg-glass-bg hover:bg-white/5 text-white rounded-full font-semibold transition-all backdrop-blur-md flex items-center justify-center gap-2"
+                            className="px-8 py-4 border border-glass-border bg-glass-bg hover:bg-slate-100/50 hover:text-primary dark:hover:text-white dark:hover:bg-white/5 text-foreground rounded-full font-semibold transition-all backdrop-blur-md flex items-center justify-center gap-2"
                         >
                             Download Resume
                             <Download className="w-4 h-4" />

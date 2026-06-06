@@ -43,12 +43,12 @@ export default function AboutMe() {
                                 className="absolute bottom-6 left-6 z-20 p-4 rounded-xl bg-glass-bg border border-glass-border backdrop-blur-md"
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 rounded-lg bg-orange-500/20 text-orange-400">
+                                    <div className="p-2 rounded-lg bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400">
                                         <Globe className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-400">Personal Interest</p>
-                                        <p className="font-semibold">Explored 20+ Countries</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">Personal Interest</p>
+                                        <p className="font-semibold text-foreground">Explored 20+ Countries</p>
                                     </div>
                                 </div>
                             </motion.div>
@@ -68,12 +68,12 @@ export default function AboutMe() {
                             <span>About Me</span>
                         </div>
 
-                        <h2 className="text-3xl md:text-5xl font-bold mb-6">
+                        <h2 className="text-3xl md:text-5xl font-bold mb-6 text-foreground">
                             More than just a <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent pb-1 pr-1">Product Manager</span>
                         </h2>
 
-                        <div className="space-y-6 text-lg text-slate-300 leading-relaxed">
+                        <div className="space-y-6 text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
                             <p>
                                 I approach product management with an entrepreneurial mindset. Having worn multiple hats in early-stage startups, I understand that great products are born at the intersection of user empathy, technical feasibility, and business viability.
                             </p>
@@ -86,7 +86,7 @@ export default function AboutMe() {
                         </div>
 
                         <div className="mt-10 flex gap-4">
-                            <div className="flex items-center gap-2 text-pink-400 font-medium">
+                            <div className="flex items-center gap-2 text-pink-600 dark:text-pink-400 font-medium">
                                 <Heart className="w-5 h-5" />
                                 <span>Travel Enthusiast</span>
                             </div>

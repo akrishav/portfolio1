@@ -5,7 +5,7 @@ import { Mail, Linkedin, FileText, ArrowUpRight } from "lucide-react";
 
 export default function Footer() {
     return (
-        <footer className="py-20 px-4 sm:px-6 lg:px-8 border-t border-glass-border bg-black/40">
+        <footer className="py-20 px-4 sm:px-6 lg:px-8 border-t border-glass-border bg-slate-100/30 dark:bg-black/40">
             <div className="container max-w-4xl mx-auto text-center">
 
                 <motion.div
@@ -13,15 +13,15 @@ export default function Footer() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
-                    <h2 className="text-4xl md:text-6xl font-bold mb-8">Let's Connect</h2>
-                    <p className="text-xl text-slate-300 mb-12 max-w-2xl mx-auto">
-                        Ready to build something impact? I'm always open to discussing new opportunities, product ideas, or just geeking out over tech.
+                    <h2 className="text-4xl md:text-6xl font-bold mb-8 text-foreground">Let&apos;s Connect</h2>
+                    <p className="text-xl text-slate-600 dark:text-slate-300 mb-12 max-w-2xl mx-auto">
+                        Ready to build something impact? I&apos;m always open to discussing new opportunities, product ideas, or just geeking out over tech.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                         <a
                             href="mailto:rishavashishkumar@gmail.com"
-                            className="px-8 py-4 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.5)] flex items-center gap-2"
+                            className="px-8 py-4 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] flex items-center gap-2"
                         >
                             <Mail className="w-5 h-5" />
                             rishavashishkumar@gmail.com
@@ -31,7 +31,7 @@ export default function Footer() {
                             href="https://www.linkedin.com/in/akrishav/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-8 py-4 rounded-full bg-white text-black hover:bg-gray-100 font-semibold transition-all flex items-center gap-2"
+                            className="px-8 py-4 rounded-full bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-black dark:hover:bg-gray-100 font-semibold transition-all flex items-center gap-2 shadow-md"
                         >
                             <Linkedin className="w-5 h-5" />
                             LinkedIn Profile
@@ -41,7 +41,7 @@ export default function Footer() {
                             href="https://drive.google.com/file/d/1rBtAu6a3M6rS74d1fahEd-4ZPkZr_Ey2/view?usp=sharing"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-8 py-4 rounded-full border border-glass-border bg-glass-bg hover:bg-white/5 text-white font-semibold transition-all flex items-center gap-2"
+                            className="px-8 py-4 rounded-full border border-glass-border bg-glass-bg hover:bg-slate-50 dark:hover:bg-white/5 text-foreground font-semibold transition-all flex items-center gap-2"
                         >
                             <FileText className="w-5 h-5" />
                             Download Resume
@@ -49,10 +49,10 @@ export default function Footer() {
                     </div>
                 </motion.div>
 
-                <div className="mt-24 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between text-slate-500 text-sm">
+                <div className="mt-24 pt-8 border-t border-glass-border flex flex-col md:flex-row items-center justify-between text-slate-500 text-sm">
                     <p>© {new Date().getFullYear()} Ashish Rishav. All rights reserved.</p>
                     <p className="flex items-center gap-1 mt-2 md:mt-0">
-                        Design inspired by <span className="text-slate-400">best practices</span>
+                        Design inspired by <span className="text-slate-600 dark:text-slate-400">best practices</span>
                     </p>
                 </div>
 

@@ -46,16 +46,16 @@ const skillCategories = [
 ];
 
 const tools = [
-    { name: "Figma", icon: Figma, color: "text-purple-400" },
+    { name: "Figma", icon: Figma, color: "text-purple-600 dark:text-purple-400" },
     { name: "Jira", icon: Trello, color: "text-blue-500" },
-    { name: "SQL", icon: Database, color: "text-slate-300" },
-    { name: "Mixpanel", icon: BarChart, color: "text-indigo-400" },
-    { name: "Google Analytics", icon: Activity, color: "text-yellow-500" },
-    { name: "Amplitude", icon: LineChart, color: "text-teal-400" },
-    { name: "Notion", icon: Layout, color: "text-white" },
-    { name: "Slack", icon: Slack, color: "text-emerald-400" },
+    { name: "SQL", icon: Database, color: "text-slate-700 dark:text-slate-300" },
+    { name: "Mixpanel", icon: BarChart, color: "text-indigo-600 dark:text-indigo-400" },
+    { name: "Google Analytics", icon: Activity, color: "text-yellow-600" },
+    { name: "Amplitude", icon: LineChart, color: "text-teal-600 dark:text-teal-400" },
+    { name: "Notion", icon: Layout, color: "text-slate-800 dark:text-white" },
+    { name: "Slack", icon: Slack, color: "text-emerald-600 dark:text-emerald-400" },
     { name: "Postman", icon: Globe, color: "text-orange-500" },
-    { name: "Optimizely", icon: Zap, color: "text-blue-400" },
+    { name: "Optimizely", icon: Zap, color: "text-blue-500 dark:text-blue-400" },
 ];
 
 export default function SkillsTools() {
@@ -68,7 +68,7 @@ export default function SkillsTools() {
                     viewport={{ once: true }}
                     className="text-center mb-16"
                 >
-                    <h2 className="text-3xl md:text-5xl font-bold mb-4">Skills & Tools</h2>
+                    <h2 className="text-3xl md:text-5xl font-bold mb-4 text-foreground">Skills & Tools</h2>
                     <p className="text-muted">Battle-tested capabilities used to ship real products at scale</p>
                 </motion.div>
 
@@ -81,7 +81,7 @@ export default function SkillsTools() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1 }}
-                            className="p-8 rounded-3xl bg-white/5 border border-glass-border hover:border-primary/50 transition-colors"
+                            className="p-8 rounded-3xl bg-glass-bg border border-glass-border hover:border-primary/50 transition-colors shadow-sm"
                         >
                             <div className="flex items-center gap-4 mb-6">
                                 <div className="p-3 rounded-xl bg-primary/20 text-primary">
@@ -91,12 +91,12 @@ export default function SkillsTools() {
                                     {index === 2 && <BarChart className="w-6 h-6" />}
                                     {index === 3 && <Slack className="w-6 h-6" />}
                                 </div>
-                                <h3 className="text-xl font-bold text-white">{category.title}</h3>
+                                <h3 className="text-xl font-bold text-foreground">{category.title}</h3>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
                                 {category.skills.map(skill => (
-                                    <div key={skill} className="flex items-center gap-2 text-sm text-slate-300">
+                                    <div key={skill} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
                                         <div className="w-1.5 h-1.5 rounded-full bg-primary/70 flex-shrink-0" />
                                         {skill}
                                     </div>
@@ -113,17 +113,17 @@ export default function SkillsTools() {
                     viewport={{ once: true }}
                     className="text-center"
                 >
-                    <h3 className="text-2xl font-bold mb-10">Toolbelt</h3>
+                    <h3 className="text-2xl font-bold mb-10 text-foreground">Toolbelt</h3>
 
                     <div className="flex flex-wrap justify-center gap-4 md:gap-6 max-w-5xl mx-auto">
                         {tools.map((tool, index) => (
                             <motion.div
                                 key={index}
                                 whileHover={{ scale: 1.05 }}
-                                className="flex items-center gap-3 px-5 py-3 rounded-xl bg-white/5 border border-glass-border hover:bg-white/10 transition-colors"
+                                className="flex items-center gap-3 px-5 py-3 rounded-xl bg-glass-bg border border-glass-border hover:bg-slate-50 dark:hover:bg-white/10 transition-colors shadow-sm"
                             >
                                 <tool.icon className={`w-5 h-5 ${tool.color}`} />
-                                <span className="text-sm font-medium text-slate-200">
+                                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
                                     {tool.name}
                                 </span>
                             </motion.div>

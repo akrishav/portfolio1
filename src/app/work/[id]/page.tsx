@@ -17,10 +17,10 @@ export default function ProjectPage() {
 
     if (!project) {
         return (
-            <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
+            <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-4xl font-bold mb-4">Project Not Found</h1>
-                    <Link href="/work" className="text-purple-400 hover:text-purple-300">
+                    <Link href="/work" className="text-primary hover:text-secondary">
                         Back to Works
                     </Link>
                 </div>
@@ -41,13 +41,13 @@ export default function ProjectPage() {
     };
 
     return (
-        <main className="min-h-screen bg-[#0a0a0a] text-white pb-24">
+        <main className="min-h-screen bg-background text-foreground pb-24">
             {/* Navigation */}
-            <div className="fixed top-0 left-0 w-full z-50 p-6 bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
+            <div className="fixed top-0 left-0 w-full z-50 p-6 bg-gradient-to-b from-background/90 via-background/60 to-transparent pointer-events-none">
                 <div className="container max-w-7xl mx-auto">
                     <Link
                         href="/work"
-                        className="inline-flex items-center gap-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full backdrop-blur-md transition-all pointer-events-auto"
+                        className="inline-flex items-center gap-2 text-foreground/80 hover:text-foreground bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 px-4 py-2 rounded-full border border-slate-200 dark:border-white/10 backdrop-blur-md transition-all pointer-events-auto shadow-sm"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back to All Works
@@ -65,23 +65,23 @@ export default function ProjectPage() {
                     >
                         <div className="flex flex-wrap justify-center gap-2 mb-6">
                             {project.tags.map(tag => (
-                                <span key={tag} className="px-4 py-1.5 rounded-full text-sm font-medium bg-purple-500/20 text-purple-300 border border-purple-500/20">
+                                <span key={tag} className="px-4 py-1.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-primary dark:text-purple-300">
                                     {tag}
                                 </span>
                             ))}
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-100 to-purple-200">
+                        <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-purple-950 dark:from-white dark:to-purple-200">
                             {project.title}
                         </h1>
-                        <p className="text-2xl text-purple-400 font-medium mb-8">
+                        <p className="text-2xl text-primary font-medium mb-8">
                             {project.subtitle}
                         </p>
-                        <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+                        <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed">
                             {project.description}
                         </p>
                         <div className="pt-8 flex justify-center">
                             <button
-                                className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white text-black hover:bg-purple-50 transition-all font-medium"
+                                className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-black dark:hover:bg-purple-50 transition-all font-medium shadow-md"
                                 onClick={() => window.open(project.link || "https://bounce-fluid-02802409.figma.site", "_blank")}
                             >
                                 View Figma Prototype
@@ -126,9 +126,9 @@ export default function ProjectPage() {
             {/* Screens Gallery */}
             <section className="container max-w-7xl mx-auto px-4 mt-12">
                 <div className="flex items-center gap-4 mb-12">
-                    <div className="h-px bg-white/10 flex-grow" />
-                    <h2 className="text-2xl font-bold text-white/50 uppercase tracking-widest">Project Gallery</h2>
-                    <div className="h-px bg-white/10 flex-grow" />
+                    <div className="h-px bg-glass-border flex-grow" />
+                    <h2 className="text-2xl font-bold text-muted uppercase tracking-widest">Project Gallery</h2>
+                    <div className="h-px bg-glass-border flex-grow" />
                 </div>
 
                 <div className="relative group/gallery">
@@ -148,7 +148,7 @@ export default function ProjectPage() {
                                 className="flex-shrink-0 w-[280px] aspect-[9/19] relative group/item snap-center cursor-pointer"
                                 onClick={() => setActiveMedia({ type: 'image', src: screen.src })}
                             >
-                                <div className="absolute inset-0 rounded-2xl overflow-hidden border border-white/10 bg-slate-900 shadow-xl group-hover:border-purple-500/50 group-hover:shadow-purple-500/20 transition-all duration-300 transform group-hover:-translate-y-2">
+                                <div className="absolute inset-0 rounded-2xl overflow-hidden border border-glass-border bg-glass-bg shadow-xl group-hover:border-purple-500/50 group-hover:shadow-purple-500/20 transition-all duration-300 transform group-hover:-translate-y-2">
                                     <Image
                                         src={screen.src}
                                         alt={screen.alt}

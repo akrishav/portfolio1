@@ -31,11 +31,11 @@ export default function UXDesign() {
     const isYouTube = (url: string) => url.includes("youtube.com") || url.includes("youtu.be");
 
     return (
-        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-black/40 relative overflow-hidden">
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-transparent relative overflow-hidden">
             {/* Background elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-                <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-purple-900/10 rounded-full blur-[120px]" />
-                <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-[120px]" />
+                <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-purple-900/5 dark:bg-purple-900/10 rounded-full blur-[120px]" />
+                <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-blue-900/5 dark:bg-blue-900/10 rounded-full blur-[120px]" />
             </div>
 
             <div className="container max-w-7xl mx-auto">
@@ -46,7 +46,7 @@ export default function UXDesign() {
                     viewport={{ once: true }}
                     className="text-center mb-24"
                 >
-                    <h2 className="text-3xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-200 to-white">
+                    <h2 className="text-3xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-purple-950 dark:from-purple-200 dark:to-white">
                         UX Design & Prototyping
                     </h2>
                     <p className="text-muted max-w-2xl mx-auto text-lg leading-relaxed">
@@ -67,19 +67,19 @@ export default function UXDesign() {
                         <div className="text-center max-w-4xl mx-auto space-y-6">
                             <div className="flex flex-wrap justify-center gap-2">
                                 {project.tags.map(tag => (
-                                    <span key={tag} className="px-4 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/10 text-purple-300">
+                                    <span key={tag} className="px-4 py-1.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-primary dark:text-purple-300">
                                         {tag}
                                     </span>
                                 ))}
                             </div>
-                            <h3 className="text-5xl md:text-7xl font-bold text-white tracking-tight">{project.title}</h3>
-                            <p className="text-2xl text-purple-400 font-medium">{project.subtitle}</p>
-                            <p className="text-slate-300 leading-relaxed text-lg max-w-2xl mx-auto">
+                            <h3 className="text-5xl md:text-7xl font-bold text-foreground tracking-tight">{project.title}</h3>
+                            <p className="text-2xl text-primary font-medium">{project.subtitle}</p>
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg max-w-2xl mx-auto">
                                 {project.description}
                             </p>
                             <div className="pt-4">
                                 <button
-                                    className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white text-black hover:bg-purple-50 transition-all font-medium"
+                                    className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-black dark:hover:bg-purple-50 transition-all font-medium shadow-md"
                                     onClick={() => window.open(project.link || "https://bounce-fluid-02802409.figma.site", "_blank")}
                                 >
                                     View Figma Prototype
@@ -127,10 +127,10 @@ export default function UXDesign() {
                                 {project.screens.map((screen, i) => (
                                     <div
                                         key={i}
-                                        className="flex-shrink-0 w-[240px] aspect-[9/19] relative group/item snap-center rounded-2xl overflow-hidden border border-white/5 bg-slate-900 hover:border-purple-500/50 transition-colors shadow-lg hover:shadow-purple-500/10 hover:-translate-y-2 duration-300"
+                                        className="flex-shrink-0 w-[240px] aspect-[9/19] relative group/item snap-center rounded-2xl overflow-hidden border border-glass-border bg-glass-bg hover:border-purple-500/50 transition-colors shadow-lg hover:shadow-purple-500/10 hover:-translate-y-2 duration-300"
                                         onClick={() => setActiveMedia({ type: 'image', src: screen.src })}
                                     >
-                                        <div className="absolute inset-0 bg-slate-800 animate-pulse -z-10" />
+                                        <div className="absolute inset-0 bg-slate-200 dark:bg-slate-800 animate-pulse -z-10" />
                                         <Image
                                             src={screen.src}
                                             alt={screen.alt}
@@ -147,8 +147,8 @@ export default function UXDesign() {
                             </div>
 
                             {/* Fade edges */}
-                            <div className="absolute top-0 bottom-12 left-0 w-24 bg-gradient-to-r from-[#0A0A1A] to-transparent pointer-events-none" />
-                            <div className="absolute top-0 bottom-12 right-0 w-24 bg-gradient-to-l from-[#0A0A1A] to-transparent pointer-events-none" />
+                            <div className="absolute top-0 bottom-12 left-0 w-24 bg-gradient-to-r from-background to-transparent pointer-events-none" />
+                            <div className="absolute top-0 bottom-12 right-0 w-24 bg-gradient-to-l from-background to-transparent pointer-events-none" />
                         </div>
 
                     </motion.div>
@@ -159,7 +159,7 @@ export default function UXDesign() {
             <div className="mt-24 text-center">
                 <Link
                     href="/work"
-                    className="inline-flex items-center gap-3 px-10 py-5 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-500 hover:to-blue-500 transition-all font-semibold text-lg shadow-lg hover:shadow-purple-500/25 group"
+                    className="inline-flex items-center gap-3 px-10 py-5 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-500 hover:to-blue-500 transition-all font-semibold text-lg shadow-lg hover:shadow-indigo-500/20 group"
                 >
                     View All UX Work
                     <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

@@ -8,13 +8,13 @@ import Image from "next/image";
 
 export default function WorkPage() {
     return (
-        <main className="min-h-screen bg-[#0a0a0a] text-white">
+        <main className="min-h-screen bg-background text-foreground">
             <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
                 {/* Header */}
                 <div className="mb-20">
                     <Link
                         href="/"
-                        className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 mb-8 transition-colors group"
+                        className="inline-flex items-center gap-2 text-primary hover:text-secondary mb-8 transition-colors group"
                     >
                         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         Back to Home
@@ -23,7 +23,7 @@ export default function WorkPage() {
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 animate-gradient-x bg-300%"
+                        className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-purple-950 to-slate-800 dark:from-purple-400 dark:via-pink-400 dark:to-purple-400 animate-gradient-x bg-300%"
                     >
                         Selected Works
                     </motion.h1>
@@ -31,7 +31,7 @@ export default function WorkPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-xl text-purple-200/80 max-w-2xl"
+                        className="text-xl text-muted max-w-2xl"
                     >
                         A comprehensive collection of my UX research, UI design, and prototyping projects.
                     </motion.p>
@@ -50,10 +50,10 @@ export default function WorkPage() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.1 }}
-                                className="group relative bg-[#111] rounded-3xl overflow-hidden border border-white/10 hover:border-purple-500/50 transition-colors h-full"
+                                className="group relative bg-card rounded-3xl overflow-hidden border border-glass-border hover:border-primary/50 hover:shadow-lg hover:shadow-indigo-500/5 transition-all h-full"
                             >
                                 {/* Project Thumbnail (First screen as cover) */}
-                                <div className="aspect-[4/3] bg-[#050505] relative overflow-hidden">
+                                <div className="aspect-[4/3] bg-slate-100 dark:bg-slate-950 relative overflow-hidden">
                                     <div className="relative h-full w-full">
                                         <Image
                                             src={project.cover || project.screens[0].src}
@@ -69,15 +69,15 @@ export default function WorkPage() {
                                 <div className="p-8">
                                     <div className="flex flex-wrap gap-2 mb-4">
                                         {project.tags.slice(0, 3).map(tag => (
-                                            <span key={tag} className="px-3 py-1 rounded-full text-xs font-medium bg-white/5 text-purple-300 border border-white/5">
+                                            <span key={tag} className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-white/5 text-primary dark:text-purple-300 border border-slate-200 dark:border-white/5">
                                                 {tag}
                                             </span>
                                         ))}
                                     </div>
-                                    <h3 className="text-3xl font-bold mb-2">{project.title}</h3>
-                                    <p className="text-slate-400 mb-6 line-clamp-2">{project.subtitle}</p>
+                                    <h3 className="text-3xl font-bold mb-2 text-foreground">{project.title}</h3>
+                                    <p className="text-muted mb-6 line-clamp-2">{project.subtitle}</p>
 
-                                    <div className="flex items-center gap-2 text-purple-400 font-medium group-hover:translate-x-2 transition-transform">
+                                    <div className="flex items-center gap-2 text-primary font-medium group-hover:translate-x-2 transition-transform">
                                         View Case Study <ChevronRight className="w-4 h-4" />
                                     </div>
                                 </div>

@@ -67,7 +67,7 @@ const experiences = [
 
 export default function ExperienceJourney() {
     return (
-        <section className="py-24 px-4 sm:px-6 lg:px-8 relative bg-black/20">
+        <section className="py-24 px-4 sm:px-6 lg:px-8 relative bg-slate-50/30 dark:bg-black/20">
             <div className="container max-w-4xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -75,7 +75,7 @@ export default function ExperienceJourney() {
                     viewport={{ once: true }}
                     className="text-center mb-16"
                 >
-                    <h2 className="text-3xl md:text-5xl font-bold mb-4">Experience Journey</h2>
+                    <h2 className="text-3xl md:text-5xl font-bold mb-4 text-foreground">Experience Journey</h2>
                     <p className="text-muted">5+ years building products across B2B SaaS, AdTech, and 0→1 consumer startups</p>
                 </motion.div>
 
@@ -94,7 +94,7 @@ export default function ExperienceJourney() {
 
                             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-2">
                                 <div>
-                                    <h3 className="text-2xl font-bold text-white group-hover:text-primary transition-colors">
+                                    <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
                                         {exp.company}
                                     </h3>
                                     <div className="flex flex-col gap-2 mt-1">
@@ -107,12 +107,12 @@ export default function ExperienceJourney() {
                                         </span>
                                     </div>
                                 </div>
-                                <span className="text-sm font-mono text-muted bg-white/5 px-3 py-1 rounded-full whitespace-nowrap mt-1">
+                                <span className="text-sm font-mono text-muted bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-3 py-1 rounded-full whitespace-nowrap mt-1">
                                     {exp.period}
                                 </span>
                             </div>
 
-                            <p className="text-slate-300 mb-4 leading-relaxed max-w-2xl mt-4">
+                            <p className="text-slate-600 dark:text-slate-300 mb-4 leading-relaxed max-w-2xl mt-4">
                                 {exp.description}
                             </p>
 
@@ -120,7 +120,7 @@ export default function ExperienceJourney() {
                                 <h4 className="text-sm font-semibold text-primary mb-2">Key Achievements:</h4>
                                 <ul className="space-y-1">
                                     {exp.metrics && exp.metrics.map((metric, i) => (
-                                        <li key={i} className="text-sm text-slate-400 flex items-start gap-2">
+                                        <li key={i} className="text-sm text-slate-500 dark:text-slate-400 flex items-start gap-2">
                                             <span className="w-1.5 h-1.5 rounded-full bg-secondary/70 mt-1.5 flex-shrink-0"></span>
                                             {metric}
                                         </li>

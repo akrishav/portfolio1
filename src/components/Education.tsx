@@ -89,18 +89,18 @@ function Card3D({ item, index }: { item: typeof educationData[0], index: number 
                     <div className={`p-3 rounded-2xl bg-gradient-to-br ${item.color} shadow-lg`}>
                         <GraduationCap className="w-6 h-6 text-white" />
                     </div>
-                    <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-slate-400 backdrop-blur-md">
+                    <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-mono text-slate-500 dark:text-slate-400 backdrop-blur-md">
                         {item.year}
                     </span>
                 </div>
 
                 {/* Body */}
                 <div className="mt-8">
-                    <h3 className="text-3xl font-bold text-white mb-2 leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-300 transition-all">
+                    <h3 className="text-3xl font-bold text-foreground mb-2 leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-slate-900 group-hover:to-slate-700 dark:group-hover:from-white dark:group-hover:to-slate-300 transition-all">
                         {item.degree}
                     </h3>
-                    <p className="text-primary/90 font-medium mb-4">{item.institution}</p>
-                    <p className="text-sm text-slate-400 leading-relaxed mb-6">
+                    <p className="text-primary/95 font-medium mb-4">{item.institution}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
                         {item.description}
                     </p>
                 </div>
@@ -114,8 +114,8 @@ function Card3D({ item, index }: { item: typeof educationData[0], index: number 
                             </span>
                         ))}
                     </div>
-                    <div className="flex items-center gap-2 text-sm font-bold text-white">
-                        <Sparkles className="w-4 h-4 text-amber-400" />
+                    <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+                        <Sparkles className="w-4 h-4 text-amber-500 dark:text-amber-400" />
                         <span>{item.grade}</span>
                     </div>
                 </div>
@@ -128,7 +128,7 @@ function Card3D({ item, index }: { item: typeof educationData[0], index: number 
             />
             <div
                 style={{ transform: "translateZ(20px)" }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[10rem] font-bold text-white/[0.02] select-none pointer-events-none whitespace-nowrap"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[10rem] font-bold text-foreground/[0.02] dark:text-white/[0.02] select-none pointer-events-none whitespace-nowrap"
             >
                 {item.year}
             </div>
@@ -150,7 +150,7 @@ export default function Education() {
                     viewport={{ once: true }}
                     className="text-center mb-16"
                 >
-                    <h2 className="text-3xl md:text-5xl font-bold mb-4">Education</h2>
+                    <h2 className="text-3xl md:text-5xl font-bold mb-4 text-foreground">Education</h2>
                     <p className="text-muted">Mastering the craft through rigorous academia</p>
                 </motion.div>
 
