@@ -48,3 +48,11 @@ body {
   min-height: 100vh;
   transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 }
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+}

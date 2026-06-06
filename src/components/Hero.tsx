@@ -1,10 +1,13 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Download, Sparkles, Linkedin } from "lucide-react";
 import Image from "next/image";
 
 export default function Hero() {
+    const { scrollY } = useScroll();
+    const scrollOpacity = useTransform(scrollY, [0, 100], [0.7, 0]);
+
     return (
         <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 pt-20">
             {/* Background Glow Effects */}
@@ -43,30 +46,30 @@ export default function Hero() {
                         I bridge the gap between user needs and business goals through data and empathy.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center lg:justify-start items-center">
+                    <div className="flex flex-row flex-nowrap gap-2 sm:gap-4 justify-center lg:justify-start items-center w-full overflow-x-auto no-scrollbar py-1">
                         <a
                             href="#case-studies"
-                            className="px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-full font-semibold transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] flex items-center justify-center gap-2"
+                            className="flex-shrink-0 px-3 sm:px-6 py-2.5 sm:py-3.5 bg-primary hover:bg-primary/90 text-white rounded-full font-semibold text-[11px] sm:text-sm md:text-base transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] flex items-center justify-center gap-1 sm:gap-2 cursor-pointer"
                         >
                             View Projects
-                            <Sparkles className="w-4 h-4" />
+                            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
                         </a>
                         <a
                             href="https://docs.google.com/document/d/1TD8Hq-WMquVzVhHwyWAJBMHvmLSp-6Ii/edit?usp=sharing&ouid=116875663750287535680&rtpof=true&sd=true"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-8 py-4 border border-glass-border bg-glass-bg hover:bg-slate-100/50 hover:text-primary dark:hover:text-white dark:hover:bg-white/5 text-foreground rounded-full font-semibold transition-all backdrop-blur-md flex items-center justify-center gap-2"
+                            className="flex-shrink-0 px-3 sm:px-6 py-2.5 sm:py-3.5 border border-glass-border bg-glass-bg hover:bg-slate-100/50 hover:text-primary dark:hover:text-white dark:hover:bg-white/5 text-foreground rounded-full font-semibold text-[11px] sm:text-sm md:text-base transition-all backdrop-blur-md flex items-center justify-center gap-1 sm:gap-2 cursor-pointer"
                         >
                             Download Resume
-                            <Download className="w-4 h-4" />
+                            <Download className="w-3 h-3 sm:w-4 sm:h-4" />
                         </a>
                         <a
                             href="https://www.linkedin.com/in/akrishav/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-6 py-4 border border-glass-border bg-glass-bg hover:bg-slate-100/50 hover:text-primary dark:hover:text-white dark:hover:bg-white/5 text-foreground rounded-full font-semibold transition-all backdrop-blur-md flex items-center justify-center gap-2 shadow-sm"
+                            className="flex-shrink-0 px-3 sm:px-5 py-2.5 sm:py-3.5 border border-glass-border bg-glass-bg hover:bg-slate-100/50 hover:text-primary dark:hover:text-white dark:hover:bg-white/5 text-foreground rounded-full font-semibold text-[11px] sm:text-sm md:text-base transition-all backdrop-blur-md flex items-center justify-center gap-1 sm:gap-2 cursor-pointer shadow-sm"
                         >
-                            <Linkedin className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            <Linkedin className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600 dark:text-blue-400" />
                             LinkedIn
                         </a>
                     </div>
@@ -79,7 +82,7 @@ export default function Hero() {
                     transition={{ delay: 0.3, duration: 0.7 }}
                     className="relative mx-auto lg:mr-0"
                 >
-                    <div className="relative w-[320px] h-[320px] lg:w-[450px] lg:h-[450px]">
+                    <div className="relative w-[240px] h-[240px] sm:w-[320px] sm:h-[320px] lg:w-[450px] lg:h-[450px]">
                         {/* Glowing Ring */}
                         <div className="absolute inset-0 rounded-full border border-primary/30 shadow-[0_0_60px_rgba(124,58,237,0.2)] animate-pulse" />
                         <div className="absolute -inset-4 rounded-full border border-secondary/20 opacity-50" />
@@ -100,7 +103,10 @@ export default function Hero() {
             </div>
 
             {/* Scroll Down Indicator */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-70 pointer-events-none hidden md:flex">
+            <motion.div 
+                style={{ opacity: scrollOpacity }}
+                className="fixed bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 pointer-events-none z-20"
+            >
                 <span className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-semibold">Scroll to explore</span>
                 <motion.div
                     animate={{ y: [0, 6, 0] }}
@@ -109,7 +115,7 @@ export default function Hero() {
                 >
                     <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                 </motion.div>
-            </div>
+            </motion.div>
         </section>
     );
 }
