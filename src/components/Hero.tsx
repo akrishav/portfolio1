@@ -55,7 +55,7 @@ export default function Hero() {
                             <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
                         </a>
                         <a
-                            href="https://docs.google.com/document/d/1TD8Hq-WMquVzVhHwyWAJBMHvmLSp-6Ii/edit?usp=sharing&ouid=116875663750287535680&rtpof=true&sd=true"
+                            href="https://drive.google.com/file/d/1HkSGa129niGQKm1nofJVWjGNFeT0Z7n9/view?usp=sharing"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex-shrink-0 px-3 sm:px-6 py-2.5 sm:py-3.5 border border-glass-border bg-glass-bg hover:bg-slate-100/50 hover:text-primary dark:hover:text-white dark:hover:bg-white/5 text-foreground rounded-full font-semibold text-[11px] sm:text-sm md:text-base transition-all backdrop-blur-md flex items-center justify-center gap-1 sm:gap-2 cursor-pointer"
