@@ -46,42 +46,44 @@ export default function Hero() {
                         I bridge the gap between user needs and business goals through data and empathy.
                     </p>
 
-                    <div className="flex flex-row flex-nowrap gap-2 sm:gap-4 justify-center lg:justify-start items-center w-full overflow-x-auto no-scrollbar py-1">
-                        <a
-                            href="#projects"
-                            className="flex-shrink-0 px-3 sm:px-6 py-2.5 sm:py-3.5 bg-primary hover:bg-primary/90 text-white rounded-full font-semibold text-[11px] sm:text-sm md:text-base transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] flex items-center justify-center gap-1 sm:gap-2 cursor-pointer"
-                        >
-                            View Projects
-                            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-                        </a>
-                        <a
-                            href="https://drive.google.com/file/d/1HkSGa129niGQKm1nofJVWjGNFeT0Z7n9/view?usp=sharing"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-shrink-0 px-3 sm:px-6 py-2.5 sm:py-3.5 border border-glass-border bg-glass-bg hover:bg-slate-100/50 hover:text-primary dark:hover:text-white dark:hover:bg-white/5 text-foreground rounded-full font-semibold text-[11px] sm:text-sm md:text-base transition-all backdrop-blur-md flex items-center justify-center gap-1 sm:gap-2 cursor-pointer"
-                        >
-                            Download Resume
-                            <Download className="w-3 h-3 sm:w-4 sm:h-4" />
-                        </a>
-                        <a
-                            href="https://www.linkedin.com/in/akrishav/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-shrink-0 px-3 sm:px-5 py-2.5 sm:py-3.5 border border-glass-border bg-glass-bg hover:bg-slate-100/50 hover:text-primary dark:hover:text-white dark:hover:bg-white/5 text-foreground rounded-full font-semibold text-[11px] sm:text-sm md:text-base transition-all backdrop-blur-md flex items-center justify-center gap-1 sm:gap-2 cursor-pointer shadow-sm"
-                        >
-                            <Linkedin className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600 dark:text-blue-400" />
-                            LinkedIn
-                        </a>
-                    </div>
+                    <div className="w-full max-w-[420px] mx-auto lg:mx-0 mt-8">
+                        <div className="flex flex-row flex-nowrap gap-2 justify-between items-center w-full overflow-x-auto no-scrollbar py-1">
+                            <a
+                                href="#projects"
+                                className="flex-shrink-0 px-3 sm:px-4 py-2.5 sm:py-3.5 bg-primary hover:bg-primary/90 text-white rounded-full font-semibold text-[11px] sm:text-xs md:text-sm transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer"
+                            >
+                                View Projects
+                                <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                            </a>
+                            <a
+                                href="https://drive.google.com/file/d/1HkSGa129niGQKm1nofJVWjGNFeT0Z7n9/view?usp=sharing"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-shrink-0 px-3 sm:px-4 py-2.5 sm:py-3.5 border border-glass-border bg-glass-bg hover:bg-slate-100/50 hover:text-primary dark:hover:text-white dark:hover:bg-white/5 text-foreground rounded-full font-semibold text-[11px] sm:text-xs md:text-sm transition-all backdrop-blur-md flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer"
+                            >
+                                Download Resume
+                                <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                            </a>
+                            <a
+                                href="https://www.linkedin.com/in/akrishav/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-shrink-0 px-3 sm:px-4 py-2.5 sm:py-3.5 border border-glass-border bg-glass-bg hover:bg-slate-100/50 hover:text-primary dark:hover:text-white dark:hover:bg-white/5 text-foreground rounded-full font-semibold text-[11px] sm:text-xs md:text-sm transition-all backdrop-blur-md flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer shadow-sm"
+                            >
+                                <Linkedin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-600 dark:text-blue-400" />
+                                LinkedIn
+                            </a>
+                        </div>
 
-                    <div className="mt-4 flex justify-center lg:justify-start w-full">
-                        <a
-                            href="mailto:rishavashishkumar@gmail.com"
-                            className="w-full max-w-[420px] px-6 py-3.5 rounded-full bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:scale-[1.01] duration-200 cursor-pointer"
-                        >
-                            <Mail className="w-4 h-4" />
-                            <span>rishavashishkumar@gmail.com</span>
-                        </a>
+                        <div className="mt-4 flex justify-center w-full">
+                            <a
+                                href="mailto:rishavashishkumar@gmail.com"
+                                className="w-full px-6 py-3.5 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] hover:scale-[1.01] duration-200 cursor-pointer"
+                            >
+                                <Mail className="w-4 h-4" />
+                                <span>rishavashishkumar@gmail.com</span>
+                            </a>
+                        </div>
                     </div>
                 </motion.div>
 
