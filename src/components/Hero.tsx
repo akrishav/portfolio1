@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Download, Sparkles } from "lucide-react";
+import { ArrowRight, Download, Sparkles, Linkedin } from "lucide-react";
 import Image from "next/image";
 
 export default function Hero() {
@@ -43,7 +43,7 @@ export default function Hero() {
                         I bridge the gap between user needs and business goals through data and empathy.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                    <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center lg:justify-start items-center">
                         <a
                             href="#case-studies"
                             className="px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-full font-semibold transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] flex items-center justify-center gap-2"
@@ -52,13 +52,22 @@ export default function Hero() {
                             <Sparkles className="w-4 h-4" />
                         </a>
                         <a
-                            href="https://drive.google.com/file/d/1rBtAu6a3M6rS74d1fahEd-4ZPkZr_Ey2/view?usp=sharing"
+                            href="https://docs.google.com/document/d/1TD8Hq-WMquVzVhHwyWAJBMHvmLSp-6Ii/edit?usp=sharing&ouid=116875663750287535680&rtpof=true&sd=true"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-8 py-4 border border-glass-border bg-glass-bg hover:bg-slate-100/50 hover:text-primary dark:hover:text-white dark:hover:bg-white/5 text-foreground rounded-full font-semibold transition-all backdrop-blur-md flex items-center justify-center gap-2"
                         >
                             Download Resume
                             <Download className="w-4 h-4" />
+                        </a>
+                        <a
+                            href="https://www.linkedin.com/in/akrishav/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-6 py-4 border border-glass-border bg-glass-bg hover:bg-slate-100/50 hover:text-primary dark:hover:text-white dark:hover:bg-white/5 text-foreground rounded-full font-semibold transition-all backdrop-blur-md flex items-center justify-center gap-2 shadow-sm"
+                        >
+                            <Linkedin className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            LinkedIn
                         </a>
                     </div>
                 </motion.div>
