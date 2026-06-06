@@ -1,11 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, Linkedin, FileText, ArrowUpRight } from "lucide-react";
+import { Mail, Linkedin, FileText, ArrowUpRight, ChevronUp } from "lucide-react";
 
 export default function Footer() {
     return (
-        <footer className="py-20 px-4 sm:px-6 lg:px-8 border-t border-glass-border bg-slate-100/30 dark:bg-black/40">
+        <footer id="footer" className="py-20 px-4 sm:px-6 lg:px-8 border-t border-glass-border bg-slate-100/30 dark:bg-black/40">
             <div className="container max-w-4xl mx-auto text-center">
 
                 <motion.div
@@ -56,6 +56,15 @@ export default function Footer() {
                     </p>
                 </div>
 
+            </div>
+            {/* Scroll to Top Button */}
+            <div className="flex justify-center mt-12 pb-4">
+                <a
+                    href="#hero"
+                    className="p-3 rounded-full border border-glass-border hover:border-primary/30 bg-glass-bg hover:text-primary transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center shadow-sm group"
+                >
+                    <ChevronUp className="w-5 h-5 text-slate-400 group-hover:text-primary group-hover:-translate-y-0.5 transition-transform" />
+                </a>
             </div>
         </footer>
     );

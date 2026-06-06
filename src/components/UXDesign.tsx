@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Play, Maximize2, X, ChevronRight, Smartphone } from "lucide-react";
+import { Play, Maximize2, X, ChevronRight, Smartphone, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -31,7 +31,7 @@ export default function UXDesign() {
     const isYouTube = (url: string) => url.includes("youtube.com") || url.includes("youtu.be");
 
     return (
-        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-transparent relative overflow-hidden">
+        <section id="ux-design" className="py-24 px-4 sm:px-6 lg:px-8 bg-transparent relative overflow-hidden">
             {/* Background elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
                 <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-purple-900/5 dark:bg-purple-900/10 rounded-full blur-[120px]" />
@@ -213,6 +213,15 @@ export default function UXDesign() {
                     </div>
                 </div>
             )}
+            {/* Scroll Down Button */}
+            <div className="flex justify-center mt-12 pb-4">
+                <a
+                    href="#education"
+                    className="p-3 rounded-full border border-glass-border hover:border-primary/30 bg-glass-bg hover:text-primary transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center shadow-sm group"
+                >
+                    <ChevronDown className="w-5 h-5 text-slate-400 group-hover:text-primary group-hover:translate-y-0.5 transition-transform" />
+                </a>
+            </div>
         </section>
     );
 }

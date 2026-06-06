@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { GraduationCap, Sparkles, Calendar, ArrowUpRight } from "lucide-react";
+import { GraduationCap, Sparkles, Calendar, ArrowUpRight, ChevronDown } from "lucide-react";
 
 const educationData = [
     {
@@ -139,7 +139,7 @@ function Card3D({ item, index }: { item: typeof educationData[0], index: number 
 
 export default function Education() {
     return (
-        <section className="py-24 px-4 sm:px-6 lg:px-8 relative perspective-1000">
+        <section id="education" className="py-24 px-4 sm:px-6 lg:px-8 relative perspective-1000">
             {/* Background Ambience */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
 
@@ -168,6 +168,15 @@ export default function Education() {
                     perspective: 2000px;
                 }
             `}</style>
+            {/* Scroll Down Button */}
+            <div className="flex justify-center mt-12 pb-4">
+                <a
+                    href="#skills"
+                    className="p-3 rounded-full border border-glass-border hover:border-primary/30 bg-glass-bg hover:text-primary transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center shadow-sm group"
+                >
+                    <ChevronDown className="w-5 h-5 text-slate-400 group-hover:text-primary group-hover:translate-y-0.5 transition-transform" />
+                </a>
+            </div>
         </section>
     );
 }

@@ -11,7 +11,8 @@ import {
     Zap,
     Layout,
     Activity,
-    LineChart
+    LineChart,
+    ChevronDown
 } from "lucide-react";
 
 // Lucide doesn't have all specific brand logos so I'll use generic approximations or existing ones
@@ -60,7 +61,7 @@ const tools = [
 
 export default function SkillsTools() {
     return (
-        <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <section id="skills" className="py-24 px-4 sm:px-6 lg:px-8">
             <div className="container max-w-6xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -131,6 +132,15 @@ export default function SkillsTools() {
                     </div>
                 </motion.div>
 
+            </div>
+            {/* Scroll Down Button */}
+            <div className="flex justify-center mt-12 pb-4">
+                <a
+                    href="#about"
+                    className="p-3 rounded-full border border-glass-border hover:border-primary/30 bg-glass-bg hover:text-primary transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center shadow-sm group"
+                >
+                    <ChevronDown className="w-5 h-5 text-slate-400 group-hover:text-primary group-hover:translate-y-0.5 transition-transform" />
+                </a>
             </div>
         </section>
     );

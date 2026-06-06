@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { TrendingUp, Users, Clock, Database, FileText, Zap, HelpCircle } from "lucide-react";
+import { TrendingUp, Users, Clock, Database, FileText, Zap, HelpCircle, ChevronDown } from "lucide-react";
 
 interface StatItem {
     icon: any;
@@ -137,7 +137,7 @@ export default function ImpactSnapshot() {
     };
 
     return (
-        <section className="py-24 px-4 sm:px-6 lg:px-8 relative bg-[#FAFAFD] dark:bg-[#0A0A1A] transition-colors duration-300">
+        <section id="impact" className="py-24 px-4 sm:px-6 lg:px-8 relative bg-[#FAFAFD] dark:bg-[#0A0A1A] transition-colors duration-300">
             {/* Decorative Background */}
             <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none" />
 
@@ -261,6 +261,15 @@ export default function ImpactSnapshot() {
                         );
                     })}
                 </div>
+            </div>
+            {/* Scroll Down Button */}
+            <div className="flex justify-center mt-12 pb-4">
+                <a
+                    href="#experience"
+                    className="p-3 rounded-full border border-glass-border hover:border-primary/30 bg-glass-bg hover:text-primary transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center shadow-sm group"
+                >
+                    <ChevronDown className="w-5 h-5 text-slate-400 group-hover:text-primary group-hover:translate-y-0.5 transition-transform" />
+                </a>
             </div>
         </section>
     );

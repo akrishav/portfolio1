@@ -1,12 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { User, Heart, Globe, Book, Languages } from "lucide-react";
+import { User, Heart, Globe, Book, Languages, ChevronDown } from "lucide-react";
 
 
 export default function AboutMe() {
     return (
-        <section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <section id="about" className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
             {/* Background decoration */}
             <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
@@ -94,6 +94,15 @@ export default function AboutMe() {
                     </motion.div>
 
                 </div>
+            </div>
+            {/* Scroll Down Button */}
+            <div className="flex justify-center mt-12 pb-4">
+                <a
+                    href="#footer"
+                    className="p-3 rounded-full border border-glass-border hover:border-primary/30 bg-glass-bg hover:text-primary transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center shadow-sm group"
+                >
+                    <ChevronDown className="w-5 h-5 text-slate-400 group-hover:text-primary group-hover:translate-y-0.5 transition-transform" />
+                </a>
             </div>
         </section>
     );

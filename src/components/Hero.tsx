@@ -9,7 +9,7 @@ export default function Hero() {
     const scrollOpacity = useTransform(scrollY, [0, 100], [0.7, 0]);
 
     return (
-        <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 pt-20">
+        <section id="hero" className="relative min-h-[90vh] flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 pt-20">
             {/* Background Glow Effects */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
 
@@ -117,16 +117,18 @@ export default function Hero() {
             {/* Scroll Down Indicator */}
             <motion.div 
                 style={{ opacity: scrollOpacity }}
-                className="fixed bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 pointer-events-none z-20"
+                className="fixed bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 z-20 hover:scale-105 transition-transform"
             >
-                <span className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-semibold">Scroll to explore</span>
-                <motion.div
-                    animate={{ y: [0, 6, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                    className="w-5 h-8 rounded-full border-2 border-slate-300 dark:border-slate-700 flex items-start justify-center p-1"
-                >
-                    <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                </motion.div>
+                <a href="#impact" className="flex flex-col items-center gap-1">
+                    <span className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-semibold">Scroll to explore</span>
+                    <motion.div
+                        animate={{ y: [0, 6, 0] }}
+                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                        className="w-5 h-8 rounded-full border-2 border-slate-300 dark:border-slate-700 flex items-start justify-center p-1"
+                    >
+                        <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+                    </motion.div>
+                </a>
             </motion.div>
         </section>
     );

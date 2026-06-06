@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Briefcase } from "lucide-react";
+import { Briefcase, ChevronDown } from "lucide-react";
 
 const experiences = [
     {
@@ -67,7 +67,7 @@ const experiences = [
 
 export default function ExperienceJourney() {
     return (
-        <section className="py-24 px-4 sm:px-6 lg:px-8 relative bg-slate-50/30 dark:bg-black/20">
+        <section id="experience" className="py-24 px-4 sm:px-6 lg:px-8 relative bg-slate-50/30 dark:bg-black/20">
             <div className="container max-w-4xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -130,6 +130,15 @@ export default function ExperienceJourney() {
                         </motion.div>
                     ))}
                 </div>
+            </div>
+            {/* Scroll Down Button */}
+            <div className="flex justify-center mt-12 pb-4">
+                <a
+                    href="#projects"
+                    className="p-3 rounded-full border border-glass-border hover:border-primary/30 bg-glass-bg hover:text-primary transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center shadow-sm group"
+                >
+                    <ChevronDown className="w-5 h-5 text-slate-400 group-hover:text-primary group-hover:translate-y-0.5 transition-transform" />
+                </a>
             </div>
         </section>
     );
