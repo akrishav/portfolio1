@@ -6,7 +6,7 @@ import { caseStudies } from "@/data/caseStudies";
 
 export default function CaseStudies() {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
-    const displayedCases = caseStudies.slice(0, 3);
+    const displayedCases = caseStudies.slice(0, 4);
 
     return (
         <section id="projects" className="py-24 px-4 sm:px-6 lg:px-8 bg-transparent">
@@ -175,7 +175,7 @@ export default function CaseStudies() {
                         href="/case-studies"
                         className="inline-flex items-center gap-3 px-10 py-5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-500 hover:to-teal-500 transition-all font-semibold text-lg shadow-lg hover:shadow-emerald-500/25 group"
                     >
-                        View Case Studies Below
+                        View Case Studies
                         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
