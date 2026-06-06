@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { TrendingUp, Users, Clock, Database, Eye, Zap, HelpCircle } from "lucide-react";
+import { TrendingUp, Users, Clock, Database, FileText, Zap, HelpCircle } from "lucide-react";
 
 interface StatItem {
     icon: any;
@@ -33,8 +33,8 @@ const stats: StatItem[] = [
             description: "Boosted advertising returns by building the FaktorOS Agentic Decision Framework with real-time optimization."
         },
         plainEnglish: {
-            value: "1.2x",
-            label: "Ad Profitability",
+            value: "15-20%",
+            label: "Ad Campaign Profit",
             description: "Helped clients make 15-20% more money for every dollar they spent on online advertising campaigns."
         }
     },
@@ -49,7 +49,7 @@ const stats: StatItem[] = [
             description: "Raised product retention rate by establishing automated CRM workflows and funnels for mental health apps."
         },
         plainEnglish: {
-            value: "1 in 5",
+            value: "+20%",
             label: "Customer Loyalty",
             description: "Kept 20% more users returning to health apps daily through smart, personalized reminder campaigns."
         }
@@ -60,14 +60,14 @@ const stats: StatItem[] = [
         bgLight: "bg-emerald-50 dark:bg-emerald-950/20",
         borderLight: "border-emerald-100 dark:border-emerald-900/30",
         professional: {
-            value: "+21%",
-            label: "Data Precision",
-            description: "Enhanced contextual targeting accuracy at Media.net by programmatically mapping ad URLs."
+            value: "+2%",
+            label: "Platform Revenue",
+            description: "Drove 2% revenue growth and boosted data precision by 21% at Media.net by mapping 500K+ ad URLs."
         },
         plainEnglish: {
-            value: "95%+",
-            label: "Ad Relevancy",
-            description: "Ensured search ads accurately matched what users searched for, making them more helpful and clicked."
+            value: "+2%",
+            label: "Ad Network Sales",
+            description: "Increased overall ad platform sales by 2% by improving how accurately ads match search terms."
         }
     },
     {
@@ -81,9 +81,9 @@ const stats: StatItem[] = [
             description: "Reduced hours of manual work by designing automated content classification pipelines."
         },
         plainEnglish: {
-            value: "-12 hrs",
-            label: "Hours Saved / Wk",
-            description: "Replaced boring, repetitive manual website checks with AI pipelines, saving teams half a day of work."
+            value: "-30%",
+            label: "Hours Saved on Tasks",
+            description: "Replaced boring, repetitive manual website checks with AI pipelines, saving teams 30% of their operational time."
         }
     },
     {
@@ -93,29 +93,29 @@ const stats: StatItem[] = [
         borderLight: "border-violet-100 dark:border-violet-900/30",
         professional: {
             value: "+12%",
-            label: "Supply Efficiency",
-            description: "Streamlined publisher yield by identifying under-utilized monetization funnels via custom dashboards."
+            label: "Supply Yield Growth",
+            description: "Optimized supply efficiency by identifying under-utilized monetization funnels via custom dashboards."
         },
         plainEnglish: {
             value: "+12%",
-            label: "Publisher Earnings",
-            description: "Spotted unused ad spaces on blogs and sites, directly increasing their monthly ad revenue."
+            label: "Website Ad Earnings",
+            description: "Spotted unused ad spaces on publisher sites, directly increasing their monthly ad earnings by 12%."
         }
     },
     {
-        icon: Eye,
+        icon: FileText,
         color: "text-orange-600 dark:text-orange-400",
         bgLight: "bg-orange-50 dark:bg-orange-950/20",
         borderLight: "border-orange-100 dark:border-orange-900/30",
         professional: {
-            value: "500K+",
-            label: "Ad URLs Mapped",
-            description: "Classified and indexed high-revenue URLs to scale ad relevancy across key search queries."
+            value: "1 Patent",
+            label: "Provisional Patent",
+            description: "Filed patent on zero-retention orchestration enabling compliant AI agents in AdTech."
         },
         plainEnglish: {
-            value: "500,000+",
-            label: "Webpages Scanned",
-            description: "Built automated systems handling millions of searches, mapping half a million webpages to key queries."
+            value: "1 Patent",
+            label: "AI Patents Filed",
+            description: "Invented and patented secure AI technology that processes user search data without saving it, ensuring privacy."
         }
     }
 ];
