@@ -48,7 +48,7 @@ export default function Hero() {
                             href="#case-studies"
                             className="px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-full font-semibold transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] flex items-center justify-center gap-2"
                         >
-                            View Case Studies
+                            View Projects
                             <Sparkles className="w-4 h-4" />
                         </a>
                         <a
