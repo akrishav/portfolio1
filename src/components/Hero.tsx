@@ -89,6 +89,18 @@ export default function Hero() {
                     </div>
                 </motion.div>
             </div>
+
+            {/* Scroll Down Indicator */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-70 pointer-events-none hidden md:flex">
+                <span className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-semibold">Scroll to explore</span>
+                <motion.div
+                    animate={{ y: [0, 6, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                    className="w-5 h-8 rounded-full border-2 border-slate-300 dark:border-slate-700 flex items-start justify-center p-1"
+                >
+                    <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+                </motion.div>
+            </div>
         </section>
     );
 }
