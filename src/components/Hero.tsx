@@ -77,13 +77,10 @@ export default function Hero() {
                     <div className="mt-4 flex justify-center lg:justify-start w-full">
                         <a
                             href="mailto:rishavashishkumar@gmail.com"
-                            className="w-full max-w-[420px] px-5 py-3 border border-glass-border bg-glass-bg hover:bg-slate-100/50 hover:text-primary dark:hover:text-white dark:hover:bg-white/5 text-muted hover:border-primary/30 rounded-2xl font-medium text-xs sm:text-sm transition-all backdrop-blur-md flex items-center justify-between group shadow-sm"
+                            className="w-full max-w-[420px] px-6 py-3.5 rounded-full bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:scale-[1.01] duration-200 cursor-pointer"
                         >
-                            <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                <span className="text-[11px] sm:text-xs text-slate-400 uppercase tracking-wider font-semibold">Get in Touch</span>
-                            </div>
-                            <span className="text-foreground font-semibold text-xs sm:text-sm select-all">rishavashishkumar@gmail.com</span>
+                            <Mail className="w-4 h-4" />
+                            <span>rishavashishkumar@gmail.com</span>
                         </a>
                     </div>
                 </motion.div>
