@@ -1062,10 +1062,10 @@ export default function RecruiterDashboard() {
                                     e.stopPropagation();
                                     setExpandedCandidateId(expandedCandidateId === cand.id ? null : cand.id);
                                   }}
-                                  className={`px-2.5 py-1 rounded-full text-[9.5px] font-bold uppercase tracking-wide flex items-center gap-1 transition-all ${
+                                  className={`px-2.5 py-1 rounded-full text-[9.5px] font-extrabold uppercase tracking-wide flex items-center gap-1 transition-all border shadow-xs cursor-pointer ${
                                     isBreached 
-                                      ? "bg-rose-100 hover:bg-rose-200 text-rose-600 border border-rose-200 animate-pulse" 
-                                      : "bg-emerald-50 hover:bg-emerald-100 text-[#007A5E] border border-emerald-100"
+                                      ? "bg-red-600 hover:bg-red-750 text-white border-red-750 animate-pulse" 
+                                      : "bg-emerald-50 hover:bg-emerald-100 text-[#007A5E] border-emerald-100"
                                   }`}
                                 >
                                   {isBreached ? "⚠️ SLA Breached" : "SLA Active"}
@@ -1079,21 +1079,50 @@ export default function RecruiterDashboard() {
                               </td>
                             </tr>
                             {expandedCandidateId === cand.id && (
-                              <tr className="bg-rose-50/20 text-xs">
-                                <td colSpan={9} className="p-4 pl-12 border-t border-rose-100/30 text-rose-700">
-                                  <div className="space-y-2 text-left">
-                                    <div className="flex items-center gap-2 font-bold text-rose-650">
-                                      <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
-                                      <span>SLA Status Warning: {cand.slaBreachDetails || "General compliance delay detected."}</span>
+                              <tr className="bg-red-50/10 text-xs">
+                                <td colSpan={9} className="p-5 pl-12 border-y border-red-100/50 text-slate-800">
+                                  <div className="space-y-3.5 text-left">
+                                    <div className="flex items-center gap-2.5 font-bold text-red-700 bg-red-50/50 border border-red-100/55 p-3 rounded-xl max-w-2xl">
+                                      <AlertCircle className="h-4.5 w-4.5 shrink-0 text-red-600 animate-bounce" />
+                                      <div>
+                                        <span className="font-extrabold uppercase text-[10px] tracking-wider block text-red-650">SLA Status Action Required</span>
+                                        <p className="text-[11.5px] mt-0.5 font-semibold">{cand.slaBreachDetails || "Compliance verification is overdue. Action required immediately."}</p>
+                                      </div>
                                     </div>
+                                    
                                     {cand.onboardingSteps && cand.onboardingSteps.length > 0 && (
-                                      <div className="flex flex-wrap gap-2.5 font-bold text-slate-500 mt-1 pl-6">
-                                        <span>Missing compliance checks:</span>
-                                        {cand.onboardingSteps.filter(s => s.status !== "completed").map(s => (
-                                          <span key={s.number} className="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-[10px]">
-                                            {s.name} ({s.status === "stuck" ? "Stuck" : "Pending"})
-                                          </span>
-                                        ))}
+                                      <div className="space-y-2 pl-2">
+                                        <span className="text-[10px] font-extrabold text-slate-450 uppercase tracking-wider block">Missing/Stuck Checklist Steps:</span>
+                                        <div className="flex flex-wrap gap-2">
+                                          {cand.onboardingSteps.filter(s => s.status !== "completed").map(s => (
+                                            <span 
+                                              key={s.number} 
+                                              className={`px-3 py-1 rounded-lg text-[10.5px] font-bold border uppercase ${
+                                                s.status === "stuck"
+                                                  ? "bg-red-50 text-red-600 border-red-200"
+                                                  : "bg-amber-50 text-amber-600 border-amber-200"
+                                              }`}
+                                            >
+                                              Step {s.number}: {s.name} ({s.status === "stuck" ? "Stuck" : "Pending"})
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {cand.erpDocuments && cand.erpDocuments.filter(d => d.submissionStatus !== "Completed").length > 0 && (
+                                      <div className="space-y-2 pl-2 pt-1">
+                                        <span className="text-[10px] font-extrabold text-slate-450 uppercase tracking-wider block">Missing Verification Documents:</span>
+                                        <div className="flex flex-wrap gap-2">
+                                          {cand.erpDocuments.filter(d => d.submissionStatus !== "Completed").map(d => (
+                                            <span 
+                                              key={d.name} 
+                                              className="bg-slate-100 text-slate-700 border border-slate-200 px-3 py-1 rounded-lg text-[10.5px] font-bold uppercase"
+                                            >
+                                              📄 {d.name} (Not Uploaded)
+                                            </span>
+                                          ))}
+                                        </div>
                                       </div>
                                     )}
                                   </div>
