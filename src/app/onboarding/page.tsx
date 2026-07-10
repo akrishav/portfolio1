@@ -49,9 +49,11 @@ export default function OnboardingPage() {
   const [uploadFileName, setUploadFileName] = useState("Nursing_License_Marcus.pdf");
   const [uploading, setUploading] = useState(false);
 
-  const candidate = candidates.find(
-    (c) => c.email.toLowerCase() === loggedInUser?.email?.toLowerCase()
-  );
+  const candidate = candidates.find((c) => {
+    const cleanEmail = loggedInUser?.email?.toLowerCase();
+    const emailToMatch = cleanEmail === "mani@staffhc.com" ? "candidate@healthcare.com" : cleanEmail;
+    return c.email.toLowerCase() === emailToMatch;
+  });
 
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();

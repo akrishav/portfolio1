@@ -464,7 +464,17 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
 
     if (savedUser) {
-      setLoggedInUser(JSON.parse(savedUser));
+      const parsed = JSON.parse(savedUser);
+      setLoggedInUser(parsed);
+      if (parsed.role === "candidate") {
+        const cleanEmail = parsed.email.toLowerCase().trim();
+        const emailToFind = cleanEmail === "mani@staffhc.com" ? "candidate@healthcare.com" : cleanEmail;
+        const candidatesList = savedCandidates ? JSON.parse(savedCandidates) : initialCandidates();
+        const match = candidatesList.find((c: any) => c.email.toLowerCase() === emailToFind);
+        if (match) {
+          setSelectedCandidateId(match.id);
+        }
+      }
     }
   }, []);
 
