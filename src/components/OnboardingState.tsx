@@ -446,7 +446,25 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const savedUser = localStorage.getItem("staffhc_logged_user_v3");
 
     if (savedCandidates) {
-      setCandidates(JSON.parse(savedCandidates));
+      try {
+        let parsed = JSON.parse(savedCandidates);
+        if (Array.isArray(parsed)) {
+          parsed = parsed.map(c => {
+            if (c.id === "candidate-mani") {
+              return {
+                ...c,
+                name: "Mani",
+                email: "mani@staffhc.com",
+                hasNoApplication: false
+              };
+            }
+            return c;
+          });
+        }
+        setCandidates(parsed);
+      } catch (err) {
+        setCandidates(initialCandidates());
+      }
     } else {
       setCandidates(initialCandidates());
     }
@@ -508,6 +526,19 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const cleanEmail = email.toLowerCase().trim();
     if (role === "candidate") {
       const emailToFind = cleanEmail === "candidate@healthcare.com" ? "mani@staffhc.com" : cleanEmail;
+      
+      // Force sync candidate-mani details in candidate list to avoid cached local storage mismatches
+      const maniMatch = candidates.find(c => c.id === "candidate-mani");
+      if (maniMatch && (emailToFind === "mani@staffhc.com")) {
+        maniMatch.email = "mani@staffhc.com";
+        maniMatch.name = "Mani";
+        maniMatch.hasNoApplication = false;
+        setCandidates([...candidates]);
+        setLoggedInUser({ email: cleanEmail, role: "candidate" });
+        setSelectedCandidateId(maniMatch.id);
+        return true;
+      }
+
       const match = candidates.find(c => c.email.toLowerCase() === emailToFind);
       if (match) {
         setLoggedInUser({ email: cleanEmail, role: "candidate" });
