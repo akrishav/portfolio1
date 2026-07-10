@@ -201,7 +201,12 @@ export default function RecruiterDashboard() {
           
           {/* Brand header logo */}
           <div className="flex items-center gap-3">
-            <Logo />
+            <img
+              src="/hummingbird-logo.png"
+              alt="Hummingbird Logo"
+              className="h-6.5 object-contain select-none pointer-events-none"
+            />
+            <span className="text-slate-350 font-normal text-lg">|</span>
             <span className="text-[#007A5E] font-bold text-sm tracking-wide">Onboarding</span>
           </div>
 

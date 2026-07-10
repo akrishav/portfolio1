@@ -15,9 +15,9 @@ export default function HiringManagersPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
-              src="/hummingbird-logo.png"
-              alt="Hummingbird Logo"
-              className="h-6.5 object-contain select-none pointer-events-none"
+              src="/staffhc-logo.png"
+              alt="Staff HC Logo"
+              className="h-9 w-auto object-contain select-none pointer-events-none"
             />
             <span className="text-slate-350 font-normal text-lg">|</span>
             <span className="text-xs font-bold text-[#007A5E] uppercase tracking-wider">Hiring Managers</span>
@@ -27,7 +27,7 @@ export default function HiringManagersPage() {
             href="/" 
             className="text-xs font-bold text-[#0052CC] hover:underline"
           >
-            Go back to Candidate Portal
+            Go to Home
           </Link>
         </div>
       </header>
