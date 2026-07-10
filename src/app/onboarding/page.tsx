@@ -271,7 +271,7 @@ export default function OnboardingPage() {
             </span>
           </div>
           <div>
-            © 2024 StaffHC Healthcare Staffing. All rights reserved.
+            © 2024 Hummingbird Healthcare Staffing. All rights reserved.
           </div>
         </div>
       </main>
@@ -330,7 +330,7 @@ export default function OnboardingPage() {
         </div>
 
         <div className="bg-transparent py-8 text-center text-[10px] text-slate-400 font-medium z-10">
-          © 2026 Staff HC INC. All rights reserved.
+          © 2026 Hummingbird INC. All rights reserved.
         </div>
       </main>
     );
@@ -460,7 +460,7 @@ export default function OnboardingPage() {
                 <div className="space-y-6">
                   <div className="px-3">
                     <span className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400 block">
-                      StaffHC
+                      Hummingbird
                     </span>
                     <span className="text-xs font-semibold text-slate-550 block -mt-0.5">
                       Candidate Portal
@@ -1312,7 +1312,7 @@ export default function OnboardingPage() {
       <footer className="bg-slate-55 border-t border-slate-200 shrink-0 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-455 font-medium">
           <div>
-            © 2024 StaffHC Healthcare Staffing. All rights reserved.
+            © 2024 Hummingbird Healthcare Staffing. All rights reserved.
           </div>
           <div className="flex gap-4">
             <a href="#" className="hover:text-slate-600">Privacy Policy</a>

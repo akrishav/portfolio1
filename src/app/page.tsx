@@ -33,7 +33,7 @@ export default function Home() {
           <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-slate-500">
             <a href="#how-it-works" className="hover:text-[#0052CC] transition-colors">Get Started</a>
             <a href="#about-us" className="hover:text-[#0052CC] transition-colors">About Us</a>
-            <a href="#hiring-managers" className="hover:text-[#0052CC] transition-colors">For Hiring Managers</a>
+            <Link href="/hiring-managers" className="hover:text-[#0052CC] transition-colors">For Hiring Managers</Link>
           </nav>
 
           {/* Right Action buttons */}
@@ -481,53 +481,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* For Hiring Managers Section */}
-      <section id="hiring-managers" className="py-16 bg-slate-50 border-t border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-          <div className="space-y-2">
-            <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">For Hiring Managers</h2>
-            <p className="text-sm text-slate-500 max-w-xl mx-auto font-medium">
-              Access the recruiter and onboarding compliance systems. Select your portal to log in.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            {/* Recruiter Card */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center space-y-4">
-              <div className="h-12 w-12 rounded-xl bg-[#EBF3FC] flex items-center justify-center text-[#0052CC]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-              </div>
-              <div className="space-y-1 text-center">
-                <h3 className="text-sm font-bold text-slate-900">Recruiter Portal</h3>
-                <p className="text-xs text-slate-400">Manage candidates, compliance checklists, and job matching.</p>
-              </div>
-              <Link 
-                href="/recruiter?role=recruiter"
-                className="w-full py-2.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all text-center"
-              >
-                Access Recruiter Portal
-              </Link>
-            </div>
-
-            {/* Onboarder Card */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center space-y-4">
-              <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center text-[#007A5E]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </div>
-              <div className="space-y-1 text-center">
-                <h3 className="text-sm font-bold text-slate-900">On-boarder Portal</h3>
-                <p className="text-xs text-slate-400">Review credential compliance, SLA monitoring, and background checks.</p>
-              </div>
-              <Link 
-                href="/recruiter?role=onboarder"
-                className="w-full py-2.5 bg-[#007A5E] hover:bg-[#005E48] text-white text-xs font-bold rounded-lg transition-all text-center"
-              >
-                Access On-boarder Portal
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Solid Blue Footer (Mockup Alignment) */}
       <footer className="bg-[#002677] text-white py-12 text-center mt-auto">
