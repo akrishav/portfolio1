@@ -1,30 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
-import ThemeToggle from "@/components/ThemeToggle";
+import { OnboardingProvider } from "@/components/OnboardingState";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const fontOutfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://akrishav-portfolio-2026.netlify.app"),
-  title: "Ashish Rishav | Product Manager",
-  description: "Product Manager | Data-driven | 0→1 & Scale",
-  openGraph: {
-    title: "Ashish Rishav | Product Manager",
-    description: "Product Manager | Data-driven | 0→1 & Scale",
-    url: "https://akrishav-portfolio-2026.netlify.app",
-    siteName: "Ashish Rishav Portfolio",
-    locale: "en_US",
-    type: "website",
-  },
+  title: "StaffHC Onboarding | Candidate Transparency Portal",
+  description: "A one-stop-shop candidate portal for tracking StaffHC 7-step onboarding process with full transparency.",
 };
 
 export default function RootLayout({
@@ -35,10 +21,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${fontOutfit.variable} antialiased bg-white text-slate-900 font-sans`}
       >
-        <ThemeToggle />
-        {children}
+        <OnboardingProvider>
+          {children}
+        </OnboardingProvider>
       </body>
     </html>
   );
