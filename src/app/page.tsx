@@ -211,7 +211,7 @@ export default function Home() {
                 <p className="text-xs text-slate-500 leading-relaxed font-semibold">
                   Set up your free account by entering your basic details, experience, and nursing credentials in{" "}
                   <Link href="/onboarding" className="text-[#0052CC] font-bold hover:underline">
-                    candidate.thehummingbird.pro
+                    candidate.staffhc.com
                   </Link>
                 </p>
               </div>
@@ -541,7 +541,7 @@ export default function Home() {
           </div>
 
           <div className="pt-6 border-t border-white/10 text-[10px] text-slate-400 font-medium w-full text-center">
-            © 2026 StaffHC Inc. All rights reserved.
+            © 2026 Staff HC INC. All rights reserved.
           </div>
         </div>
       </footer>

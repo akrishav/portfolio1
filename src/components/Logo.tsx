@@ -4,22 +4,28 @@ import React from "react";
 
 export default function Logo() {
   return (
-    <div className="flex items-center gap-1.5 select-none">
-      <svg viewBox="0 0 100 100" className="w-10 h-10 shrink-0">
+    <div className="flex items-center gap-2 select-none">
+      <svg viewBox="0 0 100 100" className="w-12 h-12 shrink-0">
         <g transform="translate(50, 50)">
           {/* Left Teal Diamond */}
-          <g transform="translate(-24, 0)">
+          <g transform="translate(-18, 12)">
             <polygon points="-22,0 0,-22 22,0 0,22" fill="#159FB6" />
           </g>
-          {/* Bottom Dark Blue Diamond */}
-          <g transform="translate(0, 24)">
-            <polygon points="-22,0 0,-22 22,0 0,22" fill="#132B48" />
+          {/* Right Dark Blue Diamond */}
+          <g transform="translate(18, 12)">
+            <polygon points="-26,0 0,-26 26,0 0,26" fill="#19315A" />
           </g>
           {/* Top Teal Circle */}
-          <circle cx="0" cy="-24" r="15.5" fill="#159FB6" />
+          <circle cx="-16" cy="-24" r="16" fill="#159FB6" />
+          
+          {/* White cutout to create the person's 'arms' and 'neck' space */}
+          <g transform="translate(-16, -5)">
+            <circle cx="0" cy="0" r="10" fill="white" />
+            <polygon points="-12,-12 -12,12 12,12 12,-12" fill="none" stroke="white" strokeWidth="6" />
+          </g>
         </g>
       </svg>
-      <span className="font-sans font-[500] text-[22px] text-[#132B48] tracking-tight">
+      <span className="font-sans font-[600] text-[28px] text-[#19315A] tracking-[-0.02em]">
         Staff HC
       </span>
     </div>
