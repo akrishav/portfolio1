@@ -30,8 +30,11 @@ export default function OnboardingPage() {
   const [otpCode, setOtpCode] = useState("");
   const [loginError, setLoginError] = useState("");
 
-  // Menu active state: overview | documents | messages | emails | costs | settings | help
-  const [activeMenu, setActiveMenu] = useState<"overview" | "documents" | "messages" | "emails" | "costs" | "settings" | "help">("overview");
+  // Active Header Tab: dashboard | onboard
+  const [activeHeaderTab, setActiveHeaderTab] = useState<"dashboard" | "onboard">("dashboard");
+
+  // Menu active state: overview | documents | messages | emails | settings
+  const [activeMenu, setActiveMenu] = useState<"overview" | "documents" | "messages" | "emails" | "settings">("overview");
 
   // Mobile / Tablet Tab switching state (Active panel when not on full 3-column desktop)
   const [mobileActiveTab, setMobileActiveTab] = useState<"overview" | "documents" | "chat">("overview");
@@ -47,7 +50,7 @@ export default function OnboardingPage() {
 
   const candidate = candidates.find(
     (c) => c.email.toLowerCase() === loggedInUser?.email?.toLowerCase()
-  ) || candidates[0];
+  );
 
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,9 +118,9 @@ export default function OnboardingPage() {
             <Logo />
 
             <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-slate-500">
-              <Link href="/" className="hover:text-[#0052CC]">Find Jobs</Link>
+              <Link href="/jobs" className="hover:text-[#0052CC]">Find Jobs</Link>
               <a href="#" className="text-[#0052CC]">Dashboard</a>
-              <a href="#" className="hover:text-[#0052CC]">Support</a>
+              <a href="#" className="hover:text-[#0052CC]">Onboard</a>
             </nav>
 
             <div className="flex items-center gap-4">
@@ -182,7 +185,7 @@ export default function OnboardingPage() {
                     <Mail className="absolute left-4 top-3.5 h-4.5 w-4.5 text-slate-400" />
                   </div>
                   <span className="text-[10px] text-slate-400 block mt-2 font-medium">
-                    We'll send a 6-digit security code to this address.
+                    We'll send a 6-digit security code to this address. (Demo — any email and any OTP will work)
                   </span>
                 </div>
 
@@ -328,9 +331,21 @@ export default function OnboardingPage() {
           <Logo />
 
           <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-slate-500">
-            <a href="#" className="hover:text-[#0052CC] transition-colors">Find Jobs</a>
-            <a href="#" className="text-[#0052CC] transition-colors border-b-2 border-[#0052CC] pb-5 mt-5">Dashboard</a>
-            <a href="#" className="hover:text-[#0052CC] transition-colors">Support</a>
+            <Link href="/jobs" className="hover:text-[#0052CC] transition-colors">Find Jobs</Link>
+            <button
+              onClick={() => setActiveHeaderTab("dashboard")}
+              className={`transition-colors pb-5 mt-5 border-[#0052CC] ${activeHeaderTab === "dashboard" ? "text-[#0052CC] border-b-2 font-extrabold" : "hover:text-[#0052CC]"}`}
+            >
+              Dashboard
+            </button>
+            {!candidate?.hasNoApplication && (
+              <button
+                onClick={() => setActiveHeaderTab("onboard")}
+                className={`transition-colors pb-5 mt-5 border-[#0052CC] ${activeHeaderTab === "onboard" ? "text-[#0052CC] border-b-2 font-extrabold" : "hover:text-[#0052CC]"}`}
+              >
+                Onboard
+              </button>
+            )}
           </nav>
 
           <div className="flex items-center gap-4">
@@ -349,148 +364,155 @@ export default function OnboardingPage() {
         </div>
       </header>
 
-      {/* Mobile/Tablet tab switcher for responsive visibility */}
-      <div className="lg:hidden bg-white border-b border-slate-200 flex justify-around py-3 text-xs font-bold text-slate-500">
-        <button 
-          onClick={() => { setActiveMenu("overview"); setMobileActiveTab("overview"); }}
-          className={`pb-1 px-3 ${activeMenu === "overview" ? "text-[#0052CC] border-b-2 border-[#0052CC]" : ""}`}
-        >
-          Overview
-        </button>
-        <button 
-          onClick={() => { setActiveMenu("documents"); setMobileActiveTab("documents"); }}
-          className={`pb-1 px-3 ${activeMenu === "documents" ? "text-[#0052CC] border-b-2 border-[#0052CC]" : ""}`}
-        >
-          Documents
-        </button>
-        <button 
-          onClick={() => { setActiveMenu("emails"); }}
-          className={`pb-1 px-3 ${activeMenu === "emails" ? "text-[#0052CC] border-b-2 border-[#0052CC]" : ""}`}
-        >
-          Emails ({candidateEmails.length})
-        </button>
-        <button 
-          onClick={() => { setActiveMenu("costs"); }}
-          className={`pb-1 px-3 ${activeMenu === "costs" ? "text-[#0052CC] border-b-2 border-[#0052CC]" : ""}`}
-        >
-          Costs
-        </button>
-        <button 
-          onClick={() => { setActiveMenu("messages"); setMobileActiveTab("chat"); }}
-          className={`pb-1 px-3 ${activeMenu === "messages" ? "text-[#0052CC] border-b-2 border-[#0052CC]" : ""}`}
-        >
-          Recruiter Chat
-        </button>
-      </div>
-
-      {/* Main dashboard content area split into sidebar, middle, and right columns */}
-      <div className="grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8 items-start">
-        
-        {/* COLUMN 1: LEFT SIDEBAR (Always visible on large screens) */}
-        <aside className="w-full lg:w-60 bg-white border border-slate-200 rounded-2xl p-6 lg:flex flex-col h-[560px] shadow-sm justify-between shrink-0 hidden">
-          <div className="space-y-6">
-            <div className="px-3">
-              <span className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400 block">
-                StaffHC
-              </span>
-              <span className="text-xs font-semibold text-slate-550 block -mt-0.5">
-                Candidate Portal
-              </span>
+      {candidate?.hasNoApplication ? (
+        <div className="grow max-w-lg w-full mx-auto px-4 py-16 flex items-center justify-center">
+          <div className="w-full bg-white border border-slate-200 rounded-2xl p-10 shadow-lg text-center space-y-6">
+            <div className="flex justify-center">
+              <div className="h-16 w-16 bg-[#EBF3FC] rounded-full flex items-center justify-center text-[#0052CC]">
+                <Layout className="h-8 w-8" />
+              </div>
             </div>
-
-            <nav className="space-y-1.5">
-              <button
-                onClick={() => setActiveMenu("overview")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                  activeMenu === "overview"
-                    ? "bg-[#EBF3FC] text-[#0052CC]"
-                    : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
-                }`}
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold text-slate-800">You haven't applied to any jobs yet</h2>
+              <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                To start your onboarding journey and compliance tracking, find and apply to matching healthcare positions on our job board.
+              </p>
+            </div>
+            <div className="pt-2 flex flex-col gap-2">
+              <Link 
+                href="/jobs"
+                className="w-full py-3 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg uppercase tracking-wider transition-all shadow flex items-center justify-center gap-1.5"
               >
-                <Layout className="h-4.5 w-4.5" />
+                Find Jobs
+              </Link>
+              <button 
+                onClick={() => logout()}
+                className="w-full py-3 border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-slate-800 text-xs font-bold rounded-lg transition-all"
+              >
+                Logout & Return
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Mobile/Tablet tab switcher for responsive visibility */}
+          {activeHeaderTab === "dashboard" && (
+            <div className="lg:hidden bg-white border-b border-slate-200 flex justify-around py-3 text-xs font-bold text-slate-500">
+              <button 
+                onClick={() => { setActiveMenu("overview"); setMobileActiveTab("overview"); }}
+                className={`pb-1 px-3 ${activeMenu === "overview" ? "text-[#0052CC] border-b-2 border-[#0052CC]" : ""}`}
+              >
                 Overview
               </button>
-              <button
-                onClick={() => setActiveMenu("documents")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                  activeMenu === "documents"
-                    ? "bg-[#EBF3FC] text-[#0052CC]"
-                    : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
-                }`}
+              <button 
+                onClick={() => { setActiveMenu("documents"); setMobileActiveTab("documents"); }}
+                className={`pb-1 px-3 ${activeMenu === "documents" ? "text-[#0052CC] border-b-2 border-[#0052CC]" : ""}`}
               >
-                <FileText className="h-4.5 w-4.5" />
                 Documents
               </button>
-              <button
-                onClick={() => setActiveMenu("emails")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                  activeMenu === "emails"
-                    ? "bg-[#EBF3FC] text-[#0052CC]"
-                    : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
-                }`}
+              <button 
+                onClick={() => { setActiveMenu("emails"); }}
+                className={`pb-1 px-3 ${activeMenu === "emails" ? "text-[#0052CC] border-b-2 border-[#0052CC]" : ""}`}
               >
-                <Inbox className="h-4.5 w-4.5" />
-                <span>Emails</span>
-                {candidateEmails.length > 0 && (
-                  <span className="ml-auto bg-[#0052CC] text-white font-bold rounded-full text-[9px] w-4.5 h-4.5 flex items-center justify-center">
-                    {candidateEmails.length}
-                  </span>
-                )}
+                Emails ({candidateEmails.length})
               </button>
-              <button
-                onClick={() => setActiveMenu("costs")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                  activeMenu === "costs"
-                    ? "bg-[#EBF3FC] text-[#0052CC]"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-                }`}
+              <button 
+                onClick={() => { setActiveMenu("messages"); setMobileActiveTab("chat"); }}
+                className={`pb-1 px-3 ${activeMenu === "messages" ? "text-[#0052CC] border-b-2 border-[#0052CC]" : ""}`}
               >
-                <DollarSign className="h-4.5 w-4.5" />
-                <span>Costs</span>
-              </button>
-              <button
-                onClick={() => setActiveMenu("messages")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                  activeMenu === "messages"
-                    ? "bg-[#EBF3FC] text-[#0052CC]"
-                    : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
-                }`}
-              >
-                <Send className="h-4.5 w-4.5" />
                 Recruiter Chat
               </button>
-              <button
-                onClick={() => setActiveMenu("settings")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                  activeMenu === "settings"
-                    ? "bg-[#EBF3FC] text-[#0052CC]"
-                    : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
-                }`}
-              >
-                <Settings className="h-4.5 w-4.5" />
-                Settings
-              </button>
-              <button
-                onClick={() => setActiveMenu("help")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                  activeMenu === "help"
-                    ? "bg-[#EBF3FC] text-[#0052CC]"
-                    : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
-                }`}
-              >
-                <HelpCircle className="h-4.5 w-4.5" />
-                Help
-              </button>
-            </nav>
-          </div>
+            </div>
+          )}
 
-          <div className="space-y-3 pt-6 border-t border-slate-100">
-            <button 
-              onClick={() => alert("Simulating viewing profile details...")}
-              className="w-full py-2.5 bg-[#002677] hover:bg-[#001D5B] text-white text-xs font-bold rounded-lg transition-all"
-            >
-              View Profile
-            </button>
+          {/* Main dashboard content area split into sidebar, middle, and right columns */}
+          {activeHeaderTab === "dashboard" ? (
+            <div className="grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8 items-start">
+              
+              {/* COLUMN 1: LEFT SIDEBAR (Always visible on large screens) */}
+              <aside className="w-full lg:w-60 bg-white border border-slate-200 rounded-2xl p-6 lg:flex flex-col h-[560px] shadow-sm justify-between shrink-0 hidden">
+                <div className="space-y-6">
+                  <div className="px-3">
+                    <span className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400 block">
+                      StaffHC
+                    </span>
+                    <span className="text-xs font-semibold text-slate-550 block -mt-0.5">
+                      Candidate Portal
+                    </span>
+                  </div>
+
+                  <nav className="space-y-1.5">
+                    <button
+                      onClick={() => setActiveMenu("overview")}
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                        activeMenu === "overview"
+                          ? "bg-[#EBF3FC] text-[#0052CC]"
+                          : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
+                      }`}
+                    >
+                      <Layout className="h-4.5 w-4.5" />
+                      Overview
+                    </button>
+                    <button
+                      onClick={() => setActiveMenu("documents")}
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                        activeMenu === "documents"
+                          ? "bg-[#EBF3FC] text-[#0052CC]"
+                          : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
+                      }`}
+                    >
+                      <FileText className="h-4.5 w-4.5" />
+                      Documents
+                    </button>
+                    <button
+                      onClick={() => setActiveMenu("emails")}
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                        activeMenu === "emails"
+                          ? "bg-[#EBF3FC] text-[#0052CC]"
+                          : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
+                      }`}
+                    >
+                      <Inbox className="h-4.5 w-4.5" />
+                      <span>Emails</span>
+                      {candidateEmails.length > 0 && (
+                        <span className="ml-auto bg-[#0052CC] text-white font-bold rounded-full text-[9px] w-4.5 h-4.5 flex items-center justify-center">
+                          {candidateEmails.length}
+                        </span>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setActiveMenu("messages")}
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                        activeMenu === "messages"
+                          ? "bg-[#EBF3FC] text-[#0052CC]"
+                          : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
+                      }`}
+                    >
+                      <Send className="h-4.5 w-4.5" />
+                      Recruiter Chat
+                    </button>
+                    <button
+                      onClick={() => setActiveMenu("settings")}
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                        activeMenu === "settings"
+                          ? "bg-[#EBF3FC] text-[#0052CC]"
+                          : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
+                      }`}
+                    >
+                      <Settings className="h-4.5 w-4.5" />
+                      Settings
+                    </button>
+                  </nav>
+                </div>
+
+                <div className="space-y-3 pt-6 border-t border-slate-100">
+                  <button 
+                    onClick={() => alert("Simulating viewing profile details...")}
+                    className="w-full py-2.5 bg-[#002677] hover:bg-[#001D5B] text-white text-xs font-bold rounded-lg transition-all"
+                  >
+                    View Profile
+                  </button>
             <button
               onClick={() => logout()}
               className="w-full flex items-center justify-center gap-2 py-2 text-slate-500 hover:text-slate-800 text-xs font-bold transition-all"
@@ -510,182 +532,98 @@ export default function OnboardingPage() {
               {/* Welcome Header */}
               <div className="flex flex-col gap-1">
                 <h1 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
-                  Welcome back, {candidate.name}
+                  Welcome back, {candidate?.name}
                 </h1>
                 <p className="text-xs text-slate-400 font-medium">
-                  Track your onboarding and complete missing tasks to get placed faster.
+                  Track your job applications, profile details, and compliance here.
                 </p>
               </div>
 
-              {/* ONBOARDING STATUS TIMELINE CARD */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                <div className="flex justify-between items-start mb-6">
+              {/* QUICK JOB PROFILE CARD */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <h3 className="font-bold text-slate-800 text-sm">Your Placement Information</h3>
+                  <div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-500 font-semibold">
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Position</span>
+                      <span className="text-slate-700">{candidate?.jobTitle}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Client Site</span>
+                      <span className="text-slate-700">{candidate?.clientName}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Employment Type</span>
+                      <span className="text-slate-700">{candidate?.employmentType}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Start Date</span>
+                      <span className="text-slate-700">{candidate?.startDate}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-[#EBF3FC] text-[#0052CC] text-xs font-bold px-3 py-1.5 rounded-lg border border-[#DEEAF7]">
+                  Status: Initiated
+                </div>
+              </div>
+
+              {/* DYNAMIC ACTION CARD FOR ONBOARDING CHECKLIST */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-bold text-slate-800 text-sm">Onboarding Status</h3>
-                    <p className="text-[11px] text-slate-400 font-semibold mt-1">
-                      You are currently at <span className="text-[#0052CC]">Step {candidate.currentStep}: {candidate.onboardingSteps[candidate.currentStep - 1].name}</span>.
+                    <h3 className="font-bold text-slate-800 text-sm">Onboarding Checklist</h3>
+                    <p className="text-xs text-slate-500 mt-1 font-semibold leading-relaxed">
+                      You have pending compliance documents required for your role placement. Please navigate to the Onboard tab to complete your tasks.
                     </p>
                   </div>
-
-                  {/* Pink action required banner inside Card header */}
-                  {candidate.stepStatus === "stuck" && (
-                    <div className="bg-[#FFF0F0] border border-[#FFD5D5] px-3 py-1 rounded text-[10.5px] text-[#C53030] flex items-center gap-1.5 font-bold">
-                      <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
-                      Action required: Upload Nursing License
-                    </div>
+                  {candidate?.stepStatus === "stuck" && (
+                    <span className="bg-red-50 text-red-650 font-bold text-[10px] px-2.5 py-0.5 rounded border border-red-100 animate-pulse uppercase">
+                      Action Required
+                    </span>
                   )}
                 </div>
 
-                {/* Horizontal Timeline */}
-                <div className="relative pt-6 pb-2">
-                  {/* Connected background bar line (Horizontal center of circles) */}
-                  <div className="absolute top-[32px] left-[6%] right-[6%] h-[3px] bg-slate-100 -z-0"></div>
-                  {/* Connected blue progress bar line */}
-                  <div 
-                    className="absolute top-[32px] left-[6%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
-                    style={{
-                      width: `${((candidate.onboardingSteps.filter(s => s.status === "completed").length - 0.5) / 6) * 88}%`
-                    }}
-                  ></div>
-
-                  <div className="flex justify-between items-start relative z-10">
-                    {candidate.onboardingSteps.map((step) => {
-                      const isDone = step.status === "completed";
-                      const isActive = step.number === candidate.currentStep;
-
-                      return (
-                        <div key={step.number} className="flex flex-col items-center text-center w-[12%]">
-                          {/* Circle Node */}
-                          <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
-                            isDone 
-                              ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10" 
-                              : isActive
-                              ? "bg-white border-2 border-[#0052CC] text-[#0052CC] ring-4 ring-[#0052CC]/15"
-                              : "bg-slate-100 border-slate-200 text-slate-400"
-                          }`}>
-                            {isDone ? (
-                              <Check className="h-4 w-4 stroke-[3px]" />
-                            ) : step.number === 7 ? (
-                              <span className="text-[10px]">🏁</span>
-                            ) : (
-                              step.number
-                            )}
-                          </div>
-                          
-                          {/* Step Name */}
-                          <span className={`text-[10.5px] mt-2.5 font-bold block truncate max-w-full ${
-                            isActive ? "text-[#0052CC] font-extrabold" : "text-slate-450"
-                          }`}>
-                            {step.name}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              {/* REQUIRED DOCUMENTS LIST CARD */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-bold text-slate-800 text-sm">Required Documents</h3>
-                  <span className="bg-[#EBF3FC] text-[#0052CC] font-bold text-[10px] px-2.5 py-0.5 rounded-full uppercase">
-                    {candidate.onboardingSteps.filter(s => s.status !== "completed" && s.number <= 3).length} Pending
-                  </span>
-                </div>
-
-                <div className="divide-y divide-slate-100">
-                  {/* Row 1 */}
-                  <div className="py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-red-50 text-red-500 rounded-lg flex items-center justify-center shrink-0 border border-red-100">
-                        <FileText className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-800">Professional Nursing License</h4>
-                        <p className="text-[10.5px] text-slate-400 mt-0.5 font-medium">Missing or expired license file.</p>
-                      </div>
-                    </div>
-                    <div>
-                      {candidate.onboardingSteps[2].status === "completed" ? (
-                        <div className="h-8 w-8 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 text-emerald-500">
-                          <Check className="h-4 w-4" />
-                        </div>
-                      ) : candidate.onboardingSteps[2].status === "in_progress" ? (
-                        <span className="text-[10px] font-bold text-amber-500 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded">Awaiting Review</span>
-                      ) : (
-                        <button 
-                          onClick={() => triggerUploadFile(3, "Nursing_License_Marcus.pdf")}
-                          className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all"
-                        >
-                          Upload
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Row 2 */}
-                  <div className="py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-[#EBF3FC] text-[#0052CC] rounded-lg flex items-center justify-center shrink-0 border border-[#DEEAF7]">
-                        <FileText className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-800">Immunization Records</h4>
-                        <p className="text-[10.5px] text-slate-400 mt-0.5 font-medium">Update required for Hep B series.</p>
-                      </div>
-                    </div>
-                    <div>
-                      <button 
-                        onClick={() => triggerUploadFile(3, "Immunization_Records_Marcus.pdf")}
-                        className="px-4 py-1.5 bg-[#EBF3FC] hover:bg-[#DEEAF7] text-[#0052CC] text-xs font-bold rounded-lg transition-all"
-                      >
-                        Review
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Row 3 */}
-                  <div className="py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-slate-50 text-slate-455 rounded-lg flex items-center justify-center shrink-0 border border-slate-100">
-                        <FileText className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-850">Background Check Consent</h4>
-                        <p className="text-[10.5px] text-slate-400 mt-0.5 font-medium">Completed on Oct 24, 2023</p>
-                      </div>
-                    </div>
-                    <div className="h-8 w-8 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 text-emerald-500">
-                      <CheckCircle2 className="h-5 w-5" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* PROFILE COMPLETION CTA CARD */}
-              <div className="bg-[#0052CC] text-white rounded-2xl p-6 shadow-md flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] opacity-5"></div>
-
-                <div className="max-w-md relative z-10 space-y-2">
-                  <h4 className="text-sm font-extrabold">Your Candidate Profile is 75% complete.</h4>
-                  <p className="text-[11px] text-slate-100 leading-relaxed font-semibold">
-                    Adding your specialty preferences helps us match you with the right high-paying assignments in your area.
-                  </p>
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
                   <button 
-                    onClick={() => alert("Simulating finishing profile...")}
-                    className="mt-3 px-4 py-2 bg-white text-[#0052CC] hover:bg-slate-50 text-xs font-bold rounded-lg transition-all"
+                    onClick={() => setActiveHeaderTab("onboard")}
+                    className="px-5 py-2.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all shadow-sm flex items-center gap-1.5"
                   >
-                    Finish Profile
+                    Go to Onboard Checklist
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                  <button 
+                    onClick={() => setActiveMenu("documents")}
+                    className="px-5 py-2.5 border border-slate-200 hover:bg-slate-55 text-slate-650 text-xs font-bold rounded-lg transition-all"
+                  >
+                    View Uploaded Files
                   </button>
                 </div>
-                
-                <div className="aspect-[4/3] w-36 rounded-xl overflow-hidden shadow-inner border border-white/20 shrink-0 relative z-10">
-                  <img 
-                    src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=300&auto=format&fit=crop" 
-                    alt="Workspace laptop" 
-                    className="w-full h-full object-cover"
-                  />
+              </div>
+
+              {/* QUICK RECENT UPDATES FEED */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                <h3 className="font-bold text-slate-800 text-sm">Recent Communications</h3>
+                <div className="space-y-3 divide-y divide-slate-100">
+                  {candidateMessages.length > 0 ? (
+                    <div className="pt-3 text-xs text-slate-500 font-medium flex items-center justify-between">
+                      <div>
+                        <strong className="text-slate-800 font-bold">Recruiter {candidate?.recruiterName}</strong>: "{candidateMessages[candidateMessages.length - 1].text.substring(0, 50)}..."
+                      </div>
+                      <span className="text-[10px] text-slate-400">{candidateMessages[candidateMessages.length - 1].timestamp}</span>
+                    </div>
+                  ) : (
+                    <div className="pt-3 text-xs text-slate-400">No recent chat messages.</div>
+                  )}
+
+                  {candidateEmails.length > 0 && (
+                    <div className="pt-3 text-xs text-slate-500 font-medium flex items-center justify-between">
+                      <div>
+                        <strong className="text-slate-800 font-bold">Email Sync Notification</strong>: "{candidateEmails[candidateEmails.length - 1].subject}"
+                      </div>
+                      <span className="text-[10px] text-slate-400">{candidateEmails[candidateEmails.length - 1].timestamp}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -813,56 +751,8 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Menu Panel 5: COST TRANSPARENCY */}
-          {activeMenu === "costs" && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 text-left">
-              <div>
-                <h3 className="font-bold text-[#162f55] text-sm flex items-center gap-2">
-                  <DollarSign className="h-4.5 w-4.5 text-[#0052CC]" />
-                  Onboarding Transaction Costs Ledger
-                </h3>
-                <p className="text-[11px] text-slate-400 mt-1 font-semibold">
-                  A transparent breakdown of all verification, screening, and diagnostic costs incurred during your compliance onboarding.
-                </p>
-              </div>
-
-              <div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100 text-xs bg-white">
-                <div className="p-4 flex justify-between font-semibold">
-                  <span className="text-slate-500">Aya Background Screening Fee</span>
-                  <span className="text-slate-800 font-bold">$45.00</span>
-                </div>
-                <div className="p-4 flex justify-between font-semibold">
-                  <span className="text-slate-550">10-Panel Drug Screen Diagnostic Voucher</span>
-                  <span className="text-slate-800 font-bold">$35.00</span>
-                </div>
-                <div className="p-4 flex justify-between font-semibold">
-                  <span className="text-slate-555">E-Verify Processing Surcharge</span>
-                  <span className="text-slate-800 font-bold">$10.00</span>
-                </div>
-                <div className="p-4 flex justify-between font-semibold">
-                  <span className="text-slate-555">Credential Verification & Certifications checks</span>
-                  <span className="text-slate-800 font-bold">$25.00</span>
-                </div>
-                <div className="p-4 bg-slate-50 flex justify-between font-extrabold text-sm border-t border-slate-250">
-                  <span className="text-slate-800">Total Onboarding Placement Cost</span>
-                  <span className="text-[#007A5E] font-black">$115.00</span>
-                </div>
-              </div>
-              
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-3">
-                <div className="h-9 w-9 bg-emerald-50 text-[#007A5E] border border-emerald-100 rounded-full flex items-center justify-center shrink-0">
-                  <Check className="h-4 w-4" />
-                </div>
-                <div className="text-[11px] font-semibold text-slate-650">
-                  <span className="font-bold text-slate-700 block">Fully Covered by CDK Global</span>
-                  All screening expenses are paid directly by the employer placement partner. No candidate payment is required.
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Menu Panel 6: SETTINGS & HELP */}
-          {(activeMenu === "settings" || activeMenu === "help") && (
+          {/* Menu Panel 6: SETTINGS */}
+          {activeMenu === "settings" && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-center py-16">
               <Settings className="h-10 w-10 text-slate-300 mx-auto mb-3" />
               <p className="text-xs text-slate-500 font-bold">Menu item simulated.</p>
@@ -994,8 +884,254 @@ export default function OnboardingPage() {
             </div>
           </div>
 
-        </aside>
-      </div>
+          </aside>
+        </div>
+      ) : (
+            <div className="grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8 items-start">
+              
+              {/* Stepper column */}
+              <section className="flex-1 space-y-6 w-full text-left">
+                {/* Header info */}
+                <div className="flex flex-col gap-1">
+                  <h1 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
+                    Onboarding Portal
+                  </h1>
+                  <p className="text-xs text-slate-400 font-medium">
+                    Complete the 7-step compliance checks below to start your shift.
+                  </p>
+                </div>
+
+                {/* ONBOARDING STATUS TIMELINE CARD */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                  {/* Timeline header */}
+                  <div className="flex justify-between items-start mb-6">
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-sm">Onboarding Status</h3>
+                      <p className="text-[11px] text-slate-400 font-semibold mt-1">
+                        You are currently at <span className="text-[#0052CC]">Step {candidate?.currentStep}: {candidate?.onboardingSteps[candidate?.currentStep - 1]?.name}</span>.
+                      </p>
+                    </div>
+
+                    {/* Pink action required banner */}
+                    {candidate?.stepStatus === "stuck" && (
+                      <div className="bg-[#FFF0F0] border border-[#FFD5D5] px-3 py-1 rounded text-[10.5px] text-[#C53030] flex items-center gap-1.5 font-bold">
+                        <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
+                        Action required: Upload Nursing License
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Horizontal Timeline Circles */}
+                  <div className="relative pt-6 pb-2">
+                    {/* Progress bar line */}
+                    <div className="absolute top-1/2 left-[6%] right-[6%] h-1 bg-slate-100 -translate-y-1/2 rounded z-0"></div>
+                    <div 
+                      className="absolute top-1/2 left-[6%] h-1 bg-[#0052CC] -translate-y-1/2 rounded z-0 transition-all duration-500"
+                      style={{
+                        width: `${((candidate?.onboardingSteps.filter(s => s.status === "completed").length - 0.5) / 6) * 88}%`
+                      }}
+                    ></div>
+
+                    <div className="relative z-10 flex justify-between items-center px-1">
+                      {candidate?.onboardingSteps.map((step) => {
+                        const isCompleted = step.status === "completed";
+                        const isInProgress = step.status === "in_progress";
+                        const isStuck = step.status === "stuck";
+                        
+                        return (
+                          <div key={step.number} className="flex flex-col items-center gap-2">
+                            <button 
+                              className={`h-8 w-8 rounded-full border-2 flex items-center justify-center font-bold text-xs transition-all ${
+                                isCompleted 
+                                  ? "bg-[#0052CC] border-[#0052CC] text-white" 
+                                  : isInProgress
+                                  ? "bg-white border-[#0052CC] text-[#0052CC]"
+                                  : isStuck
+                                  ? "bg-red-500 border-red-500 text-white animate-pulse"
+                                  : "bg-white border-slate-200 text-slate-400"
+                              }`}
+                            >
+                              {isCompleted ? <Check className="h-4 w-4" /> : step.number}
+                            </button>
+                            <span className={`text-[10px] font-bold ${
+                              isCompleted || isInProgress || isStuck ? "text-slate-800" : "text-slate-400"
+                            }`}>
+                              {step.name}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stuck detail panel or dynamic step instruction details */}
+                {candidate?.stepStatus === "stuck" && (
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-left">
+                    <div className="flex items-center gap-2 text-rose-600 mb-3">
+                      <AlertCircle className="h-5 w-5" />
+                      <h3 className="font-bold text-sm">Step 3 Stuck: {candidate?.stuckReason}</h3>
+                    </div>
+                    <p className="text-xs text-slate-500 font-medium leading-relaxed mb-6">
+                      {candidate?.stuckExplanation}
+                    </p>
+
+                    {/* Drag and drop upload zone representation */}
+                    <div className="border-2 border-dashed border-[#DEEAF7] bg-[#F8FAFC] hover:bg-[#F1F5F9] rounded-xl p-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all">
+                      <UploadCloud className="h-10 w-10 text-[#0052CC]" />
+                      <h4 className="text-xs font-bold text-slate-800">Upload Professional Nursing License</h4>
+                      <p className="text-[10px] text-slate-400 font-semibold">PDF, JPEG, or PNG up to 10MB</p>
+                      
+                      <div className="mt-4">
+                        {candidate?.onboardingSteps[2]?.status === "completed" ? (
+                          <div className="h-8 w-8 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 text-emerald-500">
+                            <Check className="h-4 w-4" />
+                          </div>
+                        ) : candidate?.onboardingSteps[2]?.status === "in_progress" ? (
+                          <span className="text-[10px] font-bold text-amber-500 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded">Awaiting Review</span>
+                        ) : (
+                          <button 
+                            onClick={() => triggerUploadFile(3, "Nursing_License_Marcus.pdf")}
+                            className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all"
+                          >
+                            Upload File
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Steps checklist Accordion */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                  <h3 className="font-bold text-slate-800 text-sm mb-4">Complete Onboarding Checklist</h3>
+                  <div className="divide-y divide-slate-100">
+                    {candidate?.onboardingSteps.map((step) => (
+                      <div key={step.number} className="py-3.5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                            step.status === "completed" 
+                              ? "bg-emerald-50 text-emerald-600 border border-emerald-100" 
+                              : step.status === "stuck"
+                              ? "bg-rose-50 text-rose-600 border border-rose-100"
+                              : "bg-slate-50 text-slate-400 border border-slate-100"
+                          }`}>
+                            {step.number}
+                          </span>
+                          <div>
+                            <h4 className="text-xs font-bold text-slate-800">{step.name}</h4>
+                            <p className="text-[10.5px] text-slate-400 mt-0.5 font-medium">{step.description}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {step.status === "completed" && (
+                            <span className="text-[10px] font-extrabold text-emerald-600 uppercase bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                              Completed
+                            </span>
+                          )}
+                          {step.status === "in_progress" && (
+                            <span className="text-[10px] font-extrabold text-[#0052CC] uppercase bg-[#EBF3FC] px-2 py-0.5 rounded border border-[#DEEAF7]">
+                              In Progress
+                            </span>
+                          )}
+                          {step.status === "stuck" && (
+                            <span className="text-[10px] font-extrabold text-rose-600 uppercase bg-rose-50 px-2 py-0.5 rounded border border-rose-100 animate-pulse">
+                              Stuck
+                            </span>
+                          )}
+                          {step.status === "pending" && (
+                            <span className="text-[10px] font-extrabold text-slate-400 uppercase bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
+                              Pending
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              {/* Chat Column on the Right */}
+              <aside className="w-full lg:w-80 space-y-6 shrink-0">
+                {/* Recruiter Contact card */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col h-[360px] justify-between">
+                  {/* Header */}
+                  <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
+                    <div className="relative">
+                      <div className="h-10 w-10 rounded-full overflow-hidden border border-slate-100">
+                        <img 
+                          src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
+                          alt="Mani" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <span className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 rounded-full border-2 border-white"></span>
+                    </div>
+                    <div className="text-left">
+                      <h4 className="text-xs font-bold text-slate-800">Mani</h4>
+                      <span className="text-[10px] text-slate-400 font-bold block">Online • Your Recruiter</span>
+                    </div>
+                  </div>
+
+                  {/* Chat Body */}
+                  <div className="grow overflow-y-auto py-3 space-y-3 no-scrollbar text-xs flex flex-col">
+                    {candidateMessages.map((msg) => {
+                      const isRecruiter = msg.sender === "recruiter";
+                      const isSystem = msg.sender === "system";
+
+                      if (isSystem) {
+                        return (
+                          <div key={msg.id} className="text-center py-0.5">
+                            <span className="inline-block px-2 py-0.5 bg-slate-50 border border-slate-100 rounded text-[9px] text-slate-400 font-mono">
+                              {msg.text}
+                            </span>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div
+                          key={msg.id}
+                          className={`flex flex-col max-w-[85%] ${
+                            isRecruiter ? "self-start" : "self-end items-end"
+                          }`}
+                        >
+                          <div
+                            className={`p-2.5 rounded-2xl ${
+                              isRecruiter
+                                ? "bg-slate-50 border border-slate-150 text-slate-800 rounded-tl-none text-left"
+                                : "bg-[#0052CC] text-white rounded-tr-none text-right"
+                            }`}
+                          >
+                            <p className="leading-relaxed font-semibold">{msg.text}</p>
+                          </div>
+                          <span className="text-[9px] text-slate-400 mt-1 font-semibold">
+                            {msg.timestamp}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Send chat footer */}
+                  <form onSubmit={handleSendMessage} className="relative mt-2 border-t border-slate-100 pt-3">
+                    <input 
+                      type="text" 
+                      value={chatMessage}
+                      onChange={(e) => setChatMessage(e.target.value)}
+                      placeholder="Type a message..."
+                      className="w-full pl-3 pr-10 py-2 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-[#0052CC]"
+                    />
+                    <button type="submit" className="absolute right-2 top-5 text-[#0052CC] hover:text-[#0042A3]">
+                      <Send className="h-4 w-4" />
+                    </button>
+                  </form>
+                </div>
+              </aside>
+            </div>
+          )}
+        </>
+      )}
 
       {/* Simulated Upload modal */}
       {showUploadModal && (

@@ -83,6 +83,10 @@ export interface Candidate {
   backgroundStatus: "Completed" | "Pending";
   drugCheckStatus: "Completed" | "Pending";
   daysStuck?: number;
+  hasNoApplication?: boolean;
+  slaStatus?: "active" | "breached";
+  slaBreachDetails?: string;
+  anomalyAlert?: string;
 }
 
 interface OnboardingContextType {
@@ -128,8 +132,8 @@ const initialCandidates = (): Candidate[] => [
     email: "candidate@healthcare.com",
     phone: "(555) 234-5678",
     jobTitle: "ICU Registered Nurse",
-    recruiterName: "Sarah Thompson",
-    recruiterEmail: "sarah.t@staffhc.com",
+    recruiterName: "Mani",
+    recruiterEmail: "mani@staffhc.com",
     candidateNo: "67288",
     clientName: "CDK Global",
     mspName: "Ascension Health (Hallmark)",
@@ -137,10 +141,11 @@ const initialCandidates = (): Candidate[] => [
     startDate: "Jul 09, 2026",
     scheduledStartDate: "Jul 09, 2026",
     scheduledEndDate: "Nov 27, 2026",
-    obOwner: "Sarah Thompson",
+    obOwner: "Mani",
     obClassification: "Clinical - Patient Facing",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R",
+    slaStatus: "active",
     currentStep: 3,
     stepStatus: "stuck",
     stuckReason: "Upload Professional Nursing License",
@@ -178,6 +183,8 @@ const initialCandidates = (): Candidate[] => [
     obClassification: "Computers",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R (Jul 08, 2026 07:13)",
+    slaStatus: "breached",
+    slaBreachDetails: "Drug screening voucher expired — background check checkmark blocked for 5 days.",
     currentStep: 3,
     stepStatus: "in_progress",
     onboardingSteps: defaultSteps().map((s, idx) => ({
@@ -212,8 +219,8 @@ const initialCandidates = (): Candidate[] => [
     email: "tiffany@example.com",
     phone: "(555) 382-9901",
     jobTitle: "ICU Registered Nurse",
-    recruiterName: "Sarah Thompson",
-    recruiterEmail: "sarah.t@staffhc.com",
+    recruiterName: "Mani",
+    recruiterEmail: "mani@staffhc.com",
     candidateNo: "67296",
     clientName: "CDK Global",
     mspName: "Ascension Health (Hallmark)",
@@ -221,10 +228,12 @@ const initialCandidates = (): Candidate[] => [
     startDate: "Jul 09, 2026",
     scheduledStartDate: "Jul 09, 2026",
     scheduledEndDate: "Nov 27, 2026",
-    obOwner: "Sarah Thompson",
+    obOwner: "Mani",
     obClassification: "Clinical - Patient Facing",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R",
+    slaStatus: "active",
+    anomalyAlert: "Signatures mismatch: FCRA form name differs from profile name 'Tiffany Vance'.",
     currentStep: 3,
     stepStatus: "stuck",
     stuckReason: "Missing Background Authorization Form",
@@ -382,7 +391,7 @@ const initialMessages = (): Message[] => [
     id: "msg-1",
     candidateId: "candidate-marcus",
     sender: "recruiter",
-    senderName: "Sarah Thompson",
+    senderName: "Mani",
     text: "Hi Marcus! I've reviewed your screening. You just need to upload that license file and we can move to interviews.",
     timestamp: "10:45 AM",
   },
@@ -391,7 +400,7 @@ const initialMessages = (): Message[] => [
     candidateId: "candidate-marcus",
     sender: "candidate",
     senderName: "Marcus",
-    text: "Thanks Sarah! Doing it now.",
+    text: "Thanks Mani! Doing it now.",
     timestamp: "10:48 AM",
   }
 ];
@@ -500,8 +509,8 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         email: cleanEmail,
         phone: "(555) 019-2831",
         jobTitle: "Registered Nurse (RN)",
-        recruiterName: "Sarah Thompson",
-        recruiterEmail: "sarah.t@staffhc.com",
+        recruiterName: "Mani",
+        recruiterEmail: "mani@staffhc.com",
         candidateNo: Math.floor(10000 + Math.random() * 90000).toString(),
         clientName: "CDK Global",
         mspName: "Ascension Health (Hallmark)",
@@ -509,16 +518,14 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         startDate: "Jul 09, 2026",
         scheduledStartDate: "Jul 09, 2026",
         scheduledEndDate: "Nov 27, 2026",
-        obOwner: "Sarah Thompson",
+        obOwner: "Mani",
         obClassification: "Clinical - Patient Facing",
         employmentType: "W2 - Hourly",
         initiatedBy: "Bindhu R",
         currentStep: 1,
-        stepStatus: "in_progress",
-        onboardingSteps: defaultSteps().map((s, idx) => ({
-          ...s,
-          status: idx === 0 ? "in_progress" : "pending"
-        })),
+        stepStatus: "pending",
+        hasNoApplication: true,
+        onboardingSteps: [],
         erpDocuments: [],
         erpPlacementItems: [],
         backgroundStatus: "Pending",
@@ -529,7 +536,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setSelectedCandidateId(newCand.id);
       return true;
     } else {
-      if (cleanEmail.includes("recruiter") || cleanEmail.includes("staffhc.com") || cleanEmail === "sarah.t@staffhc.com" || cleanEmail === "admin" || cleanEmail === "arun@example.com" || cleanEmail === "debra") {
+      if (cleanEmail.includes("recruiter") || cleanEmail.includes("staffhc.com") || cleanEmail === "mani@staffhc.com" || cleanEmail === "admin" || cleanEmail === "arun@example.com" || cleanEmail === "debra") {
         setLoggedInUser({ email: cleanEmail, role: "recruiter" });
         return true;
       }
@@ -565,7 +572,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         recipient: "candidate",
         recipientName: cand.name,
         channel: "sms",
-        subject: "New Message from Sarah",
+        subject: "New Message from Mani",
         message: `${cand.recruiterName} sent you a message: "${text.substring(0, 40)}..."`,
         timestamp: new Date().toLocaleString(),
         status: "delivered"
@@ -820,7 +827,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         ? `REMINDER: Complete Step ${stepNumber} of your StaffHC Onboarding` 
         : `StaffHC Onboarding Reminder`;
       message = channel === "email"
-        ? `Hi ${cand.name},\n\nFriendly reminder to complete Step ${stepNumber}: ${stepName}.\n\nStuck Reason: ${cand.stuckReason || "Awaiting action"}.\n\nAccess portal: staffhc.com/onboarding\n\nBest,\nSarah Thompson`
+        ? `Hi ${cand.name},\n\nFriendly reminder to complete Step ${stepNumber}: ${stepName}.\n\nStuck Reason: ${cand.stuckReason || "Awaiting action"}.\n\nAccess portal: staffhc.com/onboarding\n\nBest,\nMani`
         : `Hi ${cand.name}, complete Step ${stepNumber} (${cand.stuckReason}) to progress: staffhc.com/onboarding`;
     } else if (recipientType === "recruiter") {
       recipientName = cand.recruiterName;

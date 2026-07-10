@@ -33,7 +33,7 @@ export default function Home() {
           <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-slate-500">
             <a href="#how-it-works" className="hover:text-[#0052CC] transition-colors">Get Started</a>
             <a href="#about-us" className="hover:text-[#0052CC] transition-colors">About Us</a>
-            <a href="#hiring-managers" className="px-2.5 py-1.5 border border-[#0052CC] rounded text-[#0052CC] hover:bg-[#EBF3FC] transition-colors">For Hiring Managers</a>
+            <a href="#hiring-managers" className="hover:text-[#0052CC] transition-colors">For Hiring Managers</a>
           </nav>
 
           {/* Right Action buttons */}

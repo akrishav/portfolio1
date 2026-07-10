@@ -65,6 +65,7 @@ export default function RecruiterDashboard() {
 
   // Agency search query
   const [agencySearch, setAgencySearch] = useState("");
+  const [expandedCandidateId, setExpandedCandidateId] = useState<string | null>(null);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +76,7 @@ export default function RecruiterDashboard() {
     if (success) {
       setLoginError("");
     } else {
-      setLoginError("Invalid credentials. Enter 'sarah.t@staffhc.com' or 'admin'.");
+      setLoginError("Invalid credentials. Enter 'mani@staffhc.com' or 'admin'.");
     }
   };
 
@@ -111,68 +112,75 @@ export default function RecruiterDashboard() {
     a.state.toLowerCase().includes(agencySearch.toLowerCase())
   );
 
-  // Email Sync logs (Outlook tracker)
   const mockEmailLogs = [
     { id: 1, step: "Step 1: Account setup", subject: "Welcome to StaffHC Portal - Action Required", date: "Jul 05, 2026", status: "Delivered", details: "Candidate verified email login successfully" },
     { id: 2, step: "Step 2: E-Verify", subject: "E-Verification document confirmation", date: "Jul 06, 2026", status: "Delivered", details: "Document accepted by E-Verify system" },
     { id: 3, step: "Step 3: Purchase Order", subject: "Review placement purchase order contract", date: "Jul 07, 2026", status: "Opened", details: "Opened 3 times by candidate Mani" },
-    { id: 4, step: "Step 5: Drug Check", subject: "URGENT: Drug testing center voucher registration", date: "Jul 08, 2026", status: "Bounced", stopReason: "Invalid mailbox size / inactive mailbox", details: "Warning: Email stopped. Retrying via SMS alerts." }
-  ];
-
-  // If not logged in, show clean corporate recruiter login form
+    { id: 4, step: "Step 5: Drug Check", subject: "URGENT: Drug testing center voucher registration", date: "Jul 08, 2026", status: "Bounced", stopReason: "Invalid mailbox size / inactive mailbox", details: "Warning: Email stopped. Retrying via SMS alerts." },
+    { id: 5, step: "Step 3: Credentialing", subject: "RE: Professional Nursing License submission question", date: "Jul 09, 2026", status: "Synced from Outlook", details: "Incoming email from candidate: 'I am having trouble uploading the state registration PDF, is a scanned copy fine?'" }
+  ];  // If not logged in, show clean corporate recruiter login form
   if (!loggedInUser || loggedInUser.role !== "recruiter") {
     return (
-      <main className="min-h-screen bg-slate-900 text-white flex flex-col justify-center items-center font-sans antialiased p-6">
+      <main className="min-h-screen bg-slate-50 text-slate-800 flex flex-col justify-center items-center font-sans antialiased p-6">
         <DemoNavbar />
 
-        <div className="w-full max-w-md bg-slate-955 border border-slate-800 rounded-3xl p-8 space-y-6 shadow-2xl relative">
+        <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-10 shadow-lg relative text-center space-y-6">
           <div className="absolute top-6 right-6">
-            <span className="text-[9px] uppercase font-bold text-slate-505 bg-slate-900 px-2 py-0.5 rounded border border-slate-850">Mani Portal</span>
+            <span className="text-[9px] uppercase font-bold text-[#0052CC] bg-[#EBF3FC] border border-[#DEEAF7] px-2.5 py-0.5 rounded">Mani Portal</span>
           </div>
 
-          <div className="flex flex-col items-center text-center gap-2">
-            <div className="h-12 w-12 bg-indigo-950 rounded-2xl flex items-center justify-center text-[#13a2ba] border border-indigo-500/20 shadow-lg">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
+          {/* Header Image/Icon representing Shield check document */}
+          <div className="flex justify-center mb-4">
+            <div className="h-20 w-24 bg-[#EBF3FC] border border-[#DEEAF7] rounded-xl flex items-center justify-center relative overflow-hidden shadow-inner">
+              <div className="absolute -top-6 -right-6 w-12 h-12 bg-[#0052CC]/10 rounded-full"></div>
+              <div className="h-10 w-8 bg-[#0052CC]/15 border border-[#0052CC]/30 rounded flex flex-col justify-center items-center">
+                <ShieldAlert className="h-5 w-5 text-[#0052CC]" />
+              </div>
             </div>
-            <h2 className="text-xl font-bold tracking-tight mt-2 text-slate-100">StaffHC Onboarding ERP</h2>
-            <p className="text-xs text-slate-400">Enter your coordinator credentials to access compliance dashboards</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email Address</label>
-              <input
-                type="text"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="sarah.t@staffhc.com or admin"
-                className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#13a2ba] text-xs font-semibold"
-              />
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-[#0F172A] tracking-tight">StaffHC Onboarding ERP</h2>
+            <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed font-medium">
+              Enter your coordinator credentials to access compliance dashboards.
+            </p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-4 text-left">
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-slate-700">Email Address</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="mani@staffhc.com or admin"
+                  className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0052CC] focus:ring-1 focus:ring-[#0052CC] transition-colors text-sm pl-11"
+                />
+                <Mail className="absolute left-4 top-3.5 h-4.5 w-4.5 text-slate-400" />
+              </div>
+              <span className="text-[10px] text-slate-400 block mt-2 font-medium">
+                Enter <strong className="text-slate-700">mani@staffhc.com</strong> or <strong className="text-slate-700">admin</strong> to sign in.
+              </span>
             </div>
 
             {loginError && (
-              <div className="text-[11px] font-bold text-rose-505 bg-rose-505/10 border border-rose-500/25 p-3 rounded-lg flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 shrink-0" />
-                <span>{loginError}</span>
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-650 rounded-lg text-xs text-left">
+                {loginError}
               </div>
             )}
 
             <button
               type="submit"
-              className="w-full py-3 bg-[#13a2ba] hover:bg-[#108ea4] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5"
+              className="w-full py-3.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow"
             >
               Sign In to ERP
               <ArrowRight className="h-4 w-4" />
             </button>
           </form>
 
-          <div className="pt-4 border-t border-slate-850 text-center">
-            <Link href="/" className="text-[10px] font-bold text-[#13a2ba] hover:underline">
+          <div className="pt-4 border-t border-slate-100 text-center">
+            <Link href="/" className="text-xs font-bold text-[#0052CC] hover:underline">
               &larr; Back to Public Landing Page
             </Link>
           </div>
@@ -228,7 +236,13 @@ export default function RecruiterDashboard() {
               <div className="h-7 w-7 rounded-full bg-[#007A5E] text-white font-extrabold flex items-center justify-center text-xs">
                 M
               </div>
-              <span className="text-xs font-bold text-slate-750 group-hover:text-slate-900 transition-colors">Mani</span>
+              <span className="text-xs font-bold text-slate-750 group-hover:text-slate-900 transition-colors flex items-center gap-1.5">
+                Mani
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                </span>
+              </span>
               <ChevronDown className="h-3.5 w-3.5 text-slate-400 group-hover:text-slate-600 transition-colors" />
             </div>
 
@@ -443,6 +457,33 @@ export default function RecruiterDashboard() {
                   {inspectorTab === "dashboard" && (
                     <div className="space-y-6">
                       
+                      {/* Anomaly Alert Banner */}
+                      {activeCandidate?.anomalyAlert && (
+                        <div className="bg-[#FFF0F0] border border-[#FFD5D5] p-4 rounded-xl flex items-start gap-3 text-left">
+                          <ShieldAlert className="h-5 w-5 text-rose-600 shrink-0 mt-0.5" />
+                          <div className="space-y-1.5">
+                            <h4 className="text-xs font-black text-rose-800 uppercase tracking-wide">Anomaly Alert Detected</h4>
+                            <p className="text-xs text-rose-750 leading-relaxed font-semibold">
+                              {activeCandidate.anomalyAlert}
+                            </p>
+                            <div className="flex gap-3 pt-1">
+                              <button 
+                                onClick={() => alert(`Reaching out to ${activeCandidate.name}...`)}
+                                className="px-3 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10.5px] font-bold transition-all shadow"
+                              >
+                                Reach Out to Candidate
+                              </button>
+                              <button 
+                                onClick={() => alert("Marking alert as reviewed...")}
+                                className="px-3 py-1.5 border border-slate-200 hover:bg-slate-50 text-slate-650 rounded text-[10.5px] font-bold transition-all"
+                              >
+                                Dismiss Alert
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Placement Information Card List */}
                       <div>
                         <div className="flex justify-between items-center mb-4">
@@ -700,7 +741,9 @@ export default function RecruiterDashboard() {
                                 </div>
                               ) : (
                                 <span className={`px-2.5 py-0.5 rounded-full text-[9.5px] font-bold uppercase ${
-                                  log.status === "Opened" ? "bg-amber-50 text-amber-600 border border-amber-100" : "bg-emerald-50 text-emerald-650 border border-emerald-100"
+                                  log.status === "Opened" ? "bg-amber-50 text-amber-600 border border-amber-100" : 
+                                  log.status === "Synced from Outlook" ? "bg-blue-50 text-[#0052CC] border border-blue-100" :
+                                  "bg-emerald-50 text-emerald-650 border border-emerald-100"
                                 }`}>
                                   {log.status}
                                 </span>
@@ -945,85 +988,113 @@ export default function RecruiterDashboard() {
                         <th className="p-4 text-right pr-6">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 bg-white font-semibold text-slate-650">
+                    <tbody className="divide-y divide-slate-100 bg-white font-semibold text-slate-655">
                       {filteredCandidates.map((cand) => {
-                        const hasAnomaly = cand.id === "debra_bailey"; // Debra has W-4 anomaly
-                        const isBreached = cand.id === "debra_bailey"; // Debra has breached SLA
+                        const isBreached = cand.slaStatus === "breached";
+                        const hasAnomaly = !!cand.anomalyAlert;
                         
                         return (
-                          <tr 
-                            key={cand.id} 
-                            className="hover:bg-slate-50/50 transition-colors cursor-pointer"
-                            onClick={() => {
-                              setSelectedCandidateId(cand.id);
-                              setInspectorTab("dashboard");
-                            }}
-                          >
-                            <td className="p-4 pl-6">
-                              <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 bg-[#EBF3FC] text-[#0052CC] rounded-full flex items-center justify-center font-bold font-sans uppercase">
-                                  {cand.name.substring(0, 2)}
+                          <React.Fragment key={cand.id}>
+                            <tr 
+                              className={`transition-colors cursor-pointer ${isBreached ? "bg-rose-50/20 hover:bg-rose-50/40" : "hover:bg-slate-50/50"}`}
+                              onClick={() => {
+                                setSelectedCandidateId(cand.id);
+                                setInspectorTab("dashboard");
+                              }}
+                            >
+                              <td className="p-4 pl-6">
+                                <div className="flex items-center gap-3">
+                                  <div className="h-8 w-8 bg-[#EBF3FC] text-[#0052CC] rounded-full flex items-center justify-center font-bold font-sans uppercase">
+                                    {cand.name.substring(0, 2)}
+                                  </div>
+                                  <div>
+                                    <span className="font-extrabold text-slate-800 block hover:text-[#007A5E]">{cand.name}</span>
+                                    <span className="text-[10px] text-slate-450 block">Candidate #: {cand.candidateNo} • {cand.jobTitle}</span>
+                                  </div>
                                 </div>
-                                <div>
-                                  <span className="font-extrabold text-slate-800 block hover:text-[#007A5E]">{cand.name}</span>
-                                  <span className="text-[10px] text-slate-450 block">Candidate #: {cand.candidateNo} • {cand.jobTitle}</span>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="p-4">
-                              <span className={`px-2.5 py-0.5 rounded-full text-[9.5px] font-bold uppercase ${
-                                cand.stepStatus === "completed" 
-                                  ? "bg-emerald-50 text-emerald-600 border border-emerald-100" 
-                                  : cand.stepStatus === "stuck"
-                                  ? "bg-rose-50 text-rose-600 border border-rose-100"
-                                  : cand.stepStatus === "terminated"
-                                  ? "bg-rose-100 text-rose-700 border border-rose-205"
-                                  : "bg-blue-50 text-blue-600 border border-blue-100"
-                              }`}>
-                                {cand.stepStatus === "completed" 
-                                  ? "Employee Created" 
-                                  : cand.stepStatus === "stuck"
-                                  ? "Stuck Onboarding"
-                                  : cand.stepStatus === "terminated"
-                                  ? "OB Terminated"
-                                  : "Active Onboarding"
-                                }
-                              </span>
-                            </td>
-                            <td className="p-4">
-                              {cand.id === "candidate-debra" ? (
-                                <span className="px-2 py-0.5 bg-[#EBF3FC] text-[#0052CC] border border-[#DEE7F3] rounded text-[9.5px] font-bold">
-                                  P (0) | A (21) | R (0) | N (0)
+                              </td>
+                              <td className="p-4">
+                                <span className={`px-2.5 py-0.5 rounded-full text-[9.5px] font-bold uppercase ${
+                                  cand.stepStatus === "completed" 
+                                    ? "bg-emerald-50 text-emerald-600 border border-emerald-100" 
+                                    : cand.stepStatus === "stuck"
+                                    ? "bg-rose-50 text-rose-600 border border-rose-100"
+                                    : cand.stepStatus === "terminated"
+                                    ? "bg-rose-100 text-rose-700 border border-rose-205"
+                                    : "bg-blue-50 text-blue-600 border border-blue-100"
+                                }`}>
+                                  {cand.stepStatus === "completed" 
+                                    ? "Employee Created" 
+                                    : cand.stepStatus === "stuck"
+                                    ? "Stuck Onboarding"
+                                    : cand.stepStatus === "terminated"
+                                    ? "OB Terminated"
+                                    : "Active Onboarding"
+                                  }
                                 </span>
-                              ) : cand.id === "candidate-marcus" ? (
-                                <span className="px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 rounded text-[9.5px] font-bold">
-                                  Pending
-                                </span>
-                              ) : (
-                                <span className="text-slate-400 font-normal">—</span>
-                              )}
-                            </td>
-                            <td className="p-4 text-slate-800">{cand.clientName}</td>
-                            <td className="p-4 text-slate-400">{cand.mspName}</td>
-                            <td className="p-4">{cand.stateCode}</td>
-                            <td className="p-4 text-slate-805">{cand.startDate}</td>
-                            <td className="p-4">
-                              {isBreached ? (
-                                <span className="px-2.5 py-0.5 bg-rose-50 text-rose-500 border border-rose-100 rounded-full text-[9.5px] font-bold uppercase tracking-wide">
-                                  ⚠️ SLA Breached
-                                </span>
-                              ) : (
-                                <span className="px-2.5 py-0.5 bg-emerald-50 text-[#007A5E] border border-emerald-100 rounded-full text-[9.5px] font-bold uppercase tracking-wide">
-                                  SLA Active
-                                </span>
-                              )}
-                            </td>
-                            <td className="p-4 text-right pr-6">
-                              <button className="p-1.5 hover:bg-slate-100 rounded transition-colors text-slate-400">
-                                <Eye className="h-4.5 w-4.5" />
-                              </button>
-                            </td>
-                          </tr>
+                              </td>
+                              <td className="p-4">
+                                {cand.id === "candidate-debra" ? (
+                                  <span className="px-2 py-0.5 bg-[#EBF3FC] text-[#0052CC] border border-[#DEE7F3] rounded text-[9.5px] font-bold">
+                                    P (0) | A (21) | R (0) | N (0)
+                                  </span>
+                                ) : cand.id === "candidate-marcus" ? (
+                                  <span className="px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 rounded text-[9.5px] font-bold">
+                                    Pending
+                                  </span>
+                                ) : (
+                                  <span className="text-slate-400 font-normal">—</span>
+                                )}
+                              </td>
+                              <td className="p-4 text-slate-800">{cand.clientName}</td>
+                              <td className="p-4 text-slate-400">{cand.mspName}</td>
+                              <td className="p-4">{cand.stateCode}</td>
+                              <td className="p-4 text-slate-805">{cand.startDate}</td>
+                              <td className="p-4">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setExpandedCandidateId(expandedCandidateId === cand.id ? null : cand.id);
+                                  }}
+                                  className={`px-2.5 py-1 rounded-full text-[9.5px] font-bold uppercase tracking-wide flex items-center gap-1 transition-all ${
+                                    isBreached 
+                                      ? "bg-rose-100 hover:bg-rose-200 text-rose-600 border border-rose-200 animate-pulse" 
+                                      : "bg-emerald-50 hover:bg-emerald-100 text-[#007A5E] border border-emerald-100"
+                                  }`}
+                                >
+                                  {isBreached ? "⚠️ SLA Breached" : "SLA Active"}
+                                  <ChevronDown className={`h-3 w-3 shrink-0 transition-transform ${expandedCandidateId === cand.id ? "rotate-180" : ""}`} />
+                                </button>
+                              </td>
+                              <td className="p-4 text-right pr-6">
+                                <button className="p-1.5 hover:bg-slate-100 rounded transition-colors text-slate-400">
+                                  <Eye className="h-4.5 w-4.5" />
+                                </button>
+                              </td>
+                            </tr>
+                            {expandedCandidateId === cand.id && (
+                              <tr className="bg-rose-50/20 text-xs">
+                                <td colSpan={9} className="p-4 pl-12 border-t border-rose-100/30 text-rose-700">
+                                  <div className="space-y-2 text-left">
+                                    <div className="flex items-center gap-2 font-bold text-rose-650">
+                                      <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
+                                      <span>SLA Status Warning: {cand.slaBreachDetails || "General compliance delay detected."}</span>
+                                    </div>
+                                    {cand.onboardingSteps && cand.onboardingSteps.length > 0 && (
+                                      <div className="flex flex-wrap gap-2.5 font-bold text-slate-500 mt-1 pl-6">
+                                        <span>Missing compliance checks:</span>
+                                        {cand.onboardingSteps.filter(s => s.status !== "completed").map(s => (
+                                          <span key={s.number} className="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-[10px]">
+                                            {s.name} ({s.status === "stuck" ? "Stuck" : "Pending"})
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
                         );
                       })}
                     </tbody>
