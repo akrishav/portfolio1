@@ -235,23 +235,7 @@ export default function OnboardingPage() {
               </form>
             )}
 
-            <div className="mt-8 pt-6 border-t border-slate-100 space-y-3">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Evaluation & testing presets</span>
-              <div className="grid grid-cols-2 gap-2">
-                <Link
-                  href="/recruiter?role=recruiter"
-                  className="py-2.5 px-3 bg-[#EBF3FC] hover:bg-[#DEEAF7] text-[#0052CC] text-[10.5px] font-bold rounded-xl transition-all shadow-3xs flex items-center justify-center gap-1 border border-[#DEE7F3]"
-                >
-                  💼 Recruiter View
-                </Link>
-                <Link
-                  href="/recruiter?role=onboarder"
-                  className="py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-[#007A5E] text-[10.5px] font-bold rounded-xl transition-all shadow-3xs flex items-center justify-center gap-1 border border-emerald-100"
-                >
-                  🛡️ On-boarder View
-                </Link>
-              </div>
-            </div>
+
 
             <div className="mt-6 text-center">
               <Link href="/" className="text-xs font-bold text-[#0052CC] hover:underline">

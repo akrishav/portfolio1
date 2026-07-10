@@ -31,9 +31,9 @@ export default function Home() {
 
           {/* Links matching Image 5 */}
           <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-slate-500">
-            <a href="#how-it-works" className="hover:text-[#0052CC] transition-colors">How it Works</a>
-            <Link href="/jobs" className="hover:text-[#0052CC] transition-colors">Jobs</Link>
+            <a href="#how-it-works" className="hover:text-[#0052CC] transition-colors">Get Started</a>
             <a href="#about-us" className="hover:text-[#0052CC] transition-colors">About Us</a>
+            <Link href="/recruiter" className="px-2.5 py-1.5 border border-[#0052CC] rounded text-[#0052CC] hover:bg-[#EBF3FC] transition-colors">For Hiring Managers</Link>
           </nav>
 
           {/* Right Action buttons */}
@@ -489,14 +489,6 @@ export default function Home() {
           <div className="flex justify-center gap-8 text-xs font-bold text-slate-200">
             <a href="#" className="hover:text-white transition-colors">About Us</a>
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-          </div>
-          
-          {/* For Hiring Managers */}
-          <div className="flex flex-col items-center gap-2 mt-2">
-            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">For Hiring Managers</span>
-            <Link href="/recruiter" className="text-xs font-bold text-white hover:text-emerald-300 transition-colors underline underline-offset-4 decoration-emerald-500/50 hover:decoration-emerald-400">
-              View Recruiter Portal
-            </Link>
           </div>
 
           {/* Social Icons (White outline circles) */}
