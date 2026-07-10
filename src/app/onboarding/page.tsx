@@ -55,12 +55,12 @@ export default function OnboardingPage() {
   // Document uploading modal state
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadTargetStep, setUploadTargetStep] = useState<number>(3);
-  const [uploadFileName, setUploadFileName] = useState("Nursing_License_Marcus.pdf");
+  const [uploadFileName, setUploadFileName] = useState("Nursing_License_Mani.pdf");
   const [uploading, setUploading] = useState(false);
 
   const candidate = candidates.find((c) => {
     const cleanEmail = loggedInUser?.email?.toLowerCase();
-    const emailToMatch = cleanEmail === "mani@staffhc.com" ? "candidate@healthcare.com" : cleanEmail;
+    const emailToMatch = cleanEmail === "candidate@healthcare.com" ? "mani@staffhc.com" : cleanEmail;
     return c.email.toLowerCase() === emailToMatch;
   });
 
@@ -669,7 +669,7 @@ export default function OnboardingPage() {
                         <span className="text-[10px] font-bold text-amber-500 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded">Awaiting Review</span>
                       ) : (
                         <button 
-                          onClick={() => triggerUploadFile(3, "Nursing_License_Marcus.pdf")}
+                          onClick={() => triggerUploadFile(3, "Nursing_License_Mani.pdf")}
                           className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all"
                         >
                           Upload File
@@ -710,7 +710,7 @@ export default function OnboardingPage() {
                         <span className="text-[10px] font-bold text-amber-500 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded">Awaiting Review</span>
                       ) : (
                         <button 
-                          onClick={() => triggerUploadFile(3, "Nursing_License_Marcus.pdf")}
+                          onClick={() => triggerUploadFile(3, "Nursing_License_Mani.pdf")}
                           className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all"
                         >
                           Upload
@@ -732,7 +732,7 @@ export default function OnboardingPage() {
                     </div>
                     <div>
                       <button 
-                        onClick={() => triggerUploadFile(3, "Immunization_Records_Marcus.pdf")}
+                        onClick={() => triggerUploadFile(3, "Immunization_Records_Mani.pdf")}
                         className="px-4 py-1.5 bg-[#EBF3FC] hover:bg-[#DEEAF7] text-[#0052CC] text-xs font-bold rounded-lg transition-all"
                       >
                         Review
@@ -1141,7 +1141,7 @@ export default function OnboardingPage() {
                       <span className="text-[10px] font-bold text-amber-500 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded">Awaiting Review</span>
                     ) : (
                       <button 
-                        onClick={() => triggerUploadFile(3, "Nursing_License_Marcus.pdf")}
+                        onClick={() => triggerUploadFile(3, "Nursing_License_Mani.pdf")}
                         className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all"
                       >
                         Upload File

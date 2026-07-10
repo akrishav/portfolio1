@@ -127,13 +127,13 @@ const defaultSteps = (): OnboardingStep[] => [
 
 const initialCandidates = (): Candidate[] => [
   {
-    id: "candidate-marcus",
-    name: "Marcus",
-    email: "candidate@healthcare.com",
+    id: "candidate-mani",
+    name: "Mani",
+    email: "mani@staffhc.com",
     phone: "(555) 234-5678",
     jobTitle: "ICU Registered Nurse",
-    recruiterName: "Mani",
-    recruiterEmail: "mani@staffhc.com",
+    recruiterName: "Alex",
+    recruiterEmail: "alex@staffhc.com",
     candidateNo: "67288",
     clientName: "CDK Global",
     mspName: "Ascension Health (Hallmark)",
@@ -141,7 +141,7 @@ const initialCandidates = (): Candidate[] => [
     startDate: "Jul 09, 2026",
     scheduledStartDate: "Jul 09, 2026",
     scheduledEndDate: "Nov 27, 2026",
-    obOwner: "Mani",
+    obOwner: "Alex",
     obClassification: "Clinical - Patient Facing",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R",
@@ -389,18 +389,18 @@ const initialCandidates = (): Candidate[] => [
 const initialMessages = (): Message[] => [
   {
     id: "msg-1",
-    candidateId: "candidate-marcus",
+    candidateId: "candidate-mani",
     sender: "recruiter",
-    senderName: "Mani",
-    text: "Hi Marcus! I've reviewed your screening. You just need to upload that license file and we can move to interviews.",
+    senderName: "Alex",
+    text: "Hi Mani! I've reviewed your screening. You just need to upload that license file and we can move to interviews.",
     timestamp: "10:45 AM",
   },
   {
     id: "msg-2",
-    candidateId: "candidate-marcus",
+    candidateId: "candidate-mani",
     sender: "candidate",
-    senderName: "Marcus",
-    text: "Thanks Mani! Doing it now.",
+    senderName: "Mani",
+    text: "Thanks Alex! Doing it now.",
     timestamp: "10:48 AM",
   }
 ];
@@ -408,12 +408,12 @@ const initialMessages = (): Message[] => [
 const initialNotifications = (): NotificationLog[] => [
   {
     id: "notif-1",
-    candidateId: "candidate-marcus",
+    candidateId: "candidate-mani",
     recipient: "candidate",
-    recipientName: "Marcus",
+    recipientName: "Mani",
     channel: "email",
     subject: "Action Required: Complete Onboarding Step 3",
-    message: "Hi Marcus, your credentials package is missing your Nursing License file. Please log in to your dashboard to upload it.",
+    message: "Hi Mani, your credentials package is missing your Nursing License file. Please log in to your dashboard to upload it.",
     timestamp: "2026-07-09 10:45 AM",
     status: "delivered",
   },
@@ -468,7 +468,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setLoggedInUser(parsed);
       if (parsed.role === "candidate") {
         const cleanEmail = parsed.email.toLowerCase().trim();
-        const emailToFind = cleanEmail === "mani@staffhc.com" ? "candidate@healthcare.com" : cleanEmail;
+        const emailToFind = cleanEmail === "candidate@healthcare.com" ? "mani@staffhc.com" : cleanEmail;
         const candidatesList = savedCandidates ? JSON.parse(savedCandidates) : initialCandidates();
         const match = candidatesList.find((c: any) => c.email.toLowerCase() === emailToFind);
         if (match) {
@@ -507,7 +507,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const login = (email: string, role: "candidate" | "recruiter") => {
     const cleanEmail = email.toLowerCase().trim();
     if (role === "candidate") {
-      const emailToFind = cleanEmail === "mani@staffhc.com" ? "candidate@healthcare.com" : cleanEmail;
+      const emailToFind = cleanEmail === "candidate@healthcare.com" ? "mani@staffhc.com" : cleanEmail;
       const match = candidates.find(c => c.email.toLowerCase() === emailToFind);
       if (match) {
         setLoggedInUser({ email: cleanEmail, role: "candidate" });
