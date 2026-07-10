@@ -57,6 +57,7 @@ export default function OnboardingPage() {
   const [uploadTargetStep, setUploadTargetStep] = useState<number>(3);
   const [uploadFileName, setUploadFileName] = useState("Nursing_License_Mani.pdf");
   const [uploading, setUploading] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const candidate = candidates.find((c) => {
     const cleanEmail = loggedInUser?.email?.toLowerCase();
@@ -385,9 +386,40 @@ export default function OnboardingPage() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <button className="text-slate-400 hover:text-slate-600 transition-colors">
-              <Bell className="h-4.5 w-4.5" />
-            </button>
+            <div className="relative">
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="text-slate-400 hover:text-slate-600 transition-colors relative p-1.5 hover:bg-slate-50 rounded-full"
+              >
+                <Bell className="h-4.5 w-4.5" />
+                <span className="absolute top-1 right-1 h-2 w-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+              </button>
+              
+              {showNotifications && (
+                <div className="absolute right-0 mt-2.5 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 p-4 text-left animate-slide-in">
+                  <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-3">
+                    <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800">Notifications</h3>
+                    <button 
+                      onClick={() => setShowNotifications(false)}
+                      className="text-slate-400 hover:text-slate-600 text-xs font-bold"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="bg-blue-50/50 border border-blue-105 rounded-xl p-3 space-y-1 text-[11px] font-semibold text-slate-655">
+                      <div className="flex justify-between items-center text-blue-700">
+                        <span className="font-extrabold">OTP Authentication Pin</span>
+                        <span className="text-slate-450 text-[10px] font-bold">09:12 AM</span>
+                      </div>
+                      <p className="text-slate-600 text-[10px] leading-relaxed mt-1 font-medium">
+                        SMS: Your StaffHC onboarding login OTP code is 123456.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
             {/* User Avatar Circle */}
             <div className="h-8 w-8 rounded-full overflow-hidden border border-slate-200">
               <img 
