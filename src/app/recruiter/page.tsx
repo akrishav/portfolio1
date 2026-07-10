@@ -76,7 +76,7 @@ export default function RecruiterDashboard() {
     if (success) {
       setLoginError("");
     } else {
-      setLoginError("Invalid credentials. Enter 'mani@staffhc.com' or 'admin'.");
+      setLoginError("Invalid credentials. Enter 'recruiter@staffhc.com' or 'admin'.");
     }
   };
 
@@ -125,16 +125,15 @@ export default function RecruiterDashboard() {
         <DemoNavbar />
 
         <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-10 shadow-lg relative text-center space-y-6">
-          <div className="absolute top-6 right-6">
-            <span className="text-[9px] uppercase font-bold text-[#0052CC] bg-[#EBF3FC] border border-[#DEEAF7] px-2.5 py-0.5 rounded">Mani Portal</span>
-          </div>
 
           {/* Header Image/Icon representing Shield check document */}
           <div className="flex justify-center mb-4">
             <div className="h-20 w-24 bg-[#EBF3FC] border border-[#DEEAF7] rounded-xl flex items-center justify-center relative overflow-hidden shadow-inner">
               <div className="absolute -top-6 -right-6 w-12 h-12 bg-[#0052CC]/10 rounded-full"></div>
               <div className="h-10 w-8 bg-[#0052CC]/15 border border-[#0052CC]/30 rounded flex flex-col justify-center items-center">
-                <ShieldAlert className="h-5 w-5 text-[#0052CC]" />
+                <div className="w-4 h-0.5 bg-[#0052CC]/45 my-0.5 rounded"></div>
+                <div className="w-4 h-0.5 bg-[#0052CC]/45 my-0.5 rounded"></div>
+                <Check className="h-3 w-3 text-[#0052CC] font-bold mt-1" />
               </div>
             </div>
           </div>
@@ -154,13 +153,13 @@ export default function RecruiterDashboard() {
                   type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="mani@staffhc.com or admin"
+                  placeholder="recruiter@staffhc.com or admin"
                   className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0052CC] focus:ring-1 focus:ring-[#0052CC] transition-colors text-sm pl-11"
                 />
                 <Mail className="absolute left-4 top-3.5 h-4.5 w-4.5 text-slate-400" />
               </div>
               <span className="text-[10px] text-slate-400 block mt-2 font-medium">
-                Enter <strong className="text-slate-700">mani@staffhc.com</strong> or <strong className="text-slate-700">admin</strong> to sign in.
+                Enter <strong className="text-slate-700">recruiter@staffhc.com</strong> or <strong className="text-slate-700">admin</strong> to sign in.
               </span>
             </div>
 
