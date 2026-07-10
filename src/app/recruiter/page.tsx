@@ -44,8 +44,6 @@ export default function RecruiterDashboard() {
   // Login form state
   const [email, setEmail] = useState("");
   const [loginError, setLoginError] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState("");
 
   // Search filter
   const [searchQuery, setSearchQuery] = useState("");
@@ -69,30 +67,16 @@ export default function RecruiterDashboard() {
   const [agencySearch, setAgencySearch] = useState("");
   const [expandedCandidateId, setExpandedCandidateId] = useState<string | null>(null);
 
-  const handleSendOtp = (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    
-    const cleanEmail = email.toLowerCase().trim();
-    if (cleanEmail === "mani@staffhc.com" || cleanEmail === "admin" || cleanEmail.includes("recruiter") || cleanEmail.includes("staffhc.com")) {
-      setOtpSent(true);
-      setLoginError("");
-    } else {
-      setLoginError("Invalid credentials. Enter 'mani@staffhc.com' or 'admin'.");
-    }
-  };
-
-  const handleVerifyOtp = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!otpCode) return;
 
     // Allow recruiter login
     const success = login(email, "recruiter");
     if (success) {
-      setOtpSent(false);
       setLoginError("");
     } else {
-      setLoginError("Verification failed. Please try again.");
+      setLoginError("Invalid credentials. Enter 'recruiter@staffhc.com' or 'admin'.");
     }
   };
 
@@ -161,86 +145,38 @@ export default function RecruiterDashboard() {
             </p>
           </div>
 
-          {!otpSent ? (
-            <form onSubmit={handleSendOtp} className="space-y-4 text-left">
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-700">Email Address</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="mani@staffhc.com or admin"
-                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0052CC] focus:ring-1 focus:ring-[#0052CC] transition-colors text-sm pl-11"
-                  />
-                  <Mail className="absolute left-4 top-3.5 h-4.5 w-4.5 text-slate-400" />
-                </div>
-                <span className="text-[10px] text-slate-400 block mt-2 font-medium">
-                  Enter <strong className="text-slate-700">mani@staffhc.com</strong> or <strong className="text-slate-700">admin</strong> to sign in.
-                </span>
+          <form onSubmit={handleLogin} className="space-y-4 text-left">
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-slate-700">Email Address</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="recruiter@staffhc.com or admin"
+                  className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0052CC] focus:ring-1 focus:ring-[#0052CC] transition-colors text-sm pl-11"
+                />
+                <Mail className="absolute left-4 top-3.5 h-4.5 w-4.5 text-slate-400" />
               </div>
+              <span className="text-[10px] text-slate-400 block mt-2 font-medium">
+                Enter <strong className="text-slate-700">recruiter@staffhc.com</strong> or <strong className="text-slate-700">admin</strong> to sign in.
+              </span>
+            </div>
 
-              {loginError && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-650 rounded-lg text-xs text-left">
-                  {loginError}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                className="w-full py-3.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow"
-              >
-                Send OTP
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyOtp} className="space-y-4 text-left">
-              <div className="space-y-2">
-                <div className="flex justify-between items-center mb-2">
-                  <label className="block text-xs font-bold text-slate-700">
-                    Enter Verification Code
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setOtpSent(false)}
-                    className="text-xs font-bold text-[#0052CC] hover:underline"
-                  >
-                    Change Email
-                  </button>
-                </div>
-                <div className="relative">
-                  <input
-                    type="text"
-                    required
-                    maxLength={6}
-                    value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value)}
-                    placeholder="Enter 6-digit OTP"
-                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-850 placeholder-slate-400 focus:outline-none focus:border-[#0052CC] focus:ring-1 focus:ring-[#0052CC] transition-colors text-sm pl-11 text-center tracking-widest font-mono font-bold"
-                  />
-                  <Check className="absolute left-4 top-3.5 h-4.5 w-4.5 text-slate-400" />
-                </div>
-                <span className="text-[10px] text-slate-400 block mt-2 text-center font-medium">
-                  Enter <strong className="text-slate-700">123456</strong> (or any code) to sign in.
-                </span>
+            {loginError && (
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-650 rounded-lg text-xs text-left">
+                {loginError}
               </div>
+            )}
 
-              {loginError && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-650 rounded-lg text-xs text-left">
-                  {loginError}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                className="w-full py-3.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow"
-              >
-                Sign In to ERP
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </form>
-          )}
+            <button
+              type="submit"
+              className="w-full py-3.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow"
+            >
+              Sign In to ERP
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </form>
 
           <div className="pt-4 border-t border-slate-100 text-center">
             <Link href="/" className="text-xs font-bold text-[#0052CC] hover:underline">
