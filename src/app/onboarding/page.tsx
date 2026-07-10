@@ -113,7 +113,15 @@ export default function OnboardingPage() {
         {/* Header matching Image 2 */}
         <header className="bg-white border-b border-slate-100 shadow-sm sticky top-0 z-40">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <Logo />
+            <div className="flex items-center gap-3">
+              <img
+                src="/hummingbird-logo.png"
+                alt="Hummingbird Logo"
+                className="h-6.5 object-contain select-none pointer-events-none"
+              />
+              <span className="text-slate-350 font-normal text-lg">|</span>
+              <span className="text-xs font-bold text-[#007A5E] uppercase tracking-wider">Onboarding</span>
+            </div>
 
             <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-slate-500">
               <Link href="/jobs" className="hover:text-[#0052CC]">Find Jobs</Link>
@@ -273,7 +281,15 @@ export default function OnboardingPage() {
         <DemoNavbar />
         <header className="bg-white border-b border-slate-100 shadow-sm sticky top-0 z-40">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <Logo />
+            <div className="flex items-center gap-3">
+              <img
+                src="/hummingbird-logo.png"
+                alt="Hummingbird Logo"
+                className="h-6.5 object-contain select-none pointer-events-none"
+              />
+              <span className="text-slate-350 font-normal text-lg">|</span>
+              <span className="text-xs font-bold text-[#007A5E] uppercase tracking-wider">Onboarding</span>
+            </div>
             <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-slate-500">
               <Link href="/jobs" className="hover:text-[#0052CC]">Find Jobs</Link>
               <a href="#" className="hover:text-[#0052CC]">Dashboard</a>
@@ -326,7 +342,15 @@ export default function OnboardingPage() {
       {/* Corporate Dashboard Header */}
       <header className="bg-white border-b border-slate-100 shadow-sm z-30 shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Logo />
+          <div className="flex items-center gap-3">
+            <img
+              src="/hummingbird-logo.png"
+              alt="Hummingbird Logo"
+              className="h-6.5 object-contain select-none pointer-events-none"
+            />
+            <span className="text-slate-350 font-normal text-lg">|</span>
+            <span className="text-xs font-bold text-[#007A5E] uppercase tracking-wider">Onboarding</span>
+          </div>
 
           <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-slate-500">
             <Link href="/jobs" className="hover:text-[#0052CC] transition-colors">Find Jobs</Link>
