@@ -35,8 +35,10 @@ export default function RecruiterDashboard() {
       const roleParam = params.get("role");
       if (roleParam === "onboarder") {
         setCurrentRole("onboarder");
+        logout(); // Force login screen
       } else if (roleParam === "recruiter") {
         setCurrentRole("recruiter");
+        logout(); // Force login screen
       }
     }
   }, []);
