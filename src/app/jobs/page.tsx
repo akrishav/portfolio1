@@ -684,7 +684,7 @@ export default function JobBoard() {
             <button 
               onClick={() => {
                 alert("Simulating application... Redirecting to credentials onboarding setup.");
-                window.location.href = "/onboarding";
+                window.location.href = "/onboarding?login=true";
               }}
               className="grow py-2.5 bg-[#007A5E] hover:bg-[#005E48] text-white text-xs font-bold rounded-lg shadow-sm uppercase tracking-wider transition-colors text-center"
             >

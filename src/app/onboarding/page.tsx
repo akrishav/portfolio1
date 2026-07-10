@@ -40,6 +40,15 @@ export default function OnboardingPage() {
   // Mobile / Tablet Tab switching state (Active panel when not on full 3-column desktop)
   const [mobileActiveTab, setMobileActiveTab] = useState<"overview" | "documents" | "chat">("overview");
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("login") === "true") {
+        logout();
+      }
+    }
+  }, []);
+
   // Dashboard UI States
   const [chatMessage, setChatMessage] = useState("");
   

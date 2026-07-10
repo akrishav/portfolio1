@@ -39,13 +39,13 @@ export default function Home() {
           {/* Right Action buttons */}
           <div className="flex items-center gap-3">
             <Link
-              href="/onboarding"
+              href="/onboarding?login=true"
               className="px-5 py-2.5 bg-white border border-[#0052CC] hover:bg-[#EBF3FC] text-[#0052CC] text-xs font-bold rounded transition-all shadow-sm"
             >
               Login
             </Link>
             <Link
-              href="/onboarding"
+              href="/onboarding?login=true"
               className="px-5 py-2.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded shadow-sm transition-all"
             >
               Sign Up
@@ -83,7 +83,7 @@ export default function Home() {
 
               {/* Candidate Portal Button sitting aside symmetrically */}
               <Link
-                href="/onboarding"
+                href="/onboarding?login=true"
                 className="w-full sm:w-1/2 flex items-center justify-center gap-2 px-6 py-3.5 bg-[#EBF3FC] hover:bg-[#DEE7FF] text-[#0052CC] font-bold rounded-xl transition-all text-xs uppercase tracking-wider border border-[#B8D3F5]/60 shadow-md shrink-0 h-[48px]"
               >
                 <User className="h-4.5 w-4.5 text-[#0052CC]" />
@@ -210,7 +210,7 @@ export default function Home() {
                 <h3 className="text-sm font-extrabold text-slate-850">Step 1: Create Account</h3>
                 <p className="text-xs text-slate-500 leading-relaxed font-semibold">
                   Set up your free account by entering your basic details, experience, and nursing credentials in{" "}
-                  <Link href="/onboarding" className="text-[#0052CC] font-bold hover:underline">
+                  <Link href="/onboarding?login=true" className="text-[#0052CC] font-bold hover:underline">
                     candidate.staffhc.com
                   </Link>
                 </p>

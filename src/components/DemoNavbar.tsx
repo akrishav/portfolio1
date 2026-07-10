@@ -70,7 +70,7 @@ export default function DemoNavbar() {
               </Link>
               
               <Link
-                href="/onboarding"
+                href="/onboarding?login=true"
                 onClick={() => setIsOpen(false)}
                 className={`w-full flex items-center gap-2 p-2.5 rounded-lg border text-left font-bold transition-all ${
                   pathname === "/onboarding"
