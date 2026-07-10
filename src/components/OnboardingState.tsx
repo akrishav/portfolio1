@@ -497,9 +497,10 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const login = (email: string, role: "candidate" | "recruiter") => {
     const cleanEmail = email.toLowerCase().trim();
     if (role === "candidate") {
-      const match = candidates.find(c => c.email.toLowerCase() === cleanEmail);
+      const emailToFind = cleanEmail === "mani@staffhc.com" ? "candidate@healthcare.com" : cleanEmail;
+      const match = candidates.find(c => c.email.toLowerCase() === emailToFind);
       if (match) {
-        setLoggedInUser({ email: match.email, role: "candidate" });
+        setLoggedInUser({ email: cleanEmail, role: "candidate" });
         setSelectedCandidateId(match.id);
         return true;
       }

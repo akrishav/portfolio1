@@ -138,7 +138,7 @@ export default function OnboardingPage() {
               </button>
               <button
                 onClick={() => {
-                  setEmail("candidate@healthcare.com");
+                  setEmail("mani@staffhc.com");
                   setOtpSent(true);
                 }}
                 className="px-5 py-2.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-md transition-all shadow-sm"
