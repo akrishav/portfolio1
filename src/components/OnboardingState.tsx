@@ -83,9 +83,6 @@ export interface Candidate {
   backgroundStatus: "Completed" | "Pending";
   drugCheckStatus: "Completed" | "Pending";
   daysStuck?: number;
-  slaStatus?: "active" | "breached";
-  slaBreachDetails?: string;
-  anomalyAlert?: string;
 }
 
 interface OnboardingContextType {
@@ -131,7 +128,7 @@ const initialCandidates = (): Candidate[] => [
     email: "candidate@healthcare.com",
     phone: "(555) 234-5678",
     jobTitle: "ICU Registered Nurse",
-    recruiterName: "Mani",
+    recruiterName: "Sarah Thompson",
     recruiterEmail: "sarah.t@staffhc.com",
     candidateNo: "67288",
     clientName: "CDK Global",
@@ -140,7 +137,7 @@ const initialCandidates = (): Candidate[] => [
     startDate: "Jul 09, 2026",
     scheduledStartDate: "Jul 09, 2026",
     scheduledEndDate: "Nov 27, 2026",
-    obOwner: "Mani",
+    obOwner: "Sarah Thompson",
     obClassification: "Clinical - Patient Facing",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R",
@@ -160,8 +157,7 @@ const initialCandidates = (): Candidate[] => [
       { name: "Orientation", status: "Pending" }
     ],
     backgroundStatus: "Completed",
-    drugCheckStatus: "Pending",
-    anomalyAlert: "signature form name mismatch — please re-upload"
+    drugCheckStatus: "Pending"
   },
   {
     id: "candidate-debra",
@@ -216,7 +212,7 @@ const initialCandidates = (): Candidate[] => [
     email: "tiffany@example.com",
     phone: "(555) 382-9901",
     jobTitle: "ICU Registered Nurse",
-    recruiterName: "Mani",
+    recruiterName: "Sarah Thompson",
     recruiterEmail: "sarah.t@staffhc.com",
     candidateNo: "67296",
     clientName: "CDK Global",
@@ -225,7 +221,7 @@ const initialCandidates = (): Candidate[] => [
     startDate: "Jul 09, 2026",
     scheduledStartDate: "Jul 09, 2026",
     scheduledEndDate: "Nov 27, 2026",
-    obOwner: "Mani",
+    obOwner: "Sarah Thompson",
     obClassification: "Clinical - Patient Facing",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R",
@@ -242,9 +238,7 @@ const initialCandidates = (): Candidate[] => [
       { name: "E-Verification", status: "Pending" }
     ],
     backgroundStatus: "Pending",
-    drugCheckStatus: "Pending",
-    slaStatus: "breached",
-    slaBreachDetails: "Background Check SLA breached by 48 hours. Escalate to compliance manager immediately."
+    drugCheckStatus: "Pending"
   },
   {
     id: "candidate-irene",
@@ -388,7 +382,7 @@ const initialMessages = (): Message[] => [
     id: "msg-1",
     candidateId: "candidate-marcus",
     sender: "recruiter",
-    senderName: "Mani",
+    senderName: "Sarah Thompson",
     text: "Hi Marcus! I've reviewed your screening. You just need to upload that license file and we can move to interviews.",
     timestamp: "10:45 AM",
   },
@@ -506,7 +500,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         email: cleanEmail,
         phone: "(555) 019-2831",
         jobTitle: "Registered Nurse (RN)",
-        recruiterName: "Mani",
+        recruiterName: "Sarah Thompson",
         recruiterEmail: "sarah.t@staffhc.com",
         candidateNo: Math.floor(10000 + Math.random() * 90000).toString(),
         clientName: "CDK Global",
@@ -515,7 +509,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         startDate: "Jul 09, 2026",
         scheduledStartDate: "Jul 09, 2026",
         scheduledEndDate: "Nov 27, 2026",
-        obOwner: "Mani",
+        obOwner: "Sarah Thompson",
         obClassification: "Clinical - Patient Facing",
         employmentType: "W2 - Hourly",
         initiatedBy: "Bindhu R",
@@ -826,7 +820,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         ? `REMINDER: Complete Step ${stepNumber} of your StaffHC Onboarding` 
         : `StaffHC Onboarding Reminder`;
       message = channel === "email"
-        ? `Hi ${cand.name},\n\nFriendly reminder to complete Step ${stepNumber}: ${stepName}.\n\nStuck Reason: ${cand.stuckReason || "Awaiting action"}.\n\nAccess portal: staffhc.com/onboarding\n\nBest,\nMani`
+        ? `Hi ${cand.name},\n\nFriendly reminder to complete Step ${stepNumber}: ${stepName}.\n\nStuck Reason: ${cand.stuckReason || "Awaiting action"}.\n\nAccess portal: staffhc.com/onboarding\n\nBest,\nSarah Thompson`
         : `Hi ${cand.name}, complete Step ${stepNumber} (${cand.stuckReason}) to progress: staffhc.com/onboarding`;
     } else if (recipientType === "recruiter") {
       recipientName = cand.recruiterName;

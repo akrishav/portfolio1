@@ -59,8 +59,9 @@ export default function RecruiterDashboard() {
 
   // Chat message state
   const [replyMessage, setReplyMessage] = useState("");
+  
+  // Notification Drawer
   const [showNotificationDrawer, setShowNotificationDrawer] = useState(false);
-  const [expandedSlaRow, setExpandedSlaRow] = useState<string | null>(null);
 
   // Agency search query
   const [agencySearch, setAgencySearch] = useState("");
@@ -115,8 +116,7 @@ export default function RecruiterDashboard() {
     { id: 1, step: "Step 1: Account setup", subject: "Welcome to StaffHC Portal - Action Required", date: "Jul 05, 2026", status: "Delivered", details: "Candidate verified email login successfully" },
     { id: 2, step: "Step 2: E-Verify", subject: "E-Verification document confirmation", date: "Jul 06, 2026", status: "Delivered", details: "Document accepted by E-Verify system" },
     { id: 3, step: "Step 3: Purchase Order", subject: "Review placement purchase order contract", date: "Jul 07, 2026", status: "Opened", details: "Opened 3 times by candidate Mani" },
-    { id: 4, step: "Step 5: Drug Check", subject: "URGENT: Drug testing center voucher registration", date: "Jul 08, 2026", status: "Bounced", stopReason: "Invalid mailbox size / inactive mailbox", details: "Warning: Email stopped. Retrying via SMS alerts." },
-    { id: 5, step: "External Sync", subject: "Re: Missing License Form", date: "Jul 09, 2026", status: "Opened", details: "Synced from Outlook (Incoming): 'Hi Mani, I have uploaded the requested license document. Please verify. - Marcus'" }
+    { id: 4, step: "Step 5: Drug Check", subject: "URGENT: Drug testing center voucher registration", date: "Jul 08, 2026", status: "Bounced", stopReason: "Invalid mailbox size / inactive mailbox", details: "Warning: Email stopped. Retrying via SMS alerts." }
   ];
 
   // If not logged in, show clean corporate recruiter login form
@@ -171,15 +171,10 @@ export default function RecruiterDashboard() {
             </button>
           </form>
 
-          <div className="pt-4 border-t border-slate-850 text-center space-y-3">
-            <span className="text-[11px] font-bold text-slate-400 bg-slate-800 px-3 py-1.5 rounded-full inline-block">
-              Demo — any email and any OTP will work
-            </span>
-            <div className="block">
-              <Link href="/" className="text-[10px] font-bold text-[#13a2ba] hover:underline">
-                &larr; Back to Public Landing Page
-              </Link>
-            </div>
+          <div className="pt-4 border-t border-slate-850 text-center">
+            <Link href="/" className="text-[10px] font-bold text-[#13a2ba] hover:underline">
+              &larr; Back to Public Landing Page
+            </Link>
           </div>
         </div>
       </main>
@@ -234,11 +229,8 @@ export default function RecruiterDashboard() {
 
             {/* User profile dropdown matching screen */}
             <div className="flex items-center gap-2.5 bg-white border border-slate-200 rounded-full pl-2 pr-3.5 py-1 shadow-3xs cursor-pointer group hover:bg-slate-50 transition-colors">
-              <div className="relative">
-                <div className="h-7 w-7 rounded-full bg-[#007A5E] text-white font-extrabold flex items-center justify-center text-xs">
-                  M
-                </div>
-                <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 bg-rose-500 rounded-full border border-white"></span>
+              <div className="h-7 w-7 rounded-full bg-[#007A5E] text-white font-extrabold flex items-center justify-center text-xs">
+                M
               </div>
               <span className="text-xs font-bold text-slate-750 group-hover:text-slate-900 transition-colors">Mani</span>
               <ChevronDown className="h-3.5 w-3.5 text-slate-400 group-hover:text-slate-600 transition-colors" />
@@ -959,13 +951,13 @@ export default function RecruiterDashboard() {
                     </thead>
                     <tbody className="divide-y divide-slate-100 bg-white font-semibold text-slate-650">
                       {filteredCandidates.map((cand) => {
-                        const hasAnomaly = cand.anomalyAlert != null;
-                        const isBreached = cand.slaStatus === "breached";
+                        const hasAnomaly = cand.id === "debra_bailey"; // Debra has W-4 anomaly
+                        const isBreached = cand.id === "debra_bailey"; // Debra has breached SLA
                         
                         return (
-                          <React.Fragment key={cand.id}>
                           <tr 
-                            className="hover:bg-slate-50/50 transition-colors cursor-pointer border-b border-slate-100 last:border-0"
+                            key={cand.id} 
+                            className="hover:bg-slate-50/50 transition-colors cursor-pointer"
                             onClick={() => {
                               setSelectedCandidateId(cand.id);
                               setInspectorTab("dashboard");
@@ -1021,12 +1013,9 @@ export default function RecruiterDashboard() {
                             <td className="p-4 text-slate-805">{cand.startDate}</td>
                             <td className="p-4">
                               {isBreached ? (
-                                <button 
-                                  onClick={(e) => { e.stopPropagation(); setExpandedSlaRow(expandedSlaRow === cand.id ? null : cand.id); }}
-                                  className="px-2.5 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-100 rounded-full text-[9.5px] font-bold uppercase tracking-wide transition-colors flex items-center gap-1"
-                                >
-                                  ⚠️ SLA Breached <ChevronDown className="h-3 w-3" />
-                                </button>
+                                <span className="px-2.5 py-0.5 bg-rose-50 text-rose-500 border border-rose-100 rounded-full text-[9.5px] font-bold uppercase tracking-wide">
+                                  ⚠️ SLA Breached
+                                </span>
                               ) : (
                                 <span className="px-2.5 py-0.5 bg-emerald-50 text-[#007A5E] border border-emerald-100 rounded-full text-[9.5px] font-bold uppercase tracking-wide">
                                   SLA Active
@@ -1039,17 +1028,6 @@ export default function RecruiterDashboard() {
                               </button>
                             </td>
                           </tr>
-                          {expandedSlaRow === cand.id && isBreached && (
-                            <tr className="bg-rose-50/30">
-                              <td colSpan={8} className="p-4 pl-14 border-l-4 border-rose-500">
-                                <div className="text-xs text-rose-700">
-                                  <strong className="block mb-1 font-extrabold text-rose-800">SLA Breach Details:</strong>
-                                  {cand.slaBreachDetails}
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                          </React.Fragment>
                         );
                       })}
                     </tbody>
@@ -1285,7 +1263,14 @@ export default function RecruiterDashboard() {
                         <td className="p-4">{agency.type}</td>
                         <td className="p-4">
                           {agency.website !== "—" ? (
-                            <a href="#" className="text-[#0052CC] hover:underline">{agency.website}</a>
+                            <a href="#" className="text-[#0052CC] hover:underline">
+                      {/* Placement Information Card List */}
+                      <div>
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="font-extrabold text-sm text-slate-800 uppercase tracking-wider">Placement Information</h3>
+                          <span className="text-[10px] text-amber-500 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-100 uppercase tracking-wider">SLA Active</span>
+                        </div>
+                            </a>
                           ) : (
                             <span className="text-slate-400 font-normal">—</span>
                           )}
@@ -1384,7 +1369,7 @@ export default function RecruiterDashboard() {
 
       {/* Solid green StaffHC Footer bar */}
       <footer className="bg-[#007A5E] text-white/95 py-3.5 text-center text-[10px] font-bold border-t border-[#005E48] mt-auto shrink-0">
-        © Copyright 2026 Hummingbird Solutions INC. All Rights Reserved.
+        © Copyright 2026 Staff HC INC. All Rights Reserved.
       </footer>
     </main>
   );

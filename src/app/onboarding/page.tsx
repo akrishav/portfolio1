@@ -47,7 +47,7 @@ export default function OnboardingPage() {
 
   const candidate = candidates.find(
     (c) => c.email.toLowerCase() === loggedInUser?.email?.toLowerCase()
-  );
+  ) || candidates[0];
 
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,7 +104,7 @@ export default function OnboardingPage() {
   );
 
   // If not logged in, render Image 2 OTP Login
-  if (!loggedInUser || loggedInUser.role !== "candidate") {
+  if (!loggedInUser || loggedInUser.role !== "candidate" || !candidate) {
     return (
       <main className="min-h-screen bg-[#F4F6FC] text-[#1E293B] flex flex-col font-sans antialiased">
         <DemoNavbar />
@@ -115,9 +115,9 @@ export default function OnboardingPage() {
             <Logo />
 
             <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-slate-500">
-              <Link href="/jobs" className="hover:text-[#0052CC]">Find Jobs</Link>
-              <a href="#" className="hover:text-[#0052CC]">Dashboard</a>
-              <a href="#" className="text-[#0052CC]">Onboard</a>
+              <Link href="/" className="hover:text-[#0052CC]">Find Jobs</Link>
+              <a href="#" className="text-[#0052CC]">Dashboard</a>
+              <a href="#" className="hover:text-[#0052CC]">Support</a>
             </nav>
 
             <div className="flex items-center gap-4">
@@ -235,10 +235,22 @@ export default function OnboardingPage() {
               </form>
             )}
 
-            <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-              <span className="text-[11px] font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
-                Demo — any email and any OTP will work
-              </span>
+            <div className="mt-8 pt-6 border-t border-slate-100 space-y-3">
+              <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Evaluation & testing presets</span>
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  href="/recruiter?role=recruiter"
+                  className="py-2.5 px-3 bg-[#EBF3FC] hover:bg-[#DEEAF7] text-[#0052CC] text-[10.5px] font-bold rounded-xl transition-all shadow-3xs flex items-center justify-center gap-1 border border-[#DEE7F3]"
+                >
+                  💼 Recruiter View
+                </Link>
+                <Link
+                  href="/recruiter?role=onboarder"
+                  className="py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-[#007A5E] text-[10.5px] font-bold rounded-xl transition-all shadow-3xs flex items-center justify-center gap-1 border border-emerald-100"
+                >
+                  🛡️ On-boarder View
+                </Link>
+              </div>
             </div>
 
             <div className="mt-6 text-center">
@@ -263,7 +275,7 @@ export default function OnboardingPage() {
             </span>
           </div>
           <div>
-            © 2026 Hummingbird Solutions INC. All rights reserved.
+            © 2024 StaffHC Healthcare Staffing. All rights reserved.
           </div>
         </div>
       </main>
@@ -332,9 +344,9 @@ export default function OnboardingPage() {
           <Logo />
 
           <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-slate-500">
-            <Link href="/jobs" className="hover:text-[#0052CC] transition-colors">Find Jobs</Link>
-            <a href="#" className="hover:text-[#0052CC] transition-colors">Dashboard</a>
-            <a href="#" className="text-[#0052CC] transition-colors border-b-2 border-[#0052CC] pb-5 mt-5">Onboard</a>
+            <a href="#" className="hover:text-[#0052CC] transition-colors">Find Jobs</a>
+            <a href="#" className="text-[#0052CC] transition-colors border-b-2 border-[#0052CC] pb-5 mt-5">Dashboard</a>
+            <a href="#" className="hover:text-[#0052CC] transition-colors">Support</a>
           </nav>
 
           <div className="flex items-center gap-4">
@@ -441,7 +453,17 @@ export default function OnboardingPage() {
                   </span>
                 )}
               </button>
-
+              <button
+                onClick={() => setActiveMenu("costs")}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                  activeMenu === "costs"
+                    ? "bg-[#EBF3FC] text-[#0052CC]"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+                }`}
+              >
+                <DollarSign className="h-4.5 w-4.5" />
+                <span>Costs</span>
+              </button>
               <button
                 onClick={() => setActiveMenu("messages")}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
@@ -464,7 +486,17 @@ export default function OnboardingPage() {
                 <Settings className="h-4.5 w-4.5" />
                 Settings
               </button>
-
+              <button
+                onClick={() => setActiveMenu("help")}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                  activeMenu === "help"
+                    ? "bg-[#EBF3FC] text-[#0052CC]"
+                    : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
+                }`}
+              >
+                <HelpCircle className="h-4.5 w-4.5" />
+                Help
+              </button>
             </nav>
           </div>
 
@@ -797,8 +829,56 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Menu Panel 6: SETTINGS */}
-          {activeMenu === "settings" && (
+          {/* Menu Panel 5: COST TRANSPARENCY */}
+          {activeMenu === "costs" && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 text-left">
+              <div>
+                <h3 className="font-bold text-[#162f55] text-sm flex items-center gap-2">
+                  <DollarSign className="h-4.5 w-4.5 text-[#0052CC]" />
+                  Onboarding Transaction Costs Ledger
+                </h3>
+                <p className="text-[11px] text-slate-400 mt-1 font-semibold">
+                  A transparent breakdown of all verification, screening, and diagnostic costs incurred during your compliance onboarding.
+                </p>
+              </div>
+
+              <div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100 text-xs bg-white">
+                <div className="p-4 flex justify-between font-semibold">
+                  <span className="text-slate-500">Aya Background Screening Fee</span>
+                  <span className="text-slate-800 font-bold">$45.00</span>
+                </div>
+                <div className="p-4 flex justify-between font-semibold">
+                  <span className="text-slate-550">10-Panel Drug Screen Diagnostic Voucher</span>
+                  <span className="text-slate-800 font-bold">$35.00</span>
+                </div>
+                <div className="p-4 flex justify-between font-semibold">
+                  <span className="text-slate-555">E-Verify Processing Surcharge</span>
+                  <span className="text-slate-800 font-bold">$10.00</span>
+                </div>
+                <div className="p-4 flex justify-between font-semibold">
+                  <span className="text-slate-555">Credential Verification & Certifications checks</span>
+                  <span className="text-slate-800 font-bold">$25.00</span>
+                </div>
+                <div className="p-4 bg-slate-50 flex justify-between font-extrabold text-sm border-t border-slate-250">
+                  <span className="text-slate-800">Total Onboarding Placement Cost</span>
+                  <span className="text-[#007A5E] font-black">$115.00</span>
+                </div>
+              </div>
+              
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-3">
+                <div className="h-9 w-9 bg-emerald-50 text-[#007A5E] border border-emerald-100 rounded-full flex items-center justify-center shrink-0">
+                  <Check className="h-4 w-4" />
+                </div>
+                <div className="text-[11px] font-semibold text-slate-650">
+                  <span className="font-bold text-slate-700 block">Fully Covered by CDK Global</span>
+                  All screening expenses are paid directly by the employer placement partner. No candidate payment is required.
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Menu Panel 6: SETTINGS & HELP */}
+          {(activeMenu === "settings" || activeMenu === "help") && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-center py-16">
               <Settings className="h-10 w-10 text-slate-300 mx-auto mb-3" />
               <p className="text-xs text-slate-500 font-bold">Menu item simulated.</p>
@@ -975,7 +1055,7 @@ export default function OnboardingPage() {
       <footer className="bg-slate-55 border-t border-slate-200 shrink-0 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-455 font-medium">
           <div>
-            © 2026 Hummingbird Solutions INC. All rights reserved.
+            © 2024 StaffHC Healthcare Staffing. All rights reserved.
           </div>
           <div className="flex gap-4">
             <a href="#" className="hover:text-slate-600">Privacy Policy</a>
