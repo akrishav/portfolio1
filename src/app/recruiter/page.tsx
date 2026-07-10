@@ -141,7 +141,7 @@ export default function RecruiterDashboard() {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-[#0F172A] tracking-tight">StaffHC Onboarding ERP</h2>
+            <h2 className="text-2xl font-bold text-[#0F172A] tracking-tight">StaffHC Onboarding</h2>
             <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed font-medium">
               Enter your coordinator credentials to access compliance dashboards.
             </p>
@@ -175,7 +175,7 @@ export default function RecruiterDashboard() {
               type="submit"
               className="w-full py-3.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow"
             >
-              Sign In to ERP
+              Sign In
               <ArrowRight className="h-4 w-4" />
             </button>
           </form>

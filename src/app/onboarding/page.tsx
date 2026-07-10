@@ -194,7 +194,7 @@ export default function OnboardingPage() {
                     <Mail className="absolute left-4 top-3.5 h-4.5 w-4.5 text-slate-400" />
                   </div>
                   <span className="text-[10px] text-slate-400 block mt-2 font-medium">
-                    We'll send a 6-digit security code to this address. (Demo — any email and any OTP will work)
+                    Enter <strong className="text-slate-700">mani@staffhc.com</strong>. We'll send a 6-digit security code to this address. (Demo — any email and any OTP will work)
                   </span>
                 </div>
 
