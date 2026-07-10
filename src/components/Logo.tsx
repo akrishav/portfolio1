@@ -1,20 +1,27 @@
 "use client";
 
 import React from "react";
-import { HeartPulse } from "lucide-react";
 
 export default function Logo() {
   return (
-    <div className="flex items-center gap-2 select-none">
-      <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#0052CC] to-[#0042A3] flex items-center justify-center shadow-sm border border-[#00388A]">
-        <HeartPulse className="h-5 w-5 text-white" />
-      </div>
-      <div className="flex flex-col -space-y-1">
-        <span className="font-sans font-black text-xl text-slate-800 tracking-tight">
-          Staff<span className="text-[#0052CC]">HC</span>
-        </span>
-        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest pl-0.5">Healthcare Staffing</span>
-      </div>
+    <div className="flex items-center gap-1.5 select-none">
+      <svg viewBox="0 0 100 100" className="w-10 h-10 shrink-0">
+        <g transform="translate(50, 50)">
+          {/* Left Teal Diamond */}
+          <g transform="translate(-24, 0)">
+            <polygon points="-22,0 0,-22 22,0 0,22" fill="#159FB6" />
+          </g>
+          {/* Bottom Dark Blue Diamond */}
+          <g transform="translate(0, 24)">
+            <polygon points="-22,0 0,-22 22,0 0,22" fill="#132B48" />
+          </g>
+          {/* Top Teal Circle */}
+          <circle cx="0" cy="-24" r="15.5" fill="#159FB6" />
+        </g>
+      </svg>
+      <span className="font-sans font-[500] text-[22px] text-[#132B48] tracking-tight">
+        Staff HC
+      </span>
     </div>
   );
 }
