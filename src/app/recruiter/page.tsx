@@ -139,7 +139,7 @@ export default function RecruiterDashboard() {
                 <path d="M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold tracking-tight mt-2 text-slate-100">Hummingbird Onboarding ERP</h2>
+            <h2 className="text-xl font-bold tracking-tight mt-2 text-slate-100">StaffHC Onboarding ERP</h2>
             <p className="text-xs text-slate-400">Enter your coordinator credentials to access compliance dashboards</p>
           </div>
 
@@ -194,11 +194,7 @@ export default function RecruiterDashboard() {
           
           {/* Brand header logo */}
           <div className="flex items-center gap-3">
-            <img 
-              src="/hummingbird-logo.png" 
-              className="h-6.5 object-contain select-none pointer-events-none" 
-              alt="Hummingbird Logo" 
-            />
+            <Logo />
             <span className="text-[#007A5E] font-bold text-sm tracking-wide">Onboarding</span>
           </div>
 

@@ -326,7 +326,7 @@ export default function OnboardingPage() {
         </div>
 
         <div className="bg-transparent py-8 text-center text-[10px] text-slate-400 font-medium z-10">
-          © 2026 Hummingbird Solutions INC. All rights reserved.
+          © 2026 StaffHC Inc. All rights reserved.
         </div>
       </main>
     );
