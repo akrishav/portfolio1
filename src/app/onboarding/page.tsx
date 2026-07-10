@@ -125,8 +125,8 @@ export default function OnboardingPage() {
 
             <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-slate-500">
               <Link href="/jobs" className="hover:text-[#0052CC]">Find Jobs</Link>
-              <a href="#" className="text-[#0052CC]">Dashboard</a>
-              <a href="#" className="hover:text-[#0052CC]">Onboard</a>
+              <Link href="/onboarding" className="text-[#0052CC]">Dashboard</Link>
+              <Link href="/onboarding" className="hover:text-[#0052CC]">Onboard</Link>
             </nav>
 
             <div className="flex items-center gap-4">
@@ -292,8 +292,8 @@ export default function OnboardingPage() {
             </div>
             <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-slate-500">
               <Link href="/jobs" className="hover:text-[#0052CC]">Find Jobs</Link>
-              <a href="#" className="hover:text-[#0052CC]">Dashboard</a>
-              <a href="#" className="text-[#0052CC]">Onboard</a>
+              <Link href="/onboarding" className="hover:text-[#0052CC]">Dashboard</Link>
+              <Link href="/onboarding" className="text-[#0052CC]">Onboard</Link>
             </nav>
             <div className="flex items-center gap-4">
               <button className="text-slate-400 hover:text-slate-600 transition-colors">
@@ -363,7 +363,7 @@ export default function OnboardingPage() {
             {!candidate?.hasNoApplication && (
               <button
                 onClick={() => setActiveMenu("overview")}
-                className="hover:text-[#0052CC] transition-colors"
+                className={`transition-colors pb-5 mt-5 border-[#0052CC] ${activeMenu === "overview" ? "text-[#0052CC] border-b-2 font-extrabold" : "hover:text-[#0052CC]"}`}
               >
                 Onboard
               </button>
