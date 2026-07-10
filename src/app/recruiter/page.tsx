@@ -1263,14 +1263,7 @@ export default function RecruiterDashboard() {
                         <td className="p-4">{agency.type}</td>
                         <td className="p-4">
                           {agency.website !== "—" ? (
-                            <a href="#" className="text-[#0052CC] hover:underline">
-                      {/* Placement Information Card List */}
-                      <div>
-                        <div className="flex justify-between items-center mb-4">
-                          <h3 className="font-extrabold text-sm text-slate-800 uppercase tracking-wider">Placement Information</h3>
-                          <span className="text-[10px] text-amber-500 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-100 uppercase tracking-wider">SLA Active</span>
-                        </div>
-                            </a>
+                            <a href="#" className="text-[#0052CC] hover:underline">{agency.website}</a>
                           ) : (
                             <span className="text-slate-400 font-normal">—</span>
                           )}
