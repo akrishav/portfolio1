@@ -442,7 +442,7 @@ export default function Home() {
             {/* Testimonials left info */}
             <div className="lg:col-span-5 space-y-4">
               <h3 className="text-3xl font-extrabold text-[#0F172A] tracking-tight leading-tight">
-                True stories from nurses who've found success through our platform.
+                True stories from nurses who&apos;ve found success through our platform.
               </h3>
               <p className="text-xs text-slate-500 leading-relaxed font-semibold">
                 Discover how we've helped nurses build rewarding careers across top healthcare institutions.
