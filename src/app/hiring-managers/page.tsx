@@ -109,12 +109,30 @@ export default function HiringManagersPage() {
           </div>
 
           {/* App download badges */}
-          <div className="flex gap-4">
-            <a href="#" className="hover:opacity-90 transition-opacity">
-              <img src="/google-play.png" alt="Get it on Google Play" className="h-10 w-auto" />
+          <div className="flex justify-center gap-3.5">
+            {/* Google Play */}
+            <a href="#" className="flex items-center gap-2.5 px-3.5 py-1.5 bg-black hover:bg-neutral-900 border border-[#A1A1A1] rounded-lg text-left text-white transition-colors shrink-0 shadow-sm">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+                <path d="M3 20.35V3.65C3 3.1 3.4 2.8 3.9 3.1L12.5 12L3.9 20.9C3.4 21.2 3 20.9 3 20.35Z" fill="#EA4335" />
+                <path d="M12.5 12L16.2 15.7L3.9 20.9L12.5 12Z" fill="#FBBC05" />
+                <path d="M12.5 12L3.9 3.1L16.2 8.3L12.5 12Z" fill="#34A853" />
+                <path d="M16.2 8.3L19.5 10.15C20.1 10.5 20.1 11.5 19.5 11.85L16.2 15.7L12.5 12L16.2 8.3Z" fill="#4285F4" />
+              </svg>
+              <div className="leading-none">
+                <span className="text-[7.5px] uppercase font-bold text-white block">GET IT ON</span>
+                <span className="text-[11.5px] font-bold block mt-0.5 text-white">Google Play</span>
+              </div>
             </a>
-            <a href="#" className="hover:opacity-90 transition-opacity">
-              <img src="/app-store.png" alt="Download on the App Store" className="h-10 w-auto" />
+
+            {/* App Store */}
+            <a href="#" className="flex items-center gap-2.5 px-3.5 py-1.5 bg-black hover:bg-neutral-900 border border-[#A1A1A1] rounded-lg text-left text-white transition-colors shrink-0 shadow-sm">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.05-1 .04-2.22.67-2.94 1.51-.62.73-1.16 1.87-1.01 2.98 1.12.09 2.27-.61 2.96-1.44Z" />
+              </svg>
+              <div className="leading-none">
+                <span className="text-[7.5px] uppercase font-bold text-white block">Download on the</span>
+                <span className="text-[11.5px] font-bold block mt-0.5 text-white font-sans">App Store</span>
+              </div>
             </a>
           </div>
 
