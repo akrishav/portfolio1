@@ -1383,14 +1383,14 @@ export default function RecruiterDashboard() {
                   <span className="text-slate-800 font-bold">OTP Authentication Pin</span>
                   <span className="text-slate-400 font-normal">09:12 AM</span>
                 </div>
-                <p className="text-slate-500 text-[10px]">SMS: Your StaffHC onboarding login OTP code is 123456.</p>
+                <p className="text-slate-500 text-[10px]">SMS Dispatch: Sent login authentication OTP code 123456 to candidate Mani.</p>
               </div>
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5 text-[11px] font-semibold text-slate-655">
                 <div className="flex justify-between">
                   <span className="text-slate-800 font-bold">W-4 Anomaly Notice</span>
                   <span className="text-slate-400 font-normal">10:30 AM</span>
                 </div>
-                <p className="text-rose-500 text-[10px]">⚠️ Warning: Your signature on W-4 form has a name mismatch. Please re-upload.</p>
+                <p className="text-rose-500 text-[10px]">⚠️ Warning: Sent anomaly alert to candidate Mani regarding W-4 form signature name mismatch. Awaiting re-upload.</p>
               </div>
             </div>
 
