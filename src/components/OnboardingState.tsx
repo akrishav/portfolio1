@@ -383,42 +383,6 @@ const initialCandidates = (): Candidate[] => [
     erpPlacementItems: [],
     backgroundStatus: "Pending",
     drugCheckStatus: "Pending"
-  },
-  {
-    id: "candidate-ganesan",
-    name: "Ganesan K",
-    email: "ganesan@example.com",
-    phone: "(555) 728-1192",
-    jobTitle: "ICU Specialist Nurse",
-    recruiterName: "Mani",
-    recruiterEmail: "mani@staffhc.com",
-    candidateNo: "67290",
-    clientName: "CDK Global",
-    mspName: "Ascension Health (Hallmark)",
-    stateCode: "Illinois",
-    startDate: "Jul 08, 2026",
-    scheduledStartDate: "Jul 08, 2026",
-    scheduledEndDate: "Nov 27, 2026",
-    obOwner: "Mani",
-    obClassification: "Clinical - Patient Facing",
-    employmentType: "W2 - Hourly",
-    initiatedBy: "Bindhu R",
-    slaStatus: "breached",
-    slaBreachDetails: "Drug screening node hasn't updated in 4 days. High Priority ticket issued to Director of Operations.",
-    currentStep: 3,
-    stepStatus: "stuck",
-    stuckReason: "Drug Screening Delay",
-    stuckExplanation: "The drug screening node has exceeded the turnaround time threshold.",
-    onboardingSteps: defaultSteps(),
-    erpDocuments: [
-      { name: "Drug Check", fileName: "-", submissionStatus: "Pending", approvalStatus: "Waiting" }
-    ],
-    erpPlacementItems: [
-      { name: "Purchase Order", status: "Pending" },
-      { name: "E-Verification", status: "Pending" }
-    ],
-    backgroundStatus: "Completed",
-    drugCheckStatus: "Pending"
   }
 ];
 

@@ -494,13 +494,7 @@ export default function RecruiterDashboard() {
                       <div>
                         <div className="flex justify-between items-center mb-4">
                           <h3 className="font-extrabold text-sm text-slate-800 uppercase tracking-wider">Placement Information</h3>
-                          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded border uppercase tracking-wider ${
-                            activeCandidate.slaStatus === "breached"
-                              ? "bg-red-50 text-red-655 border-red-200"
-                              : "bg-emerald-50 text-[#007A5E] border-emerald-100"
-                          }`}>
-                            {activeCandidate.slaStatus === "breached" ? "SLA Breached" : "SLA Active"}
-                          </span>
+                          <span className="text-[10px] text-amber-500 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-100 uppercase tracking-wider">SLA Active</span>
                         </div>
                         <div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100 text-xs font-semibold text-slate-655">
                           
@@ -1068,9 +1062,9 @@ export default function RecruiterDashboard() {
                                     e.stopPropagation();
                                     setExpandedCandidateId(expandedCandidateId === cand.id ? null : cand.id);
                                   }}
-                                  className={`px-2.5 py-1 rounded-full text-[9.5px] font-extrabold uppercase tracking-wide flex items-center gap-1 transition-all shadow-sm border ${
+                                  className={`px-2.5 py-1 rounded-full text-[9.5px] font-bold uppercase tracking-wide flex items-center gap-1 transition-all ${
                                     isBreached 
-                                      ? "bg-red-650 hover:bg-red-750 text-white border-red-700 animate-pulse" 
+                                      ? "bg-rose-100 hover:bg-rose-200 text-rose-600 border border-rose-200 animate-pulse" 
                                       : "bg-emerald-50 hover:bg-emerald-100 text-[#007A5E] border border-emerald-100"
                                   }`}
                                 >
@@ -1381,55 +1375,53 @@ export default function RecruiterDashboard() {
 
           <div className="flex-1 overflow-y-auto pt-4 space-y-4 no-scrollbar">
             
-{/* SLA Escalation Alerts (Tightened & Dynamic) */}
+            {/* Candidate Alerts */}
             <div className="space-y-2">
-              <span className="text-[9.5px] uppercase font-bold text-slate-400 tracking-wider block">Active SLA Breach Escalations</span>
-              {candidates.filter(c => c.slaStatus === "breached").map(c => (
-                <div key={c.id} className="bg-rose-50 border border-rose-200 rounded-xl p-3.5 space-y-1.5 text-[11px] font-semibold text-slate-655 shadow-xs animate-slide-in">
-                  <div className="flex justify-between text-rose-700 items-center">
-                    <span className="font-extrabold flex items-center gap-1">
-                      <span className="h-2 w-2 rounded-full bg-rose-650 animate-ping"></span>
-                      ⚠️ SLA BREACH ESCALATED
-                    </span>
-                    <span className="text-[10px] text-rose-600 font-extrabold uppercase">Critical</span>
-                  </div>
-                  <p className="text-rose-900 text-[10px] leading-relaxed font-semibold">
-                    Compliance check has breached SLA threshold for <strong className="text-slate-800">{c.name}</strong> ({c.jobTitle}).
-                  </p>
-                  <p className="text-rose-700 text-[10px] bg-white border border-rose-100 rounded-lg p-2 font-bold leading-normal">
-                    Details: {c.slaBreachDetails || "Compliance verification delayed."}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* Candidate Notifications & Anomaly Tracker */}
-            <div className="space-y-2">
-              <span className="text-[9.5px] uppercase font-bold text-slate-400 tracking-wider block">Real-time Portal Notifications Log</span>
-              
-              {/* Anomaly logs (Recruiter only) */}
-              {candidates.filter(c => c.anomalyAlert).map(c => (
-                <div key={c.id} className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 space-y-1.5 text-[11px] font-semibold text-slate-655 shadow-xs">
-                  <div className="flex justify-between text-amber-750 items-center">
-                    <span className="font-extrabold uppercase text-[10.5px]">⚠️ Anomaly Alert (Recruiter Only)</span>
-                    <span className="text-[10px] text-amber-600 font-extrabold uppercase">Action Req.</span>
-                  </div>
-                  <p className="text-amber-900 text-[10px] leading-relaxed font-semibold">
-                    Name mismatch detected for candidate <strong className="text-slate-850">{c.name}</strong>'s uploaded compliance records:
-                  </p>
-                  <p className="text-amber-805 text-[10px] bg-white border border-amber-100 rounded-lg p-2 font-bold italic leading-normal">
-                    "{c.anomalyAlert}"
-                  </p>
-                </div>
-              ))}
-
-              {/* Standard portal SMS logs */}
+              <span className="text-[9.5px] uppercase font-bold text-slate-400 tracking-wider block">Candidate Notifications (Mani)</span>
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5 text-[11px] font-semibold text-slate-655">
                 <div className="flex justify-between">
                   <span className="text-slate-800 font-bold">OTP Authentication Pin</span>
                   <span className="text-slate-400 font-normal">09:12 AM</span>
                 </div>
                 <p className="text-slate-500 text-[10px]">SMS: Your StaffHC onboarding login OTP code is 123456.</p>
+              </div>
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5 text-[11px] font-semibold text-slate-655">
+                <div className="flex justify-between">
+                  <span className="text-slate-800 font-bold">W-4 Anomaly Notice</span>
+                  <span className="text-slate-400 font-normal">10:30 AM</span>
+                </div>
+                <p className="text-rose-500 text-[10px]">⚠️ Warning: Your signature on W-4 form has a name mismatch. Please re-upload.</p>
+              </div>
+            </div>
+
+            {/* Recruiter / Onboarder Alerts */}
+            <div className="space-y-2">
+              <span className="text-[9.5px] uppercase font-bold text-slate-400 tracking-wider block">Compliance Coordinator Notifications</span>
+              <div className="bg-amber-50 border border-amber-250 rounded-xl p-3 space-y-1.5 text-[11px] font-semibold text-slate-655">
+                <div className="flex justify-between text-amber-700">
+                  <span className="font-bold">SLA Escalation Alert</span>
+                  <span className="text-slate-400 font-normal">11:00 AM</span>
+                </div>
+                <p className="text-amber-800 text-[10px]">⚠️ Background Check overdue by 3 days for Debra Bailey. Automatically escalated to VP compliance.</p>
+              </div>
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5 text-[11px] font-semibold text-slate-655">
+                <div className="flex justify-between">
+                  <span className="text-slate-800 font-bold">Outlook Synced Email Tracked</span>
+                  <span className="text-slate-400 font-normal">Yesterday</span>
+                </div>
+                <p className="text-slate-500 text-[10px]">Outlook integration successfully recorded incoming mail from candidate Mani under Step 2.</p>
+              </div>
+            </div>
+
+            {/* Hierarchy Escalations */}
+            <div className="space-y-2">
+              <span className="text-[9.5px] uppercase font-bold text-slate-400 tracking-wider block">Hierarchical Escalation Status</span>
+              <div className="bg-rose-50 border border-rose-250 rounded-xl p-3 space-y-1.5 text-[11px] font-semibold text-slate-655">
+                <div className="flex justify-between text-rose-700">
+                  <span className="font-bold">Hierarchy Alert Active</span>
+                  <span className="text-slate-400 font-normal">Active</span>
+                </div>
+                <p className="text-rose-800 text-[10px]">High Priority ticket issued to Director of Operations for Ganesan K's delayed Drug Screening.</p>
               </div>
             </div>
 
