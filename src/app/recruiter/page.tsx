@@ -64,6 +64,7 @@ export default function RecruiterDashboard() {
   
   // Notification Drawer
   const [showNotificationDrawer, setShowNotificationDrawer] = useState(false);
+  const [selectedEmailLog, setSelectedEmailLog] = useState<any>(null);
 
   // Agency search query
   const [agencySearch, setAgencySearch] = useState("");
@@ -115,12 +116,61 @@ export default function RecruiterDashboard() {
   );
 
   const mockEmailLogs = [
-    { id: 1, step: "Step 1: Account setup", subject: "Welcome to StaffHC Portal - Action Required", date: "Jul 05, 2026", status: "Delivered", details: "Candidate verified email login successfully" },
-    { id: 2, step: "Step 2: E-Verify", subject: "E-Verification document confirmation", date: "Jul 06, 2026", status: "Delivered", details: "Document accepted by E-Verify system" },
-    { id: 3, step: "Step 3: Purchase Order", subject: "Review placement purchase order contract", date: "Jul 07, 2026", status: "Opened", details: "Opened 3 times by candidate Mani" },
-    { id: 4, step: "Step 5: Drug Check", subject: "URGENT: Drug testing center voucher registration", date: "Jul 08, 2026", status: "Bounced", stopReason: "Invalid mailbox size / inactive mailbox", details: "Warning: Email stopped. Retrying via SMS alerts." },
-    { id: 5, step: "Step 3: Credentialing", subject: "RE: Professional Nursing License submission question", date: "Jul 09, 2026", status: "Synced from Outlook", details: "Incoming email reply sent from Mani's personal Outlook: 'I am having trouble uploading the state registration PDF, is a scanned copy fine?' [Auto-captured & Synced]" },
-    { id: 6, step: "Step 1: Onboarding", subject: "RE: Welcome to StaffHC Portal - Action Required", date: "Jul 06, 2026", status: "Synced from Gmail", details: "Incoming email reply sent from Mani's personal Gmail (mani@staffhc.com): 'Confirming my profile account setup is complete. Thanks!' [Auto-captured & Synced]" }
+    { 
+      id: 1, 
+      step: "Step 1: Account setup", 
+      subject: "Welcome to StaffHC Portal - Action Required", 
+      date: "Jul 05, 2026", 
+      status: "Delivered", 
+      details: "Candidate verified email login successfully",
+      body: `From: credentials@staffhc.com\nTo: mani@staffhc.com\n\nHi Mani,\n\nWelcome to StaffHC! Your candidate onboarding profile is ready. Please click the link below to verify your account and initialize your compliance check list.\n\nVerification Link: https://classy-malasada-57bdc6.netlify.app/onboarding\n\nThanks,\nStaffHC Credentials Team`
+    },
+    { 
+      id: 2, 
+      step: "Step 2: E-Verify", 
+      subject: "E-Verification document confirmation", 
+      date: "Jul 06, 2026", 
+      status: "Delivered", 
+      details: "Document accepted by E-Verify system",
+      body: `From: credentials@staffhc.com\nTo: mani@staffhc.com\n\nDear Mani,\n\nYour Form I-9 and supporting documents have been successfully processed through the federal E-Verify system. The system returned status: AUTHORIZED.\n\nNo further E-Verify action is required at this stage.\n\nBest,\nStaffHC E-Verify Coordinator`
+    },
+    { 
+      id: 3, 
+      step: "Step 3: Purchase Order", 
+      subject: "Review placement purchase order contract", 
+      date: "Jul 07, 2026", 
+      status: "Opened", 
+      details: "Opened 3 times by candidate Mani",
+      body: `From: contracts@staffhc.com\nTo: mani@staffhc.com\n\nHi Mani,\n\nWe have dispatched your placement Purchase Order contract for CDK Global placement starting Jul 09, 2026.\n\nPlease review and execute the signature block in your dashboard tab.\n\nThank you,\nStaffHC Operations`
+    },
+    { 
+      id: 4, 
+      step: "Step 5: Drug Check", 
+      subject: "URGENT: Drug testing center voucher registration", 
+      date: "Jul 08, 2026", 
+      status: "Bounced", 
+      stopReason: "Invalid mailbox size / inactive mailbox", 
+      details: "Warning: Email stopped. Retrying via SMS alerts.",
+      body: `From: testing-services@staffhc.com\nTo: mani@staffhc.com\n\nURGENT NOTICE:\n\nYour drug check screening voucher is ready for download. Please register with your nearest lab within 48 hours to complete the test.\n\n[DELIVERY WARNING: Mailbox quota exceeded. Message bounced. Retrying contact dispatch via SMS alerts]`
+    },
+    { 
+      id: 5, 
+      step: "Step 3: Credentialing", 
+      subject: "RE: Professional Nursing License submission question", 
+      date: "Jul 09, 2026", 
+      status: "Synced from Outlook", 
+      details: "Incoming email reply sent from Mani's personal Outlook: 'I am having trouble uploading the state registration PDF, is a scanned copy fine?' [Auto-captured & Synced]",
+      body: `From: mani@staffhc.com (via Outlook Sync)\nTo: alex@staffhc.com\n\nAlex,\n\nI am having trouble uploading the state registration PDF for the Nursing License check. Is a scanned copy from my phone camera fine, or does it have to be an official digital PDF from the state board registry?\n\nLet me know,\nMani`
+    },
+    { 
+      id: 6, 
+      step: "Step 1: Onboarding", 
+      subject: "RE: Welcome to StaffHC Portal - Action Required", 
+      date: "Jul 06, 2026", 
+      status: "Synced from Gmail", 
+      details: "Incoming email reply sent from Mani's personal Gmail (mani@staffhc.com): 'Confirming my profile account setup is complete. Thanks!' [Auto-captured & Synced]",
+      body: `From: mani@staffhc.com (via Gmail Sync)\nTo: alex@staffhc.com\n\nHi Alex,\n\nConfirming my profile account setup is complete and I've verified the OTP code. Everything looks great so far!\n\nThanks,\nMani`
+    }
   ];  // If not logged in, show clean corporate recruiter login form
   if (!loggedInUser || loggedInUser.role !== "recruiter") {
     return (
@@ -733,28 +783,35 @@ export default function RecruiterDashboard() {
                       </div>
                       <div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100 text-xs bg-white">
                         {mockEmailLogs.map((log) => (
-                          <div key={log.id} className="p-4 hover:bg-slate-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-semibold text-slate-650">
+                          <div 
+                            key={log.id} 
+                            onClick={() => setSelectedEmailLog(log)}
+                            className="p-4 hover:bg-slate-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-semibold text-slate-650 cursor-pointer group"
+                          >
                             <div className="space-y-1">
                               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{log.step}</span>
-                              <span className="text-slate-800 font-bold block">{log.subject}</span>
+                              <span className="text-slate-800 font-bold block group-hover:text-[#0052CC] transition-colors">{log.subject}</span>
                               <p className="text-[10.5px] text-slate-400 font-medium">{log.details}</p>
                             </div>
                             <div className="flex items-center gap-3">
                               <span className="text-[10.5px] text-slate-400">{log.date}</span>
                               {log.status === "Bounced" ? (
                                 <div className="flex items-center gap-1.5">
-                                  <span className="px-2.5 py-0.5 bg-rose-50 text-rose-505 border border-rose-100 rounded-full text-[9.5px] font-bold uppercase">Stopped / Bounced</span>
+                                  <span className="px-2.5 py-0.5 bg-rose-50 text-rose-550 border border-rose-100 rounded-full text-[9.5px] font-bold uppercase">Stopped / Bounced</span>
                                   <span className="text-[9.5px] text-rose-500 italic" title={log.stopReason}>Reason: Over Quota</span>
                                 </div>
                               ) : (
                                 <span className={`px-2.5 py-0.5 rounded-full text-[9.5px] font-bold uppercase ${
                                   log.status === "Opened" ? "bg-amber-50 text-amber-600 border border-amber-100" : 
-                                  log.status === "Synced from Outlook" ? "bg-blue-50 text-[#0052CC] border border-blue-100" :
+                                  log.status.includes("Synced") ? "bg-blue-50 text-[#0052CC] border border-blue-100" :
                                   "bg-emerald-50 text-emerald-650 border border-emerald-100"
                                 }`}>
                                   {log.status}
                                 </span>
                               )}
+                              <span className="text-slate-350 group-hover:text-slate-600 transition-colors pl-1 font-bold">
+                                &rarr;
+                              </span>
                             </div>
                           </div>
                         ))}
@@ -1431,6 +1488,80 @@ export default function RecruiterDashboard() {
       <footer className="bg-[#007A5E] text-white/95 py-3.5 text-center text-[10px] font-bold border-t border-[#005E48] mt-auto shrink-0">
         © Copyright 2026 Hummingbird Healthcare Staffing. All Rights Reserved.
       </footer>
+
+      {/* Interactive Email Audit modal */}
+      {selectedEmailLog && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-xl w-full max-h-[85vh] flex flex-col overflow-hidden text-left">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <div className="flex items-center gap-2.5">
+                <div className="h-8 w-8 rounded-full bg-blue-50 text-[#0052CC] flex items-center justify-center">
+                  <Mail className="h-4.5 w-4.5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800">Email Dispatch Audit Overview</h3>
+                  <p className="text-[10px] text-slate-400 font-extrabold">{selectedEmailLog.step}</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setSelectedEmailLog(null)}
+                className="p-1.5 hover:bg-slate-200/60 rounded-full transition-colors text-slate-400 hover:text-slate-655"
+              >
+                <X className="h-4.5 w-4.5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-4 text-xs font-semibold text-slate-655 leading-relaxed no-scrollbar">
+              <div className="bg-slate-50/60 border border-slate-100 rounded-xl p-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Subject:</span>
+                  <span className="text-slate-800 font-extrabold text-right">{selectedEmailLog.subject}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Audit Date:</span>
+                  <span className="text-slate-600">{selectedEmailLog.date}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400">Status Badge:</span>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
+                    selectedEmailLog.status === "Bounced" ? "bg-rose-50 text-rose-550 border border-rose-100" : 
+                    selectedEmailLog.status === "Opened" ? "bg-amber-50 text-amber-600 border border-amber-100" : 
+                    selectedEmailLog.status.includes("Synced") ? "bg-blue-50 text-[#0052CC] border border-blue-100" :
+                    "bg-emerald-50 text-emerald-650 border border-emerald-100"
+                  }`}>
+                    {selectedEmailLog.status}
+                  </span>
+                </div>
+                {selectedEmailLog.stopReason && (
+                  <div className="flex justify-between">
+                    <span className="text-rose-500">MTA Bounce Reason:</span>
+                    <span className="text-rose-600 font-bold">{selectedEmailLog.stopReason}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-1.5 text-[11px] font-normal">
+                <span className="text-[9.5px] text-slate-400 font-bold uppercase tracking-wider block">Raw Synced Payload Body</span>
+                <div className="border border-slate-150 rounded-xl p-4 bg-slate-50/20 font-mono text-slate-700 whitespace-pre-wrap leading-relaxed shadow-3xs text-[11px]">
+                  {selectedEmailLog.body || `From: credentials@staffhc.com\nTo: ${activeCandidate?.email || "mani@staffhc.com"}\n\nHi ${activeCandidate?.name || "Mani"},\n\nThis is a system audit record for step: "${selectedEmailLog.step}".\n\nLog Details:\n${selectedEmailLog.details}`}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex justify-end">
+              <button 
+                onClick={() => setSelectedEmailLog(null)}
+                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-[11px] font-bold transition-colors"
+              >
+                Close Audit Link
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
