@@ -505,7 +505,7 @@ export default function RecruiterDashboard() {
                       inspectorTab === "emails" ? "text-[#007A5E] border-b-2 border-[#007A5E] font-black" : "text-slate-400 hover:text-slate-700"
                     }`}
                   >
-                    Email Tracking (Outlook)
+                    Email Tracking
                   </button>
                   <button 
                     onClick={() => setInspectorTab("costs")}
