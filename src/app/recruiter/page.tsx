@@ -171,7 +171,15 @@ export default function RecruiterDashboard() {
       details: "Incoming email reply sent from Mani's personal Gmail (mani@staffhc.com): 'Confirming my profile account setup is complete. Thanks!' [Auto-captured & Synced]",
       body: `From: mani@staffhc.com (via Gmail Sync)\nTo: alex@staffhc.com\n\nHi Alex,\n\nConfirming my profile account setup is complete and I've verified the OTP code. Everything looks great so far!\n\nThanks,\nMani`
     }
-  ];  // If not logged in, show clean corporate recruiter login form
+  ];
+
+  useEffect(() => {
+    if (inspectorTab === "emails" && mockEmailLogs.length > 0) {
+      setSelectedEmailLog(mockEmailLogs[0]);
+    }
+  }, [inspectorTab, selectedCandidateId]);
+
+  // If not logged in, show clean corporate recruiter login form
   if (!loggedInUser || loggedInUser.role !== "recruiter") {
     return (
       <main className="min-h-screen bg-slate-50 text-slate-800 flex flex-col justify-center items-center font-sans antialiased p-6">
@@ -781,40 +789,104 @@ export default function RecruiterDashboard() {
                         <h4 className="font-bold text-xs uppercase tracking-wider text-slate-700">Outlook Automated Email Audit</h4>
                         <span className="px-2 py-0.5 bg-[#EBF3FC] text-[#0052CC] border border-[#DEEAF7] rounded text-[9.5px] font-bold">Outlook Synced</span>
                       </div>
-                      <div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100 text-xs bg-white">
-                        {mockEmailLogs.map((log) => (
-                          <div 
-                            key={log.id} 
-                            onClick={() => setSelectedEmailLog(log)}
-                            className="p-4 hover:bg-slate-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-semibold text-slate-650 cursor-pointer group"
-                          >
-                            <div className="space-y-1">
-                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{log.step}</span>
-                              <span className="text-slate-800 font-bold block group-hover:text-[#0052CC] transition-colors">{log.subject}</span>
-                              <p className="text-[10.5px] text-slate-400 font-medium">{log.details}</p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <span className="text-[10.5px] text-slate-400">{log.date}</span>
-                              {log.status === "Bounced" ? (
-                                <div className="flex items-center gap-1.5">
-                                  <span className="px-2.5 py-0.5 bg-rose-50 text-rose-550 border border-rose-100 rounded-full text-[9.5px] font-bold uppercase">Stopped / Bounced</span>
-                                  <span className="text-[9.5px] text-rose-500 italic" title={log.stopReason}>Reason: Over Quota</span>
+                      
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-[480px]">
+                        {/* Left column: List of emails (5 cols) */}
+                        <div className="lg:col-span-5 border border-slate-200 rounded-2xl overflow-hidden divide-y divide-slate-100 bg-white max-h-[520px] overflow-y-auto no-scrollbar">
+                          {mockEmailLogs.map((log) => {
+                            const isSelected = selectedEmailLog?.id === log.id;
+                            return (
+                              <div 
+                                key={log.id} 
+                                onClick={() => setSelectedEmailLog(log)}
+                                className={`p-4 transition-colors flex flex-col gap-2 cursor-pointer border-l-4 ${
+                                  isSelected 
+                                    ? "bg-[#F0F5FA] border-[#0052CC] text-[#0052CC]" 
+                                    : "border-transparent hover:bg-slate-50 text-slate-655"
+                                }`}
+                              >
+                                <div className="flex justify-between items-start gap-2">
+                                  <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">{log.step}</span>
+                                  <span className="text-[9.5px] text-slate-400 font-semibold">{log.date}</span>
                                 </div>
-                              ) : (
-                                <span className={`px-2.5 py-0.5 rounded-full text-[9.5px] font-bold uppercase ${
-                                  log.status === "Opened" ? "bg-amber-50 text-amber-600 border border-amber-100" : 
-                                  log.status.includes("Synced") ? "bg-blue-50 text-[#0052CC] border border-blue-100" :
+                                <span className={`font-bold block text-xs ${isSelected ? "text-slate-900" : "text-slate-800"}`}>{log.subject}</span>
+                                <p className="text-[10px] text-slate-450 font-medium truncate">{log.details}</p>
+                                <div className="flex items-center justify-between pt-1">
+                                  <span className={`px-2 py-0.5 rounded-full text-[8.5px] font-bold uppercase ${
+                                    log.status === "Bounced" ? "bg-rose-50 text-rose-550 border border-rose-100" : 
+                                    log.status === "Opened" ? "bg-amber-50 text-amber-600 border border-amber-100" : 
+                                    log.status.includes("Synced") ? "bg-blue-50 text-[#0052CC] border border-blue-100" :
+                                    "bg-emerald-50 text-emerald-650 border border-emerald-100"
+                                  }`}>
+                                    {log.status}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Right column: Selected email content detail view (7 cols) */}
+                        <div className="lg:col-span-7 border border-slate-200 rounded-2xl bg-white flex flex-col overflow-hidden max-h-[520px]">
+                          {selectedEmailLog ? (
+                            <div className="flex flex-col h-full grow">
+                              {/* Header */}
+                              <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center shrink-0">
+                                <div className="flex items-center gap-2.5">
+                                  <div className="h-8 w-8 rounded-full bg-blue-50 text-[#0052CC] flex items-center justify-center">
+                                    <Mail className="h-4 w-4" />
+                                  </div>
+                                  <div>
+                                    <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-800">Email Dispatch Audit Overview</h4>
+                                    <p className="text-[10px] text-slate-400 font-extrabold">{selectedEmailLog.step}</p>
+                                  </div>
+                                </div>
+                                <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
+                                  selectedEmailLog.status === "Bounced" ? "bg-rose-50 text-rose-550 border border-rose-100" : 
+                                  selectedEmailLog.status === "Opened" ? "bg-amber-50 text-amber-600 border border-amber-100" : 
+                                  selectedEmailLog.status.includes("Synced") ? "bg-blue-50 text-[#0052CC] border border-blue-100" :
                                   "bg-emerald-50 text-emerald-650 border border-emerald-100"
                                 }`}>
-                                  {log.status}
+                                  {selectedEmailLog.status}
                                 </span>
-                              )}
-                              <span className="text-slate-350 group-hover:text-slate-600 transition-colors pl-1 font-bold">
-                                &rarr;
-                              </span>
+                              </div>
+
+                              {/* Body */}
+                              <div className="p-5 overflow-y-auto space-y-4 grow no-scrollbar text-xs font-semibold text-slate-655 leading-relaxed flex flex-col justify-between">
+                                <div className="space-y-4 text-left">
+                                  <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-2">
+                                    <div className="flex justify-between">
+                                      <span className="text-slate-400">Subject:</span>
+                                      <span className="text-slate-800 font-extrabold text-right">{selectedEmailLog.subject}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span className="text-slate-400">Audit Date:</span>
+                                      <span className="text-slate-600">{selectedEmailLog.date}</span>
+                                    </div>
+                                    {selectedEmailLog.stopReason && (
+                                      <div className="flex justify-between">
+                                        <span className="text-rose-500">MTA Bounce Reason:</span>
+                                        <span className="text-rose-600 font-bold">{selectedEmailLog.stopReason}</span>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <div className="space-y-1.5 text-[11px] font-normal">
+                                    <span className="text-[9.5px] text-slate-400 font-bold uppercase tracking-wider block">Raw Synced Payload Body</span>
+                                    <div className="border border-slate-150 rounded-xl p-4 bg-slate-50/20 font-mono text-slate-700 whitespace-pre-wrap leading-relaxed shadow-3xs text-[11px]">
+                                      {selectedEmailLog.body || `From: credentials@staffhc.com\nTo: ${activeCandidate?.email || "mani@staffhc.com"}\n\nHi ${activeCandidate?.name || "Mani"},\n\nThis is a system audit record for step: "${selectedEmailLog.step}".\n\nLog Details:\n${selectedEmailLog.details}`}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ) : (
+                            <div className="flex flex-col items-center justify-center grow p-10 text-slate-400 text-center">
+                              <Mail className="h-10 w-10 text-slate-200 mb-3" />
+                              <p className="text-xs font-bold">Select an email log from the list to view its audit payload details.</p>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -1488,80 +1560,6 @@ export default function RecruiterDashboard() {
       <footer className="bg-[#007A5E] text-white/95 py-3.5 text-center text-[10px] font-bold border-t border-[#005E48] mt-auto shrink-0">
         © Copyright 2026 Hummingbird Healthcare Staffing. All Rights Reserved.
       </footer>
-
-      {/* Interactive Email Audit modal */}
-      {selectedEmailLog && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-xl w-full max-h-[85vh] flex flex-col overflow-hidden text-left">
-            {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <div className="flex items-center gap-2.5">
-                <div className="h-8 w-8 rounded-full bg-blue-50 text-[#0052CC] flex items-center justify-center">
-                  <Mail className="h-4.5 w-4.5" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800">Email Dispatch Audit Overview</h3>
-                  <p className="text-[10px] text-slate-400 font-extrabold">{selectedEmailLog.step}</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setSelectedEmailLog(null)}
-                className="p-1.5 hover:bg-slate-200/60 rounded-full transition-colors text-slate-400 hover:text-slate-655"
-              >
-                <X className="h-4.5 w-4.5" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-6 overflow-y-auto space-y-4 text-xs font-semibold text-slate-655 leading-relaxed no-scrollbar">
-              <div className="bg-slate-50/60 border border-slate-100 rounded-xl p-4 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Subject:</span>
-                  <span className="text-slate-800 font-extrabold text-right">{selectedEmailLog.subject}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Audit Date:</span>
-                  <span className="text-slate-600">{selectedEmailLog.date}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Status Badge:</span>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
-                    selectedEmailLog.status === "Bounced" ? "bg-rose-50 text-rose-550 border border-rose-100" : 
-                    selectedEmailLog.status === "Opened" ? "bg-amber-50 text-amber-600 border border-amber-100" : 
-                    selectedEmailLog.status.includes("Synced") ? "bg-blue-50 text-[#0052CC] border border-blue-100" :
-                    "bg-emerald-50 text-emerald-650 border border-emerald-100"
-                  }`}>
-                    {selectedEmailLog.status}
-                  </span>
-                </div>
-                {selectedEmailLog.stopReason && (
-                  <div className="flex justify-between">
-                    <span className="text-rose-500">MTA Bounce Reason:</span>
-                    <span className="text-rose-600 font-bold">{selectedEmailLog.stopReason}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-1.5 text-[11px] font-normal">
-                <span className="text-[9.5px] text-slate-400 font-bold uppercase tracking-wider block">Raw Synced Payload Body</span>
-                <div className="border border-slate-150 rounded-xl p-4 bg-slate-50/20 font-mono text-slate-700 whitespace-pre-wrap leading-relaxed shadow-3xs text-[11px]">
-                  {selectedEmailLog.body || `From: credentials@staffhc.com\nTo: ${activeCandidate?.email || "mani@staffhc.com"}\n\nHi ${activeCandidate?.name || "Mani"},\n\nThis is a system audit record for step: "${selectedEmailLog.step}".\n\nLog Details:\n${selectedEmailLog.details}`}
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex justify-end">
-              <button 
-                onClick={() => setSelectedEmailLog(null)}
-                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-[11px] font-bold transition-colors"
-              >
-                Close Audit Link
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </main>
   );
 }
