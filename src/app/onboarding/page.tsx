@@ -59,16 +59,11 @@ export default function OnboardingPage() {
   const [uploading, setUploading] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  const rawCandidate = candidates.find((c) => {
+  const candidate = candidates.find((c) => {
     const cleanEmail = loggedInUser?.email?.toLowerCase();
     const emailToMatch = cleanEmail === "candidate@healthcare.com" ? "mani@staffhc.com" : cleanEmail;
     return c.email.toLowerCase() === emailToMatch;
   });
-
-  const candidate = rawCandidate ? {
-    ...rawCandidate,
-    name: "Marcos"
-  } : undefined;
 
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
@@ -894,7 +889,7 @@ export default function OnboardingPage() {
                         <div className="space-y-0.5">
                           <span className="text-slate-800 block">Subject: {email.subject}</span>
                           <span className="text-[9.5px] text-slate-450 block font-semibold">
-                            From: {email.sender ? email.sender.replace("Mani", "Marcos") : "StaffHC Credentials Team <credentials@staffhc.com>"}
+                            From: {email.sender || "StaffHC Credentials Team <credentials@staffhc.com>"}
                           </span>
                         </div>
                         <div className="flex items-center gap-2.5">
