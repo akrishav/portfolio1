@@ -1426,9 +1426,9 @@ export default function RecruiterDashboard() {
         </div>
       )}
 
-      {/* Solid green StaffHC Footer bar */}
+      {/* Solid green Hummingbird Footer bar */}
       <footer className="bg-[#007A5E] text-white/95 py-3.5 text-center text-[10px] font-bold border-t border-[#005E48] mt-auto shrink-0">
-        © Copyright 2026 Staff HC INC. All Rights Reserved.
+        © Copyright 2026 Hummingbird Healthcare Staffing. All Rights Reserved.
       </footer>
     </main>
   );
