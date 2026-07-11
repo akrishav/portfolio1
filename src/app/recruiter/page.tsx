@@ -119,7 +119,8 @@ export default function RecruiterDashboard() {
     { id: 2, step: "Step 2: E-Verify", subject: "E-Verification document confirmation", date: "Jul 06, 2026", status: "Delivered", details: "Document accepted by E-Verify system" },
     { id: 3, step: "Step 3: Purchase Order", subject: "Review placement purchase order contract", date: "Jul 07, 2026", status: "Opened", details: "Opened 3 times by candidate Mani" },
     { id: 4, step: "Step 5: Drug Check", subject: "URGENT: Drug testing center voucher registration", date: "Jul 08, 2026", status: "Bounced", stopReason: "Invalid mailbox size / inactive mailbox", details: "Warning: Email stopped. Retrying via SMS alerts." },
-    { id: 5, step: "Step 3: Credentialing", subject: "RE: Professional Nursing License submission question", date: "Jul 09, 2026", status: "Synced from Outlook", details: "Incoming email from candidate: 'I am having trouble uploading the state registration PDF, is a scanned copy fine?'" }
+    { id: 5, step: "Step 3: Credentialing", subject: "RE: Professional Nursing License submission question", date: "Jul 09, 2026", status: "Synced from Outlook", details: "Incoming email reply sent from Mani's personal Outlook: 'I am having trouble uploading the state registration PDF, is a scanned copy fine?' [Auto-captured & Synced]" },
+    { id: 6, step: "Step 1: Onboarding", subject: "RE: Welcome to StaffHC Portal - Action Required", date: "Jul 06, 2026", status: "Synced from Gmail", details: "Incoming email reply sent from Mani's personal Gmail (mani@staffhc.com): 'Confirming my profile account setup is complete. Thanks!' [Auto-captured & Synced]" }
   ];  // If not logged in, show clean corporate recruiter login form
   if (!loggedInUser || loggedInUser.role !== "recruiter") {
     return (

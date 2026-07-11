@@ -875,16 +875,33 @@ export default function OnboardingPage() {
                   {candidateEmails.map((email) => (
                     <div 
                       key={email.id} 
-                      className="border border-slate-200/80 rounded-xl overflow-hidden hover:border-[#0052CC]/35 transition-all bg-slate-50/20"
+                      className={`border rounded-xl overflow-hidden hover:border-[#0052CC]/35 transition-all bg-white shadow-3xs ${
+                        email.isExternalSync 
+                          ? "border-blue-150 ring-1 ring-blue-50/50" 
+                          : "border-slate-200/80"
+                      }`}
                     >
-                      <div className="bg-slate-50 border-b border-slate-100 p-3 flex justify-between items-center text-[10.5px] font-bold">
+                      <div className={`p-3.5 flex justify-between items-center text-[10.5px] font-bold border-b ${
+                        email.isExternalSync 
+                          ? "bg-blue-50/30 border-blue-100" 
+                          : "bg-slate-50 border-slate-100"
+                      }`}>
                         <div className="space-y-0.5">
-                          <span className="text-slate-700 block">Subject: {email.subject}</span>
-                          <span className="text-[9.5px] text-slate-400 block font-semibold">From: StaffHC Credentials Team &lt;credentials@staffhc.com&gt;</span>
+                          <span className="text-slate-800 block">Subject: {email.subject}</span>
+                          <span className="text-[9.5px] text-slate-450 block font-semibold">
+                            From: {email.sender || "StaffHC Credentials Team <credentials@staffhc.com>"}
+                          </span>
                         </div>
-                        <span className="text-[9px] text-slate-400 font-semibold">{email.timestamp}</span>
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-[9px] text-slate-400 font-semibold">{email.timestamp}</span>
+                          {email.isExternalSync && (
+                            <span className="px-2 py-0.5 bg-blue-100 text-[#0052CC] border border-blue-200 rounded text-[8.5px] font-extrabold uppercase tracking-wide flex items-center gap-1 shadow-3xs">
+                              🔄 Outlook/Gmail Synced
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="p-3.5 text-xs text-slate-600 bg-white font-mono leading-relaxed whitespace-pre-wrap">
+                      <div className="p-4 text-xs text-slate-650 bg-white font-mono leading-relaxed whitespace-pre-wrap">
                         {email.message}
                       </div>
                     </div>

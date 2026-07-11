@@ -50,7 +50,9 @@ export interface NotificationLog {
   subject: string;
   message: string;
   timestamp: string;
-  status: "delivered" | "pending";
+  status: "delivered" | "pending" | "synced";
+  sender?: string;
+  isExternalSync?: boolean;
 }
 
 export interface Candidate {
@@ -427,6 +429,32 @@ const initialNotifications = (): NotificationLog[] => [
     message: "Dear Debra, please complete your pending orientation modules and upload your W-4 forms in your candidate portal.",
     timestamp: "2026-07-09 09:12 AM",
     status: "delivered"
+  },
+  {
+    id: "notif-3",
+    candidateId: "candidate-mani",
+    recipient: "recruiter",
+    recipientName: "Alex",
+    channel: "email",
+    subject: "RE: Professional Nursing License submission question",
+    sender: "Mani <mani@staffhc.com>",
+    message: "Incoming synced message from candidate's personal Gmail (mani@staffhc.com):\n\n\"I am having trouble uploading the state registration PDF, is a scanned copy fine?\"",
+    timestamp: "2026-07-09 11:15 AM",
+    status: "synced",
+    isExternalSync: true
+  },
+  {
+    id: "notif-4",
+    candidateId: "candidate-mani",
+    recipient: "recruiter",
+    recipientName: "Alex",
+    channel: "email",
+    subject: "RE: Welcome to StaffHC Portal - Action Required",
+    sender: "Mani <mani@staffhc.com>",
+    message: "Incoming synced message from Mani's Outlook client:\n\n\"Confirming my profile account setup is complete. Thanks!\"",
+    timestamp: "2026-07-06 02:40 PM",
+    status: "synced",
+    isExternalSync: true
   }
 ];
 
