@@ -916,10 +916,10 @@ export default function OnboardingPage() {
             <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col h-[480px] justify-between">
               <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
                 <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-655">
-                  M
+                  {candidate?.recruiterName?.substring(0, 1) || "A"}
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-slate-800">Mani</h4>
+                  <h4 className="text-xs font-bold text-slate-800">{candidate?.recruiterName || "Alex"}</h4>
                   <span className="text-[10px] text-slate-400 font-bold block">Online • Your Recruiter</span>
                 </div>
               </div>
@@ -979,14 +979,14 @@ export default function OnboardingPage() {
                 <div className="h-10 w-10 rounded-full overflow-hidden border border-slate-100">
                   <img 
                     src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
-                    alt="Mani" 
+                    alt={candidate?.recruiterName || "Recruiter"} 
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <span className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 rounded-full border-2 border-white"></span>
               </div>
               <div className="text-left">
-                <h4 className="text-xs font-bold text-slate-800">Mani</h4>
+                <h4 className="text-xs font-bold text-slate-800">{candidate?.recruiterName || "Alex"}</h4>
                 <span className="text-[10px] text-slate-400 font-bold block">Online • Your Recruiter</span>
               </div>
             </div>
@@ -1260,14 +1260,14 @@ export default function OnboardingPage() {
                   <div className="h-10 w-10 rounded-full overflow-hidden border border-slate-100">
                     <img 
                       src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
-                      alt="Mani" 
+                      alt={candidate?.recruiterName || "Recruiter"} 
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <span className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 rounded-full border-2 border-white"></span>
                 </div>
                 <div className="text-left">
-                  <h4 className="text-xs font-bold text-slate-800">Mani</h4>
+                  <h4 className="text-xs font-bold text-slate-800">{candidate?.recruiterName || "Alex"}</h4>
                   <span className="text-[10px] text-slate-400 font-bold block">Online • Your Recruiter</span>
                 </div>
               </div>
