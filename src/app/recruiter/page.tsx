@@ -241,10 +241,10 @@ export default function RecruiterDashboard() {
             {/* User profile dropdown matching screen */}
             <div className="flex items-center gap-2.5 bg-white border border-slate-200 rounded-full pl-2 pr-3.5 py-1 shadow-3xs cursor-pointer group hover:bg-slate-50 transition-colors">
               <div className="h-7 w-7 rounded-full bg-[#007A5E] text-white font-extrabold flex items-center justify-center text-xs">
-                M
+                A
               </div>
               <span className="text-xs font-bold text-slate-750 group-hover:text-slate-900 transition-colors flex items-center gap-1.5">
-                Mani
+                Alex
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
@@ -703,7 +703,7 @@ export default function RecruiterDashboard() {
                                 {msg.text}
                               </div>
                               <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
-                                {msg.sender === "recruiter" ? "Mani" : activeCandidate.name}
+                                {msg.sender === "recruiter" ? "Alex" : activeCandidate.name}
                               </span>
                             </div>
                           ))}
@@ -815,7 +815,7 @@ export default function RecruiterDashboard() {
                 {/* Welcome green banner */}
                 <div className="bg-[#007A5E] text-white p-6 rounded-2xl shadow-sm text-left relative overflow-hidden">
                   <div className="relative z-10 space-y-1">
-                    <h1 className="text-xl font-bold tracking-tight">Good Afternoon, Mani! 👋</h1>
+                    <h1 className="text-xl font-bold tracking-tight">Good Afternoon, Alex! 👋</h1>
                     <p className="text-xs text-emerald-100 font-semibold">Welcome back to your Onboarding compliance panel.</p>
                     <div className="flex gap-4 pt-3 text-[10px] font-bold text-teal-150">
                       <span className="flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-lg">
