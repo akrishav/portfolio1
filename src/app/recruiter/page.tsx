@@ -741,7 +741,7 @@ export default function RecruiterDashboard() {
 
                         {/* Horizontal Timeline Track */}
                         <div className="grid grid-cols-1 md:grid-cols-7 gap-3 pt-2">
-                          {activeCandidate?.onboardingSteps.map((step, idx) => {
+                          {activeCandidate?.onboardingSteps?.map((step, idx) => {
                             const stepConfig = slaSettings.find(s => s.stepNumber === step.number);
                             const targetVal = stepConfig?.durationValue || 3;
                             const targetUnit = stepConfig?.durationUnit || "days";
@@ -1003,7 +1003,7 @@ export default function RecruiterDashboard() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 text-xs font-semibold text-slate-655 bg-white">
-                          {activeCandidate?.erpDocuments.map((doc, idx) => {
+                          {activeCandidate?.erpDocuments?.map((doc, idx) => {
                             const isUploaded = doc.fileName !== "-";
                             // Check if this document has associated anomalies matching substring of document name
                             const docAnom = anomalies.find(a => a.candidateId === activeCandidate.id && a.title.toLowerCase().includes(doc.name.substring(0, 8).toLowerCase()) && (a.status === "open" || a.status === "in_review"));
