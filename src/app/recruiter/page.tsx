@@ -706,16 +706,37 @@ export default function RecruiterDashboard() {
 
                       {/* SLA Milestones / Timeline Bar */}
                       <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 text-left">
-                        <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                        <div className="flex justify-between items-center pb-2 border-b border-slate-100 flex-wrap gap-3">
                           <div>
                             <h3 className="font-extrabold text-xs text-slate-800 uppercase tracking-wider">Onboarding SLA Milestones Timeline</h3>
-                            <p className="text-[10px] text-slate-450 mt-0.5 font-normal">Calculated based on configured targets and simulation clock (+{simulationOffsetDays} Days offset).</p>
+                            <p className="text-[10px] text-slate-450 mt-0.5 font-normal">Calculated based on configured targets and simulation clock.</p>
                           </div>
-                          <span className={`px-2 py-0.5 rounded text-[9.5px] font-bold uppercase ${
-                            activeCandidate?.slaStatus === "breached" ? "bg-rose-50 text-rose-600 border border-rose-100 animate-pulse" : "bg-emerald-50 text-[#007A5E] border border-emerald-100"
-                          }`}>
-                            {activeCandidate?.slaStatus === "breached" ? "⚠️ SLA Breached" : "SLA Active"}
-                          </span>
+                          <div className="flex items-center gap-3">
+                            {/* Simulated Time Offset Control widget */}
+                            <div className="flex items-center gap-2 bg-[#EBF3FC] border border-[#DEEAF7] rounded-lg px-3 py-1.5 text-[11px] text-[#0052CC]">
+                              <Clock className="h-3.5 w-3.5 animate-pulse" />
+                              <span className="font-bold">Simulated Time: +{simulationOffsetDays} Days</span>
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); advanceSimulationTime(1); }}
+                                className="ml-2 px-2.5 py-0.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold shadow-xs transition-all active:scale-95"
+                              >
+                                +1 Day
+                              </button>
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); advanceSimulationTime(-1); }}
+                                disabled={simulationOffsetDays <= 0}
+                                className="px-2.5 py-0.5 bg-slate-200 text-slate-500 rounded text-[10px] font-bold shadow-xs transition-all hover:bg-slate-300 disabled:opacity-50 disabled:pointer-events-none"
+                              >
+                                -1 Day
+                              </button>
+                            </div>
+
+                            <span className={`px-2 py-0.5 rounded text-[9.5px] font-bold uppercase ${
+                              activeCandidate?.slaStatus === "breached" ? "bg-rose-50 text-rose-600 border border-rose-100 animate-pulse" : "bg-emerald-50 text-[#007A5E] border border-emerald-100"
+                            }`}>
+                              {activeCandidate?.slaStatus === "breached" ? "⚠️ SLA Breached" : "SLA Active"}
+                            </span>
+                          </div>
                         </div>
 
                         {/* Horizontal Timeline Track */}
@@ -1501,24 +1522,6 @@ export default function RecruiterDashboard() {
 
                   {/* Search, Clock & Filter tools */}
                   <div className="flex items-center gap-3 flex-wrap">
-                    {/* Simulated Time Offset Control widget */}
-                    <div className="flex items-center gap-2 bg-[#EBF3FC] border border-[#DEEAF7] rounded-lg px-3 py-1.5 text-xs text-[#0052CC]">
-                      <Clock className="h-3.5 w-3.5 animate-pulse" />
-                      <span className="font-bold">Simulated Time: +{simulationOffsetDays} Days</span>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); advanceSimulationTime(1); }}
-                        className="ml-2 px-2.5 py-0.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold shadow-xs transition-all active:scale-95"
-                      >
-                        +1 Day
-                      </button>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); advanceSimulationTime(-1); }}
-                        disabled={simulationOffsetDays <= 0}
-                        className="px-2.5 py-0.5 bg-slate-200 text-slate-500 rounded text-[10px] font-bold shadow-xs transition-all hover:bg-slate-300 disabled:opacity-50 disabled:pointer-events-none"
-                      >
-                        -1 Day
-                      </button>
-                    </div>
 
                     {/* Simulated Anomaly Trigger widget */}
                     <div className="flex items-center gap-1.5 bg-[#FFF0F0] border border-[#FFD5D5] rounded-lg px-3 py-1.5 text-xs text-[#C53030]">
