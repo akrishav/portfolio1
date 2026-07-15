@@ -633,18 +633,24 @@ export default function RecruiterDashboard() {
                                       >
                                         Reach Out
                                       </button>
-                                      <button
-                                        onClick={() => {
-                                          const reason = prompt("Enter waiver justification reason:");
-                                          if (reason) {
-                                            updateAnomalyStatus(anom.id, "waived", reason);
-                                            alert("Anomaly status updated to Waived.");
-                                          }
-                                        }}
-                                        className="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded text-[10px] font-bold transition-all"
-                                      >
-                                        Waive
-                                      </button>
+                                      {anom.severity === "hard-block" && activeRole === "recruiter" ? (
+                                        <span className="text-[10px] text-rose-600 font-bold bg-rose-50 border border-rose-100 rounded px-2 py-1 flex items-center gap-1 select-none">
+                                          <Lock className="h-3 w-3" /> Audit Review Required
+                                        </span>
+                                      ) : (
+                                        <button
+                                          onClick={() => {
+                                            const reason = prompt("Enter override justification comments (Mandatory):");
+                                            if (reason) {
+                                              updateAnomalyStatus(anom.id, "waived", reason);
+                                              alert("Anomaly status updated to Waived.");
+                                            }
+                                          }}
+                                          className="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded text-[10px] font-bold transition-all"
+                                        >
+                                          Waive
+                                        </button>
+                                      )}
                                     </div>
                                   </div>
                                 ))}
@@ -660,10 +666,10 @@ export default function RecruiterDashboard() {
                                       <Lock className="h-4.5 w-4.5 text-[#007A5E]" />
                                       Layer 1: Document OCR Comparative Field Check
                                     </h3>
-                                    <p className="text-[10px] text-slate-450 mt-0.5 font-normal font-sans">Automated OCR field extraction vs Golden Record. Match confidence rating.</p>
+                                    <p className="text-[10px] text-slate-450 mt-0.5 font-normal font-sans">Automated OCR field extraction vs Golden Record. Deterministic check rules status.</p>
                                   </div>
                                   <span className="px-2 py-0.5 bg-[#EBF3FC] text-[#0052CC] border border-[#DEEAF7] rounded text-[9.5px] font-black uppercase tracking-wider">
-                                    Confidence: {activeAnomalies.find(a => a.fieldComparisons)?.confidencePercent || 94}%
+                                    OCR Read Status: {activeAnomalies.find(a => a.fieldComparisons)?.readStatus?.toUpperCase() || "READABLE"}
                                   </span>
                                 </div>
 
@@ -2082,6 +2088,58 @@ export default function RecruiterDashboard() {
                 <p className="text-xs text-slate-450 font-semibold mt-0.5">Audit flagged document discrepancies, tampering flags, background hit indicators, and step completion failures.</p>
               </div>
 
+              {/* Override Governance Analytics Panel */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-2">
+                  <span className="font-bold text-slate-400 uppercase tracking-wider block text-[9.5px]">Global Anomalies Summary</span>
+                  <div className="flex justify-between items-baseline mt-1.5">
+                    <span className="text-2xl font-black text-slate-800">
+                      {anomalies.filter(a => a.status === "open").length} Open
+                    </span>
+                    <span className="text-slate-500 font-semibold">
+                      ({anomalies.filter(a => a.status === "resolved" || a.status === "waived" || a.status === "false_positive").length} Overridden)
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-400 font-semibold leading-relaxed">Deterministic OCR verification checks & system integrity logs.</p>
+                </div>
+
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-slate-400 uppercase tracking-wider block text-[9.5px]">Operator: Alex (Recruiter)</span>
+                    <span className="bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded text-[8.5px] font-black uppercase">Normal</span>
+                  </div>
+                  <div className="space-y-1 mt-1.5">
+                    <div className="flex justify-between text-slate-500 font-semibold">
+                      <span>Placements Owned</span>
+                      <span className="font-bold text-slate-800">3 Placements</span>
+                    </div>
+                    <div className="flex justify-between text-slate-500 font-semibold">
+                      <span>FP Override Rate</span>
+                      <span className="font-bold text-slate-800">14% (1 FP)</span>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-slate-400 font-semibold leading-relaxed">Governance metrics healthy. Within policy threshold.</p>
+                </div>
+
+                <div className="bg-rose-50/50 border border-rose-200 rounded-xl p-4 text-xs space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-rose-700 uppercase tracking-wider block text-[9.5px]">Operator: Arun (Recruiter)</span>
+                    <span className="bg-rose-100 text-rose-700 border border-rose-200 px-2 py-0.5 rounded text-[8.5px] font-black uppercase tracking-wider animate-pulse">⚠️ High Risk</span>
+                  </div>
+                  <div className="space-y-1 mt-1.5">
+                    <div className="flex justify-between text-slate-500 font-semibold">
+                      <span>Placements Owned</span>
+                      <span className="font-bold text-slate-850">2 Placements</span>
+                    </div>
+                    <div className="flex justify-between text-slate-500 font-semibold">
+                      <span>FP Override Rate</span>
+                      <span className="font-bold text-rose-700">45% (3 FP)</span>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-rose-600 font-semibold leading-relaxed">Auto-Flagged for audit. Exceeded 35% governance bypass limit.</p>
+                </div>
+              </div>
+
               {/* Anomaly Review Queue Table */}
               <div className="overflow-x-auto border border-slate-100 rounded-xl">
                 <table className="w-full text-left border-collapse text-xs">
@@ -2090,7 +2148,7 @@ export default function RecruiterDashboard() {
                       <th className="p-4 pl-6">Candidate</th>
                       <th className="p-4">Anomaly Flag Details</th>
                       <th className="p-4">Step</th>
-                      <th className="p-4">Confidence</th>
+                      <th className="p-4">Read Status</th>
                       <th className="p-4">Severity</th>
                       <th className="p-4">Status</th>
                       <th className="p-4 text-center pr-6">Override / Resolution Actions</th>
@@ -2119,8 +2177,12 @@ export default function RecruiterDashboard() {
                           </td>
                           <td className="p-4 text-slate-500">Step {anom.stepNumber}</td>
                           <td className="p-4">
-                            <span className="bg-[#EBF3FC] text-[#0052CC] border border-[#DEEAF7] px-2 py-0.5 rounded text-[10px] font-bold">
-                              {anom.confidencePercent}%
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                              anom.readStatus === "readable" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" :
+                              anom.readStatus === "unreadable" ? "bg-rose-50 text-rose-700 border border-rose-100 animate-pulse" :
+                              "bg-amber-50 text-amber-700 border border-amber-105"
+                            }`}>
+                              {anom.readStatus}
                             </span>
                           </td>
                           <td className="p-4">
@@ -2147,39 +2209,59 @@ export default function RecruiterDashboard() {
                             <div className="flex justify-center gap-1.5">
                               {anom.status !== "resolved" && anom.status !== "waived" && anom.status !== "false_positive" ? (
                                 <>
-                                  <button
-                                    onClick={() => {
-                                      updateAnomalyStatus(anom.id, "resolved");
-                                      alert("Anomaly marked as Resolved.");
-                                    }}
-                                    className="px-2 py-1 bg-[#007A5E] hover:bg-[#005E48] text-white rounded text-[10px] font-bold transition-all shadow-xs active:scale-95"
-                                    title="Mark document resolved/corrected"
-                                  >
-                                    Resolve
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      const reason = prompt("Enter override justification reason:");
-                                      if (reason) {
-                                        updateAnomalyStatus(anom.id, "waived", reason);
-                                        alert("Anomaly waived successfully.");
-                                      }
-                                    }}
-                                    className="px-2 py-1 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold transition-all shadow-xs active:scale-95"
-                                    title="Waive security lock requirements"
-                                  >
-                                    Waive
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      updateAnomalyStatus(anom.id, "false_positive");
-                                      alert("Anomaly marked as False Positive.");
-                                    }}
-                                    className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-bold transition-all border border-slate-200 active:scale-95"
-                                    title="Mark system flag as false positive"
-                                  >
-                                    FP
-                                  </button>
+                                  {anom.severity === "hard-block" && activeRole === "recruiter" ? (
+                                    <span className="text-[10px] text-rose-655 font-bold bg-rose-50 border border-rose-100 rounded px-2.5 py-1 flex items-center gap-1 select-none">
+                                      <Lock className="h-3 w-3" /> Audit Review Required
+                                    </span>
+                                  ) : (
+                                    <>
+                                      <button
+                                        onClick={() => {
+                                          let reason = "Resolved";
+                                          if (anom.severity === "hard-block") {
+                                            const res = prompt("Enter verification justification comments (Mandatory for hard-block):");
+                                            if (!res) return;
+                                            reason = res;
+                                          }
+                                          updateAnomalyStatus(anom.id, "resolved", reason);
+                                          alert("Anomaly marked as Resolved.");
+                                        }}
+                                        className="px-2 py-1 bg-[#007A5E] hover:bg-[#005E48] text-white rounded text-[10px] font-bold transition-all shadow-xs active:scale-95"
+                                        title="Mark document resolved/corrected"
+                                      >
+                                        Resolve
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          const reason = prompt("Enter override justification comments (Mandatory):");
+                                          if (reason) {
+                                            updateAnomalyStatus(anom.id, "waived", reason);
+                                            alert("Anomaly waived successfully.");
+                                          }
+                                        }}
+                                        className="px-2 py-1 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold transition-all shadow-xs active:scale-95"
+                                        title="Waive security lock requirements"
+                                      >
+                                        Waive
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          let reason = "Marked as False Positive";
+                                          if (anom.severity === "hard-block") {
+                                            const res = prompt("Enter False Positive justification comments (Mandatory for hard-block):");
+                                            if (!res) return;
+                                            reason = res;
+                                          }
+                                          updateAnomalyStatus(anom.id, "false_positive", reason);
+                                          alert("Anomaly marked as False Positive.");
+                                        }}
+                                        className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-bold transition-all border border-slate-200 active:scale-95"
+                                        title="Mark system flag as false positive"
+                                      >
+                                        FP
+                                      </button>
+                                    </>
+                                  )}
                                 </>
                               ) : (
                                 <span className="text-[10px] text-slate-400 italic">No Action Needed</span>

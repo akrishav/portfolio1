@@ -132,7 +132,7 @@ export interface AnomalyRecord {
   severity: "hard-block" | "soft-flag" | "warning";
   status: "open" | "in_review" | "resolved" | "waived" | "false_positive";
   stepNumber: number;
-  confidencePercent: number;
+  readStatus: "readable" | "unreadable" | "uncertain";
   fieldComparisons?: FieldComparison[];
   waiverReason?: string;
   timestamp: string;
@@ -548,7 +548,7 @@ const DEFAULT_ANOMALIES: AnomalyRecord[] = [
     severity: "hard-block",
     status: "open",
     stepNumber: 3,
-    confidencePercent: 94,
+    readStatus: "readable",
     fieldComparisons: [
       { fieldName: "Full Name", goldenValue: "Mani", extractedValue: "Mani Ganesan", isMatch: false },
       { fieldName: "Date of Birth", goldenValue: "1992-04-12", extractedValue: "1992-04-12", isMatch: true },
@@ -566,7 +566,7 @@ const DEFAULT_ANOMALIES: AnomalyRecord[] = [
     severity: "hard-block",
     status: "open",
     stepNumber: 3,
-    confidencePercent: 99,
+    readStatus: "unreadable",
     fieldComparisons: [
       { fieldName: "Document Integrity Hash", goldenValue: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", extractedValue: "8f4a62c9cc72b8349bbef80a552278f99e41b785ca88cc59bbefc8088eeff43a", isMatch: false }
     ],
@@ -581,7 +581,7 @@ const DEFAULT_ANOMALIES: AnomalyRecord[] = [
     severity: "soft-flag",
     status: "open",
     stepNumber: 2,
-    confidencePercent: 88,
+    readStatus: "readable",
     timestamp: "2026-07-08 11:00 AM"
   },
   {
@@ -593,7 +593,7 @@ const DEFAULT_ANOMALIES: AnomalyRecord[] = [
     severity: "warning",
     status: "open",
     stepNumber: 2,
-    confidencePercent: 100,
+    readStatus: "uncertain",
     timestamp: "2026-07-07 04:00 PM"
   }
 ];
@@ -691,7 +691,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setSimulationOffsetDays(0);
     }
 
-    const savedAnomalies = localStorage.getItem("staffhc_anomalies");
+    const savedAnomalies = localStorage.getItem("staffhc_anomalies_v2");
     const savedAnomalyAudit = localStorage.getItem("staffhc_anomaly_audit");
     const savedActiveRole = localStorage.getItem("staffhc_active_role");
 
@@ -759,7 +759,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, [activeRole]);
 
   useEffect(() => {
-    localStorage.setItem("staffhc_anomalies", JSON.stringify(anomalies));
+    localStorage.setItem("staffhc_anomalies_v2", JSON.stringify(anomalies));
   }, [anomalies]);
 
   useEffect(() => {
@@ -1286,7 +1286,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         }
         return anom;
       });
-      localStorage.setItem("staffhc_anomalies", JSON.stringify(updated));
+      localStorage.setItem("staffhc_anomalies_v2", JSON.stringify(updated));
       return updated;
     });
 
@@ -1299,7 +1299,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         action: actionText,
         details: `Status changed to ${nextStatus}. Reason: "${reason || 'N/A'}"`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " + new Date().toLocaleDateString(),
-        operator: "Alex"
+        operator: activeRole === "audit" ? "Alex (Compliance Audit)" : "Alex (Recruiter)"
       };
       setAnomalyAuditLogs(prev => [...prev, newLog]);
     }
@@ -1336,7 +1336,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       severity,
       status: "open",
       stepNumber: 3,
-      confidencePercent: 95,
+      readStatus: type === "bgc_anomaly" ? "readable" : type === "step_skip" ? "uncertain" : "unreadable",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " + new Date().toLocaleDateString()
     };
 
@@ -1389,7 +1389,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     localStorage.removeItem("staffhc_sla_config");
     localStorage.removeItem("staffhc_sla_audit");
     localStorage.removeItem("staffhc_sim_offset");
-    localStorage.removeItem("staffhc_anomalies");
+    localStorage.removeItem("staffhc_anomalies_v2");
     localStorage.removeItem("staffhc_anomaly_audit");
     localStorage.removeItem("staffhc_active_role");
     setCandidates(initialCandidates());
