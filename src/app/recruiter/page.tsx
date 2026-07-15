@@ -10,7 +10,7 @@ import {
   Smartphone, Mail, Check, RefreshCw, MessageSquare, ArrowRight, 
   Settings, Clock, Bell, Filter, Award, ChevronRight, Search, 
   Plus, Edit2, Download, Eye, ArrowLeft, Calendar, LayoutGrid, 
-  Building2, ShieldCheck, DollarSign, HelpCircle, HardDrive, ListCollapse, X, ChevronDown
+  Building2, ShieldCheck, DollarSign, HelpCircle, HardDrive, ListCollapse, X, ChevronDown, Lock
 } from "lucide-react";
 
 export default function RecruiterDashboard() {
