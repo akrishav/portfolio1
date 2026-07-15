@@ -445,7 +445,7 @@ export default function RecruiterDashboard() {
         <div className="flex-1 min-w-0">
           
           {/* Active Candidate Inspector Overlay */}
-          {activeCandidate ? (
+          {selectedCandidateId && activeCandidate ? (
             /* ========================================================================= */
             /* VIEW: DETAILED CANDIDATE INSPECTOR ("Review Onboarding Info")             */
             /* ========================================================================= */
@@ -463,7 +463,7 @@ export default function RecruiterDashboard() {
                       Candidates
                     </button>
                     <span>&gt;</span>
-                    <span className="text-white font-bold">{activeCandidate.name}</span>
+                    <span className="text-white font-bold">{activeCandidate?.name}</span>
                   </div>
                   <h2 className="text-xl font-bold tracking-tight">Review Onboarding Info</h2>
                   <p className="text-xs text-emerald-100">Verify information and supporting documents for a compliant onboarding.</p>
@@ -477,17 +477,17 @@ export default function RecruiterDashboard() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
                   <div className="flex items-center gap-4">
                     <div className="h-14 w-14 bg-emerald-50 text-[#007A5E] border border-emerald-100 rounded-full flex items-center justify-center font-extrabold text-lg shadow-2xs">
-                      {activeCandidate.name.substring(0,2)}
+                      {activeCandidate?.name?.substring(0,2)}
                     </div>
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-base font-extrabold text-slate-800">{activeCandidate.name}</span>
+                        <span className="text-base font-extrabold text-slate-800">{activeCandidate?.name}</span>
                         <span className="px-2.5 py-0.5 bg-emerald-50 text-[#007A5E] border border-emerald-100 rounded-full text-[9.5px] font-bold uppercase tracking-wider">
                           Active Onboarding
                         </span>
                       </div>
                       <span className="text-xs text-slate-400 font-semibold block mt-0.5">
-                        Candidate #: {activeCandidate.candidateNo} • {activeCandidate.jobTitle}
+                        Candidate #: {activeCandidate?.candidateNo} • {activeCandidate?.jobTitle}
                       </span>
                     </div>
                   </div>
@@ -495,7 +495,7 @@ export default function RecruiterDashboard() {
                   {/* Actions Bar */}
                   <div className="flex items-center gap-2">
                     <button 
-                      onClick={() => triggerReminder(activeCandidate.id, activeCandidate.currentStep, "candidate", "email")}
+                      onClick={() => triggerReminder(activeCandidate?.id, activeCandidate?.currentStep, "candidate", "email")}
                       className="px-3.5 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg shadow-sm transition-all"
                     >
                       Trigger Reminder
@@ -1115,13 +1115,13 @@ export default function RecruiterDashboard() {
                                 {msg.text}
                               </div>
                               <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
-                                {msg.sender === "recruiter" ? "Alex" : activeCandidate.name}
+                                {msg.sender === "recruiter" ? "Alex" : activeCandidate?.name}
                               </span>
                             </div>
                           ))}
                       </div>
 
-                      <form onSubmit={(e) => handleSendReply(e, activeCandidate.id)} className="flex gap-2">
+                      <form onSubmit={(e) => handleSendReply(e, activeCandidate?.id)} className="flex gap-2">
                         <input
                           type="text"
                           value={replyMessage}
