@@ -114,9 +114,17 @@ export default function OnboardingPage() {
   // Messages for this candidate
   const candidateMessages = messages.filter((m) => m.candidateId === candidate?.id);
 
-  // Filter emails for candidate
+  // Filter emails for candidate, ensuring compliance anomalies or BGC flags never leak
   const candidateEmails = notifications.filter(
-    (n) => n.candidateId === candidate?.id && n.channel === "email"
+    (n) => 
+      n.candidateId === candidate?.id && 
+      n.channel === "email" && 
+      n.recipient === "candidate" && 
+      !n.subject.toLowerCase().includes("anomaly") &&
+      !n.subject.toLowerCase().includes("mismatch") &&
+      !n.subject.toLowerCase().includes("tamper") &&
+      !n.subject.toLowerCase().includes("checksum") &&
+      !n.message.toLowerCase().includes("anomaly")
   );
 
   // If not logged in, render Image 2 OTP Login
@@ -673,6 +681,16 @@ export default function OnboardingPage() {
                     })}
                   </div>
                 </div>
+
+                {/* Soft SLA Deadline Nudge */}
+                <div className="mt-4 bg-[#EBF3FC] border border-[#DEEAF7] p-3 rounded-xl flex items-center justify-between text-xs text-[#0052CC] font-semibold text-left">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-[#0052CC]" />
+                    <span>Please complete Step {candidate?.currentStep}: {candidate?.onboardingSteps[candidate?.currentStep - 1]?.name} by **July 09, 2026**.</span>
+                  </div>
+                  <span className="text-[9.5px] uppercase font-bold bg-[#0052CC] text-white px-2 py-0.5 rounded">Action Required</span>
+                </div>
+
               </div>
 
               {/* Stuck detail panel or dynamic step instruction details */}

@@ -18,6 +18,10 @@ export interface OnboardingStep {
   actionType?: "upload" | "sign" | "external_link" | "none";
   actionLink?: string;
   uploadedFiles: UploadedFile[];
+  isWaived?: boolean;
+  waiverReason?: string;
+  slaExtendedHours?: number;
+  startedAt?: string;
 }
 
 export interface ERPDocument {
@@ -91,12 +95,70 @@ export interface Candidate {
   anomalyAlert?: string;
 }
 
+export interface SlaStepConfig {
+  stepNumber: number;
+  stepName: string;
+  durationValue: number;
+  durationUnit: "hours" | "days";
+  owner: "candidate" | "recruiter" | "onboarder" | "vendor";
+  reminderLeadTime: number;
+  reminderLeadUnit: "hours" | "days";
+  escalationTarget: "recruiter" | "team lead" | "manager";
+}
+
+export interface SlaAuditLog {
+  id: string;
+  candidateId: string;
+  stepNumber: number;
+  eventType: "start" | "at_risk" | "breach" | "escalation" | "waiver";
+  description: string;
+  timestamp: string;
+  operator: string;
+}
+
+export interface FieldComparison {
+  fieldName: string;
+  goldenValue: string;
+  extractedValue: string;
+  isMatch: boolean;
+}
+
+export interface AnomalyRecord {
+  id: string;
+  candidateId: string;
+  type: "identity_mismatch" | "document_tampering" | "bgc_anomaly" | "step_skip";
+  title: string;
+  description: string;
+  severity: "hard-block" | "soft-flag" | "warning";
+  status: "open" | "in_review" | "resolved" | "waived" | "false_positive";
+  stepNumber: number;
+  confidencePercent: number;
+  fieldComparisons?: FieldComparison[];
+  waiverReason?: string;
+  timestamp: string;
+}
+
+export interface AnomalyAuditLog {
+  id: string;
+  candidateId: string;
+  action: string;
+  details: string;
+  timestamp: string;
+  operator: string;
+}
+
 interface OnboardingContextType {
   candidates: Candidate[];
   messages: Message[];
   notifications: NotificationLog[];
   loggedInUser: { email: string; role: "candidate" | "recruiter" | "none" } | null;
   selectedCandidateId: string | null;
+  slaSettings: SlaStepConfig[];
+  simulationOffsetDays: number;
+  slaAuditLogs: SlaAuditLog[];
+  activeRole: "recruiter" | "audit";
+  anomalies: AnomalyRecord[];
+  anomalyAuditLogs: AnomalyAuditLog[];
   login: (email: string, role: "candidate" | "recruiter") => boolean;
   logout: () => void;
   setSelectedCandidateId: (id: string | null) => void;
@@ -106,12 +168,19 @@ interface OnboardingContextType {
   resolveERPDocument: (candidateId: string, docName: string) => void;
   resolveERPPlacement: (candidateId: string, placementName: string) => void;
   triggerReminder: (candidateId: string, stepNumber: number, recipientType: "candidate" | "recruiter" | "hierarchy", channel: "email" | "sms") => void;
+  updateSlaConfig: (config: SlaStepConfig[]) => void;
+  advanceSimulationTime: (days: number) => void;
+  applySlaWaiver: (candidateId: string, stepNumber: number, reason: string, operator: string) => void;
+  toggleActiveRole: () => void;
+  updateAnomalyStatus: (id: string, nextStatus: AnomalyRecord["status"], reason?: string) => void;
+  triggerMockAnomaly: (candidateId: string, type: AnomalyRecord["type"]) => void;
+  transferToClient: (candidateId: string) => { success: boolean; error?: string };
   resetDemoState: () => void;
 }
 
 const defaultSteps = (): OnboardingStep[] => [
-  { number: 1, name: "Application", description: "Submit application form", status: "completed", uploadedFiles: [] },
-  { number: 2, name: "Screening", description: "Clinical background check", status: "completed", uploadedFiles: [] },
+  { number: 1, name: "Application", description: "Submit application form", status: "completed", uploadedFiles: [], startedAt: "2026-07-04 09:00 AM" },
+  { number: 2, name: "Screening", description: "Clinical background check", status: "completed", uploadedFiles: [], startedAt: "2026-07-05 10:00 AM" },
   {
     number: 3,
     name: "Credentialing",
@@ -119,12 +188,13 @@ const defaultSteps = (): OnboardingStep[] => [
     status: "stuck",
     actionRequiredText: "Missing or expired license file.",
     actionType: "upload",
-    uploadedFiles: []
+    uploadedFiles: [],
+    startedAt: "2026-07-06 09:00 AM"
   },
-  { number: 4, name: "Interview", description: "Clinical specialist interview", status: "pending", uploadedFiles: [] },
-  { number: 5, name: "Contract", description: "Placement agreement contract", status: "pending", uploadedFiles: [] },
-  { number: 6, name: "Compliance", description: "Facility compliance modules", status: "pending", uploadedFiles: [] },
-  { number: 7, name: "Ready", description: "Final onboarding sign-off", status: "pending", uploadedFiles: [] }
+  { number: 4, name: "Interview", description: "Clinical specialist interview", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 11:00 AM" },
+  { number: 5, name: "Contract", description: "Placement agreement contract", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 01:00 PM" },
+  { number: 6, name: "Compliance", description: "Facility compliance modules", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 02:00 PM" },
+  { number: 7, name: "Ready", description: "Final onboarding sign-off", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 04:00 PM" }
 ];
 
 const initialCandidates = (): Candidate[] => [
@@ -458,6 +528,76 @@ const initialNotifications = (): NotificationLog[] => [
   }
 ];
 
+const DEFAULT_SLA_CONFIGS: SlaStepConfig[] = [
+  { stepNumber: 1, stepName: "Application", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: "recruiter" },
+  { stepNumber: 2, stepName: "Screening", durationValue: 2, durationUnit: "days", owner: "vendor", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "team lead" },
+  { stepNumber: 3, stepName: "Credentialing", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
+  { stepNumber: 4, stepName: "Interview", durationValue: 2, durationUnit: "days", owner: "recruiter", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: "team lead" },
+  { stepNumber: 5, stepName: "Contract", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
+  { stepNumber: 6, stepName: "Compliance", durationValue: 4, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
+  { stepNumber: 7, stepName: "Ready", durationValue: 1, durationUnit: "days", owner: "onboarder", reminderLeadTime: 6, reminderLeadUnit: "hours", escalationTarget: "recruiter" }
+];
+
+const DEFAULT_ANOMALIES: AnomalyRecord[] = [
+  {
+    id: "anomaly-1",
+    candidateId: "candidate-mani",
+    type: "identity_mismatch",
+    title: "Document SSN/Name Identity Mismatch",
+    description: "Extracted SSN and Name from uploaded Professional License file do not match Candidate Profile's golden record.",
+    severity: "hard-block",
+    status: "open",
+    stepNumber: 3,
+    confidencePercent: 94,
+    fieldComparisons: [
+      { fieldName: "Full Name", goldenValue: "Mani", extractedValue: "Mani Ganesan", isMatch: false },
+      { fieldName: "Date of Birth", goldenValue: "1992-04-12", extractedValue: "1992-04-12", isMatch: true },
+      { fieldName: "SSN (Tax ID)", goldenValue: "XXX-XX-1234", extractedValue: "XXX-XX-9876", isMatch: false },
+      { fieldName: "License Number", goldenValue: "TX-998822", extractedValue: "TX-998822", isMatch: true }
+    ],
+    timestamp: "2026-07-10 10:30 AM"
+  },
+  {
+    id: "anomaly-2",
+    candidateId: "candidate-debra",
+    type: "document_tampering",
+    title: "W-4 Form Layout Hash Tampering Flag",
+    description: "SHA-256 layout hash signature of uploaded file differs from the security hash template of the W-4 Form. Uploaded version might be modified.",
+    severity: "hard-block",
+    status: "open",
+    stepNumber: 3,
+    confidencePercent: 99,
+    fieldComparisons: [
+      { fieldName: "Document Integrity Hash", goldenValue: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", extractedValue: "8f4a62c9cc72b8349bbef80a552278f99e41b785ca88cc59bbefc8088eeff43a", isMatch: false }
+    ],
+    timestamp: "2026-07-09 02:15 PM"
+  },
+  {
+    id: "anomaly-3",
+    candidateId: "candidate-debra",
+    type: "bgc_anomaly",
+    title: "BGC Adverse Hit Record Match",
+    description: "Simulated Sterling Background Check report flagged a potential adverse history match (misdemeanor hit or credit flags) requiring compliance audit.",
+    severity: "soft-flag",
+    status: "open",
+    stepNumber: 2,
+    confidencePercent: 88,
+    timestamp: "2026-07-08 11:00 AM"
+  },
+  {
+    id: "anomaly-4",
+    candidateId: "candidate-ganesan",
+    type: "step_skip",
+    title: "Step Completed Without Uploaded Artifact",
+    description: "Step 2 (Screening) was marked as completed in ERP ledger, but no background check consent form or clinical license upload was detected.",
+    severity: "warning",
+    status: "open",
+    stepNumber: 2,
+    confidencePercent: 100,
+    timestamp: "2026-07-07 04:00 PM"
+  }
+];
+
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
 
 export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -466,6 +606,12 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [notifications, setNotifications] = useState<NotificationLog[]>([]);
   const [loggedInUser, setLoggedInUser] = useState<OnboardingContextType["loggedInUser"]>(null);
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
+  const [slaSettings, setSlaSettings] = useState<SlaStepConfig[]>([]);
+  const [simulationOffsetDays, setSimulationOffsetDays] = useState<number>(0);
+  const [slaAuditLogs, setSlaAuditLogs] = useState<SlaAuditLog[]>([]);
+  const [activeRole, setActiveRole] = useState<"recruiter" | "audit">("recruiter");
+  const [anomalies, setAnomalies] = useState<AnomalyRecord[]>([]);
+  const [anomalyAuditLogs, setAnomalyAuditLogs] = useState<AnomalyAuditLog[]>([]);
 
   useEffect(() => {
     const savedCandidates = localStorage.getItem("staffhc_candidates_v3");
@@ -522,6 +668,50 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         }
       }
     }
+
+    const savedSlaConfig = localStorage.getItem("staffhc_sla_config");
+    const savedSlaAudit = localStorage.getItem("staffhc_sla_audit");
+    const savedSimOffset = localStorage.getItem("staffhc_sim_offset");
+
+    if (savedSlaConfig) {
+      setSlaSettings(JSON.parse(savedSlaConfig));
+    } else {
+      setSlaSettings(DEFAULT_SLA_CONFIGS);
+    }
+
+    if (savedSlaAudit) {
+      setSlaAuditLogs(JSON.parse(savedSlaAudit));
+    } else {
+      setSlaAuditLogs([]);
+    }
+
+    if (savedSimOffset) {
+      setSimulationOffsetDays(Number(savedSimOffset));
+    } else {
+      setSimulationOffsetDays(0);
+    }
+
+    const savedAnomalies = localStorage.getItem("staffhc_anomalies");
+    const savedAnomalyAudit = localStorage.getItem("staffhc_anomaly_audit");
+    const savedActiveRole = localStorage.getItem("staffhc_active_role");
+
+    if (savedAnomalies) {
+      setAnomalies(JSON.parse(savedAnomalies));
+    } else {
+      setAnomalies(DEFAULT_ANOMALIES);
+    }
+
+    if (savedAnomalyAudit) {
+      setAnomalyAuditLogs(JSON.parse(savedAnomalyAudit));
+    } else {
+      setAnomalyAuditLogs([]);
+    }
+
+    if (savedActiveRole === "audit" || savedActiveRole === "recruiter") {
+      setActiveRole(savedActiveRole);
+    } else {
+      setActiveRole("recruiter");
+    }
   }, []);
 
   useEffect(() => {
@@ -549,6 +739,32 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       localStorage.removeItem("staffhc_logged_user_v3");
     }
   }, [loggedInUser]);
+
+  useEffect(() => {
+    if (slaSettings.length > 0) {
+      localStorage.setItem("staffhc_sla_config", JSON.stringify(slaSettings));
+    }
+  }, [slaSettings]);
+
+  useEffect(() => {
+    localStorage.setItem("staffhc_sla_audit", JSON.stringify(slaAuditLogs));
+  }, [slaAuditLogs]);
+
+  useEffect(() => {
+    localStorage.setItem("staffhc_sim_offset", String(simulationOffsetDays));
+  }, [simulationOffsetDays]);
+
+  useEffect(() => {
+    localStorage.setItem("staffhc_active_role", activeRole);
+  }, [activeRole]);
+
+  useEffect(() => {
+    localStorage.setItem("staffhc_anomalies", JSON.stringify(anomalies));
+  }, [anomalies]);
+
+  useEffect(() => {
+    localStorage.setItem("staffhc_anomaly_audit", JSON.stringify(anomalyAuditLogs));
+  }, [anomalyAuditLogs]);
 
   const login = (email: string, role: "candidate" | "recruiter") => {
     const cleanEmail = email.toLowerCase().trim();
@@ -935,16 +1151,258 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setMessages(prev => [...prev, newMsg]);
   };
 
+  const triggerSimulatedSlaEvents = (nextOffset: number) => {
+    setNotifications(prevNotifs => {
+      const updated = [...prevNotifs];
+      if (nextOffset >= 1) {
+        const exists = updated.some(n => n.id === `sim-at-risk-${nextOffset}`);
+        if (!exists) {
+          updated.push({
+            id: `sim-at-risk-${nextOffset}`,
+            candidateId: "candidate-mani",
+            recipient: "candidate",
+            recipientName: "Mani",
+            channel: "email",
+            subject: "Action Required: Complete Onboarding Step 3 immediately",
+            message: `Hi Mani, your Credentialing step is approaching its final deadline. Please upload your Nursing License file now to complete.`,
+            timestamp: `Today 09:12 AM`,
+            status: "delivered"
+          });
+        }
+      }
+      if (nextOffset >= 2) {
+        const exists = updated.some(n => n.id === `sim-breach-${nextOffset}`);
+        if (!exists) {
+          updated.push({
+            id: `sim-breach-${nextOffset}`,
+            candidateId: "candidate-mani",
+            recipient: "recruiter",
+            recipientName: "Alex",
+            channel: "system",
+            subject: "SLA Breach Escalation: Step 3 Credentialing (Mani)",
+            message: `⚠️ System escalated SLA breach for Mani (Step 3: Credentialing). Target exceeded. Notification routed to manager.`,
+            timestamp: `Today 10:30 AM`,
+            status: "delivered"
+          });
+
+          // Update candidate Mani SLA status to breached
+          setCandidates(prevCands => {
+            const nextC = prevCands.map(c => {
+              if (c.id === "candidate-mani") {
+                return {
+                  ...c,
+                  slaStatus: "breached" as const,
+                  slaBreachDetails: "Step 3 (Credentialing) exceeded 3-day SLA target."
+                };
+              }
+              return c;
+            });
+            localStorage.setItem("staffhc_candidates_v3", JSON.stringify(nextC));
+            return nextC;
+          });
+        }
+      }
+      return updated;
+    });
+  };
+
+  const updateSlaConfig = (config: SlaStepConfig[]) => {
+    setSlaSettings(config);
+  };
+
+  const advanceSimulationTime = (days: number) => {
+    setSimulationOffsetDays(prev => {
+      const nextOffset = prev + days;
+      triggerSimulatedSlaEvents(nextOffset);
+      return nextOffset;
+    });
+  };
+
+  const applySlaWaiver = (candidateId: string, stepNumber: number, reason: string, operator: string) => {
+    setCandidates(prevCandidates => {
+      const next = prevCandidates.map(cand => {
+        if (cand.id === candidateId) {
+          const updatedSteps = cand.onboardingSteps.map(step => {
+            if (step.number === stepNumber) {
+              return {
+                ...step,
+                isWaived: true,
+                waiverReason: reason,
+                status: "completed" as const
+              };
+            }
+            return step;
+          });
+
+          let nextStep = cand.currentStep;
+          let nextStepStatus = cand.stepStatus;
+          if (cand.currentStep === stepNumber) {
+            const pendingStep = updatedSteps.find(s => s.status !== "completed");
+            if (pendingStep) {
+              nextStep = pendingStep.number;
+              nextStepStatus = "in_progress";
+              pendingStep.status = "in_progress";
+              pendingStep.startedAt = new Date().toISOString().split('T')[0] + " 09:00 AM";
+            } else {
+              nextStepStatus = "completed";
+            }
+          }
+
+          return {
+            ...cand,
+            currentStep: nextStep,
+            stepStatus: nextStepStatus,
+            slaStatus: "active" as const, // Clear breach status on waiver
+            onboardingSteps: updatedSteps
+          };
+        }
+        return cand;
+      });
+      localStorage.setItem("staffhc_candidates_v3", JSON.stringify(next));
+      return next;
+    });
+
+    const newLog: SlaAuditLog = {
+      id: `audit-${Date.now()}`,
+      candidateId,
+      stepNumber,
+      eventType: "waiver",
+      description: `SLA waived for Step ${stepNumber}. Reason: "${reason}"`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " + new Date().toLocaleDateString(),
+      operator
+    };
+    setSlaAuditLogs(prev => [...prev, newLog]);
+  };
+
+  const toggleActiveRole = () => {
+    setActiveRole(prev => prev === "recruiter" ? "audit" : "recruiter");
+  };
+
+  const updateAnomalyStatus = (id: string, nextStatus: AnomalyRecord["status"], reason?: string) => {
+    setAnomalies(prev => {
+      const updated = prev.map(anom => {
+        if (anom.id === id) {
+          return { ...anom, status: nextStatus, waiverReason: reason };
+        }
+        return anom;
+      });
+      localStorage.setItem("staffhc_anomalies", JSON.stringify(updated));
+      return updated;
+    });
+
+    const targetAnomaly = anomalies.find(a => a.id === id);
+    if (targetAnomaly) {
+      const actionText = nextStatus === "waived" ? "Anomaly Waived" : nextStatus === "resolved" ? "Anomaly Resolved" : "Anomaly Marked False Positive";
+      const newLog: AnomalyAuditLog = {
+        id: `anom-audit-${Date.now()}`,
+        candidateId: targetAnomaly.candidateId,
+        action: actionText,
+        details: `Status changed to ${nextStatus}. Reason: "${reason || 'N/A'}"`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " + new Date().toLocaleDateString(),
+        operator: "Alex"
+      };
+      setAnomalyAuditLogs(prev => [...prev, newLog]);
+    }
+  };
+
+  const triggerMockAnomaly = (candidateId: string, type: AnomalyRecord["type"]) => {
+    const id = `anomaly-${Date.now()}`;
+    let title = "Document Mismatch";
+    let description = "Extracted information does not match profile.";
+    let severity: AnomalyRecord["severity"] = "hard-block";
+
+    if (type === "identity_mismatch") {
+      title = "Identity Name Mismatch Detected";
+      description = "Golden record Name differs from Extracted Name on contract.";
+    } else if (type === "document_tampering") {
+      title = "SHA-256 Layout Checksum Mismatch";
+      description = "Warning: document hash changed between upload and send state.";
+    } else if (type === "bgc_anomaly") {
+      title = "Background Check Adverse Entry Flagged";
+      description = "Adverse entry found on Sterling report. Manual verification required.";
+      severity = "soft-flag";
+    } else if (type === "step_skip") {
+      title = "Compliance Step Completed with No File Upload";
+      description = "Step marked as done in client dashboard but uploaded files array is empty.";
+      severity = "warning";
+    }
+
+    const newAnomaly: AnomalyRecord = {
+      id,
+      candidateId,
+      type,
+      title,
+      description,
+      severity,
+      status: "open",
+      stepNumber: 3,
+      confidencePercent: 95,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " + new Date().toLocaleDateString()
+    };
+
+    setAnomalies(prev => [...prev, newAnomaly]);
+
+    setNotifications(prev => {
+      const next = [...prev];
+      next.push({
+        id: `notif-anom-${Date.now()}`,
+        candidateId,
+        recipient: "recruiter",
+        recipientName: "Alex",
+        channel: "system",
+        subject: `CRITICAL: ${title}`,
+        message: `⚠️ System Flagged Anomaly on candidate file: ${description}`,
+        timestamp: "Just Now",
+        status: "delivered"
+      });
+      return next;
+    });
+  };
+
+  const transferToClient = (candidateId: string): { success: boolean; error?: string } => {
+    const blockers = anomalies.filter(a => a.candidateId === candidateId && a.severity === "hard-block" && (a.status === "open" || a.status === "in_review"));
+    if (blockers.length > 0) {
+      return { 
+        success: false, 
+        error: `Transfer Blocked: ${blockers.length} open hard-block anomaly items require resolution/waiver before MSP export.`
+      };
+    }
+
+    const newLog: AnomalyAuditLog = {
+      id: `anom-audit-${Date.now()}`,
+      candidateId,
+      action: "Client Transfer Successful",
+      details: "Candidate onboarding file successfully uploaded system-to-system to CDK Global MSP portal.",
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " + new Date().toLocaleDateString(),
+      operator: "Alex"
+    };
+    setAnomalyAuditLogs(prev => [...prev, newLog]);
+
+    return { success: true };
+  };
+
   const resetDemoState = () => {
     localStorage.removeItem("staffhc_candidates_v3");
     localStorage.removeItem("staffhc_messages_v3");
     localStorage.removeItem("staffhc_notifications_v3");
     localStorage.removeItem("staffhc_logged_user_v3");
+    localStorage.removeItem("staffhc_sla_config");
+    localStorage.removeItem("staffhc_sla_audit");
+    localStorage.removeItem("staffhc_sim_offset");
+    localStorage.removeItem("staffhc_anomalies");
+    localStorage.removeItem("staffhc_anomaly_audit");
+    localStorage.removeItem("staffhc_active_role");
     setCandidates(initialCandidates());
     setMessages(initialMessages());
     setNotifications(initialNotifications());
     setLoggedInUser(null);
     setSelectedCandidateId(null);
+    setSlaSettings(DEFAULT_SLA_CONFIGS);
+    setSlaAuditLogs([]);
+    setSimulationOffsetDays(0);
+    setAnomalies(DEFAULT_ANOMALIES);
+    setAnomalyAuditLogs([]);
+    setActiveRole("recruiter");
   };
 
   return (
@@ -955,6 +1413,12 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         notifications,
         loggedInUser,
         selectedCandidateId,
+        slaSettings,
+        simulationOffsetDays,
+        slaAuditLogs,
+        activeRole,
+        anomalies,
+        anomalyAuditLogs,
         login,
         logout,
         setSelectedCandidateId,
@@ -964,6 +1428,13 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         resolveERPDocument,
         resolveERPPlacement,
         triggerReminder,
+        updateSlaConfig,
+        advanceSimulationTime,
+        applySlaWaiver,
+        toggleActiveRole,
+        updateAnomalyStatus,
+        triggerMockAnomaly,
+        transferToClient,
         resetDemoState
       }}
     >

@@ -20,13 +20,26 @@ export default function RecruiterDashboard() {
     notifications, 
     loggedInUser, 
     selectedCandidateId, 
-    login, 
-    logout, 
-    setSelectedCandidateId, 
-    sendCandidateMessage, 
-    resolveERPDocument, 
-    resolveERPPlacement, 
-    triggerReminder 
+    slaSettings,
+    simulationOffsetDays,
+    slaAuditLogs,
+    activeRole,
+    anomalies,
+    anomalyAuditLogs,
+    login,
+    logout,
+    setSelectedCandidateId,
+    sendCandidateMessage,
+    resolveERPDocument,
+    resolveERPPlacement,
+    triggerReminder,
+    updateSlaConfig,
+    advanceSimulationTime,
+    applySlaWaiver,
+    toggleActiveRole,
+    updateAnomalyStatus,
+    triggerMockAnomaly,
+    transferToClient
   } = useOnboarding();
 
   useEffect(() => {
@@ -56,8 +69,11 @@ export default function RecruiterDashboard() {
   // Left sidebar navigation view state
   const [currentView, setCurrentView] = useState<"dashboard" | "candidates" | "matrix" | "agencies">("candidates");
 
-  // Inspector Panel Navigation: dashboard | summary | documents | chat | emails | costs
-  const [inspectorTab, setInspectorTab] = useState<"dashboard" | "summary" | "documents" | "chat" | "emails" | "costs">("dashboard");
+  // Inspector Panel Navigation: dashboard | summary | documents | chat | emails | costs | sla-audit
+  const [inspectorTab, setInspectorTab] = useState<"dashboard" | "summary" | "documents" | "chat" | "emails" | "costs" | "sla-audit">("dashboard");
+  const [showWaiverModal, setShowWaiverModal] = useState(false);
+  const [waiverStepNumber, setWaiverStepNumber] = useState<number | null>(null);
+  const [waiverReasonText, setWaiverReasonText] = useState("");
 
   // Chat message state
   const [replyMessage, setReplyMessage] = useState("");
@@ -274,6 +290,26 @@ export default function RecruiterDashboard() {
           {/* Right Profile settings */}
           <div className="flex items-center gap-3">
             
+            {/* Role Switcher Toggle */}
+            <div className="flex items-center gap-1 bg-[#F0F5FA] border border-[#DEEAF7] rounded-full p-1 shadow-3xs text-xs">
+              <button 
+                onClick={toggleActiveRole}
+                className={`px-3 py-1 rounded-full font-bold uppercase transition-all text-[9.5px] ${
+                  activeRole === "recruiter" ? "bg-[#0052CC] text-white shadow-xs" : "text-[#0052CC] hover:bg-blue-50/50"
+                }`}
+              >
+                Recruiter
+              </button>
+              <button 
+                onClick={toggleActiveRole}
+                className={`px-3 py-1 rounded-full font-bold uppercase transition-all text-[9.5px] ${
+                  activeRole === "audit" ? "bg-[#0052CC] text-white shadow-xs" : "text-[#0052CC] hover:bg-blue-50/50"
+                }`}
+              >
+                Audit Role
+              </button>
+            </div>
+
             {/* Notification system routing logs trigger - moved to side near profile */}
             <button 
               onClick={() => setShowNotificationDrawer(!showNotificationDrawer)}
@@ -372,6 +408,30 @@ export default function RecruiterDashboard() {
             title="Verification Agencies"
           >
             <ShieldCheck className="h-5 w-5" />
+          </button>
+
+          <button 
+            onClick={() => { setSelectedCandidateId(null); setCurrentView("sla-config" as any); }}
+            className={`p-2.5 rounded-xl transition-all ${
+              currentView === "sla-config" && !selectedCandidateId
+                ? "bg-emerald-50 text-[#007A5E] border border-emerald-100" 
+                : "text-slate-400 hover:text-[#007A5E]"
+            }`}
+            title="SLA Configuration"
+          >
+            <Clock className="h-5 w-5" />
+          </button>
+
+          <button 
+            onClick={() => { setSelectedCandidateId(null); setCurrentView("anomaly-queue" as any); }}
+            className={`p-2.5 rounded-xl transition-all ${
+              currentView === "anomaly-queue" && !selectedCandidateId
+                ? "bg-emerald-50 text-[#007A5E] border border-emerald-100" 
+                : "text-slate-400 hover:text-[#007A5E]"
+            }`}
+            title="Anomaly Review Queue"
+          >
+            <ShieldAlert className="h-5 w-5" />
           </button>
 
           <div className="mt-auto border-t border-slate-105 pt-4 w-full flex justify-center">
@@ -515,39 +575,233 @@ export default function RecruiterDashboard() {
                   >
                     Cost Transparency
                   </button>
+                  <button 
+                    onClick={() => setInspectorTab("sla-audit")}
+                    className={`pb-1 text-xs font-bold uppercase transition-all ${
+                      inspectorTab === "sla-audit" ? "text-[#007A5E] border-b-2 border-[#007A5E] font-black" : "text-slate-400 hover:text-slate-700"
+                    }`}
+                  >
+                    Compliance Audit Trail
+                  </button>
                 </div>
 
                 <div className="p-6">
                   {/* Tab 1: Dashboard Details */}
                   {inspectorTab === "dashboard" && (
                     <div className="space-y-6">
-                      
-                      {/* Anomaly Alert Banner */}
-                      {activeCandidate?.anomalyAlert && (
-                        <div className="bg-[#FFF0F0] border border-[#FFD5D5] p-4 rounded-xl flex items-start gap-3 text-left">
-                          <ShieldAlert className="h-5 w-5 text-rose-600 shrink-0 mt-0.5" />
-                          <div className="space-y-1.5">
-                            <h4 className="text-xs font-black text-rose-800 uppercase tracking-wide">Anomaly Alert Detected</h4>
-                            <p className="text-xs text-rose-750 leading-relaxed font-semibold">
-                              {activeCandidate.anomalyAlert}
-                            </p>
-                            <div className="flex gap-3 pt-1">
-                              <button 
-                                onClick={() => alert(`Reaching out to ${activeCandidate.name}...`)}
-                                className="px-3 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10.5px] font-bold transition-all shadow"
-                              >
-                                Reach Out to Candidate
-                              </button>
-                              <button 
-                                onClick={() => alert("Marking alert as reviewed...")}
-                                className="px-3 py-1.5 border border-slate-200 hover:bg-slate-50 text-slate-650 rounded text-[10.5px] font-bold transition-all"
-                              >
-                                Dismiss Alert
-                              </button>
+                                         {/* Active Anomalies List Banner */}
+                      {(() => {
+                        const activeAnomalies = anomalies.filter(a => a.candidateId === activeCandidate?.id && (a.status === "open" || a.status === "in_review"));
+                        if (activeAnomalies.length === 0) return null;
+                        
+                        return (
+                          <div className="space-y-4">
+                            <div className="bg-[#FFF0F0] border border-[#FFD5D5] p-5 rounded-xl space-y-3 text-left">
+                              <div className="flex items-start gap-3">
+                                <ShieldAlert className="h-5 w-5 text-rose-600 shrink-0 mt-0.5" />
+                                <div className="space-y-1">
+                                  <h4 className="text-xs font-black text-rose-800 uppercase tracking-wide">
+                                    ⚠️ {activeAnomalies.length} Compliance Anomaly Flags Detected
+                                  </h4>
+                                  <p className="text-[11px] text-rose-750 font-semibold leading-relaxed">
+                                    Our automated OCR comparison engine flagged document integrity discrepancies. Verify extracted values before MSP delivery.
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* List of active anomalies */}
+                              <div className="space-y-2 pt-2 border-t border-rose-200/50">
+                                {activeAnomalies.map((anom) => (
+                                  <div key={anom.id} className="bg-white/60 border border-rose-100 rounded-lg p-3 text-xs flex justify-between items-center gap-3">
+                                    <div>
+                                      <span className={`px-2 py-0.5 rounded text-[8.5px] font-black uppercase tracking-wider ${
+                                        anom.severity === "hard-block" ? "bg-rose-100 text-rose-700" :
+                                        anom.severity === "soft-flag" ? "bg-amber-100 text-amber-700" :
+                                        "bg-slate-100 text-slate-700"
+                                      }`}>
+                                        {anom.severity} · {anom.status}
+                                      </span>
+                                      <h5 className="font-extrabold text-slate-800 mt-1">{anom.title}</h5>
+                                      <p className="text-[10.5px] text-slate-500 font-normal">{anom.description}</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        onClick={() => {
+                                          alert(`Sent request to ${activeCandidate?.name} to clarify "${anom.title}"`);
+                                        }}
+                                        className="px-2.5 py-1 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold transition-all shadow-xs"
+                                      >
+                                        Reach Out
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          const reason = prompt("Enter waiver justification reason:");
+                                          if (reason) {
+                                            updateAnomalyStatus(anom.id, "waived", reason);
+                                            alert("Anomaly status updated to Waived.");
+                                          }
+                                        }}
+                                        className="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded text-[10px] font-bold transition-all"
+                                      >
+                                        Waive
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
+
+                            {/* Layer 1: Document OCR Comparative Field Check */}
+                            {activeAnomalies.some(a => a.fieldComparisons && a.fieldComparisons.length > 0) && (
+                              <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 text-left shadow-2xs">
+                                <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                                  <div>
+                                    <h3 className="font-extrabold text-xs text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                                      <Lock className="h-4.5 w-4.5 text-[#007A5E]" />
+                                      Layer 1: Document OCR Comparative Field Check
+                                    </h3>
+                                    <p className="text-[10px] text-slate-450 mt-0.5 font-normal font-sans">Automated OCR field extraction vs Golden Record. Match confidence rating.</p>
+                                  </div>
+                                  <span className="px-2 py-0.5 bg-[#EBF3FC] text-[#0052CC] border border-[#DEEAF7] rounded text-[9.5px] font-black uppercase tracking-wider">
+                                    Confidence: {activeAnomalies.find(a => a.fieldComparisons)?.confidencePercent || 94}%
+                                  </span>
+                                </div>
+
+                                <div className="overflow-x-auto border border-slate-100 rounded-lg">
+                                  <table className="w-full text-left border-collapse text-xs">
+                                    <thead>
+                                      <tr className="bg-slate-50 border-b border-slate-200 text-[9.5px] font-bold text-slate-500 uppercase tracking-wider">
+                                        <th className="p-3 pl-4">Document Field</th>
+                                        <th className="p-3">Profile Golden Record</th>
+                                        <th className="p-3">Extracted File Value</th>
+                                        <th className="p-3 text-right pr-4">Status Check</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 bg-white font-semibold text-slate-655">
+                                      {activeAnomalies
+                                        .find(a => a.fieldComparisons)?.fieldComparisons?.map((field, idx) => (
+                                          <tr key={idx} className="hover:bg-slate-50/50">
+                                            <td className="p-3 pl-4 font-bold text-slate-700">{field.fieldName}</td>
+                                            <td className="p-3 text-slate-800 font-normal">{field.goldenValue}</td>
+                                            <td className={`p-3 font-bold ${field.isMatch ? "text-slate-800" : "text-rose-600"}`}>
+                                              {field.extractedValue}
+                                            </td>
+                                            <td className="p-3 text-right pr-4">
+                                              <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
+                                                field.isMatch ? "bg-emerald-50 text-[#007A5E] border border-emerald-100" : "bg-rose-50 text-rose-600 border border-rose-100 animate-pulse"
+                                              }`}>
+                                                {field.isMatch ? "✓ Match" : "⚠️ Mismatch"}
+                                              </span>
+                                            </td>
+                                          </tr>
+                                        ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            )}
                           </div>
+                        );
+                      })()}
+
+                      {/* SLA Milestones / Timeline Bar */}
+                      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 text-left">
+                        <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                          <div>
+                            <h3 className="font-extrabold text-xs text-slate-800 uppercase tracking-wider">Onboarding SLA Milestones Timeline</h3>
+                            <p className="text-[10px] text-slate-450 mt-0.5 font-normal">Calculated based on configured targets and simulation clock (+{simulationOffsetDays} Days offset).</p>
+                          </div>
+                          <span className={`px-2 py-0.5 rounded text-[9.5px] font-bold uppercase ${
+                            activeCandidate?.slaStatus === "breached" ? "bg-rose-50 text-rose-600 border border-rose-100 animate-pulse" : "bg-emerald-50 text-[#007A5E] border border-emerald-100"
+                          }`}>
+                            {activeCandidate?.slaStatus === "breached" ? "⚠️ SLA Breached" : "SLA Active"}
+                          </span>
                         </div>
-                      )}
+
+                        {/* Horizontal Timeline Track */}
+                        <div className="grid grid-cols-1 md:grid-cols-7 gap-3 pt-2">
+                          {activeCandidate?.onboardingSteps.map((step, idx) => {
+                            const stepConfig = slaSettings.find(s => s.stepNumber === step.number);
+                            const targetVal = stepConfig?.durationValue || 3;
+                            const targetUnit = stepConfig?.durationUnit || "days";
+                            const leadVal = stepConfig?.reminderLeadTime || 1;
+                            const leadUnit = stepConfig?.reminderLeadUnit || "days";
+                            const ownerName = stepConfig?.owner || "candidate";
+
+                            let elapsedText = "0h";
+                            let status: "Completed" | "On-track" | "At-risk" | "Breached" | "Pending" | "Waived" = "Pending";
+
+                            if (step.isWaived) {
+                              status = "Waived";
+                              elapsedText = "Waived";
+                            } else if (step.status === "completed") {
+                              status = "Completed";
+                              elapsedText = "Completed within SLA";
+                            } else if (step.status === "pending") {
+                              status = "Pending";
+                              elapsedText = "Pending previous step";
+                            } else {
+                              // Active step (Credentialing or other active step)
+                              const totalHours = 72 + (simulationOffsetDays * 24);
+                              const targetHours = targetVal * (targetUnit === "days" ? 24 : 1);
+                              const warningHours = leadVal * (leadUnit === "days" ? 24 : 1);
+
+                              elapsedText = `${totalHours}h elapsed`;
+
+                              if (totalHours > targetHours) {
+                                status = "Breached";
+                              } else if (totalHours > (targetHours - warningHours)) {
+                                status = "At-risk";
+                              } else {
+                                status = "On-track";
+                              }
+                            }
+
+                            const borderClass = 
+                              status === "Completed" ? "border-emerald-200 bg-emerald-50/10 text-emerald-800" :
+                              status === "Waived" ? "border-blue-200 bg-blue-50/10 text-[#0052CC]" :
+                              status === "On-track" ? "border-emerald-250 bg-emerald-50/10 text-[#007A5E]" :
+                              status === "At-risk" ? "border-amber-250 bg-amber-50/10 text-amber-700" :
+                              status === "Breached" ? "border-rose-250 bg-rose-50/20 text-rose-800 animate-pulse animate-duration-1000" :
+                              "border-slate-200 bg-slate-50/20 text-slate-400";
+
+                            const badgeClass =
+                              status === "Completed" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
+                              status === "Waived" ? "bg-blue-50 text-[#0052CC] border border-[#DEE7F3]" :
+                              status === "On-track" ? "bg-emerald-50 text-[#007A5E] border border-emerald-100" :
+                              status === "At-risk" ? "bg-amber-50 text-amber-600 border border-amber-100" :
+                              status === "Breached" ? "bg-rose-50 text-rose-600 border border-rose-100" :
+                              "bg-slate-50 text-slate-400 border border-slate-200";
+
+                            return (
+                              <div key={step.number} className={`border rounded-xl p-3 flex flex-col justify-between min-h-[140px] text-xs font-semibold ${borderClass}`}>
+                                <div className="space-y-1">
+                                  <div className="flex justify-between items-start">
+                                    <span className="font-extrabold uppercase text-[10px] tracking-wider block">Step {step.number}</span>
+                                    <span className={`px-1.5 py-0.5 rounded text-[8.5px] font-bold ${badgeClass}`}>{status}</span>
+                                  </div>
+                                  <h4 className="font-extrabold text-slate-800 text-[11px] truncate" title={step.name}>{step.name}</h4>
+                                  <span className="text-[9.5px] text-slate-400 block font-normal leading-tight">Target: {targetVal} {targetUnit}</span>
+                                  <span className="text-[9.5px] text-slate-400 block font-normal leading-tight">Owner: <span className="capitalize font-bold text-slate-500">{ownerName}</span></span>
+                                  <span className="text-[9.5px] block font-bold mt-1 text-slate-600">{elapsedText}</span>
+                                </div>
+
+                                {status !== "Completed" && status !== "Waived" && status !== "Pending" && (
+                                  <button
+                                    onClick={() => {
+                                      setWaiverStepNumber(step.number);
+                                      setShowWaiverModal(true);
+                                    }}
+                                    className="w-full mt-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[9.5px] font-bold rounded-lg border border-slate-200 transition-all active:scale-95 text-center"
+                                  >
+                                    Waive / Extend
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
 
                       {/* Placement Information Card List */}
                       <div>
@@ -584,6 +838,63 @@ export default function RecruiterDashboard() {
                           </div>
 
                         </div>
+                      </div>
+
+                      {/* CDK Global MSP Client Transfer Gate */}
+                      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 text-left space-y-3">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <h3 className="font-extrabold text-xs text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                              <ArrowRight className="h-4 w-4 text-[#007A5E]" />
+                              Layer 3: Client Transfer MSP Export Gate
+                            </h3>
+                            <p className="text-[10px] text-slate-450 mt-0.5 font-normal font-sans">Secure system-to-system upload of onboarding records to CDK Global MSP portal.</p>
+                          </div>
+                        </div>
+
+                        {(() => {
+                          const hardBlockers = anomalies.filter(a => a.candidateId === activeCandidate?.id && a.severity === "hard-block" && (a.status === "open" || a.status === "in_review"));
+                          const isBlocked = hardBlockers.length > 0;
+
+                          return (
+                            <div className="space-y-3">
+                              {isBlocked ? (
+                                <div className="bg-rose-50 border border-rose-200 rounded-lg p-3 text-xs text-rose-800 font-semibold flex items-center gap-2">
+                                  <ShieldAlert className="h-4.5 w-4.5 text-rose-600 shrink-0" />
+                                  <span>
+                                    <strong>Transfer Blocked:</strong> {hardBlockers.length} active hard-block anomaly items must be resolved/waived first.
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="bg-emerald-50 border border-emerald-250 rounded-lg p-3 text-xs text-emerald-800 font-semibold flex items-center gap-2">
+                                  <Check className="h-4.5 w-4.5 text-emerald-600 shrink-0 animate-bounce" />
+                                  <span>
+                                    <strong>Clear for Export:</strong> Document integrity hashes match golden records. Safe to transfer.
+                                  </span>
+                                </div>
+                              )}
+
+                              <button
+                                onClick={() => {
+                                  const res = transferToClient(activeCandidate!.id);
+                                  if (res.success) {
+                                    alert("Export Successful: Onboarding file pushed secure system-to-system packet to client portal. Action logged.");
+                                  } else {
+                                    alert(res.error);
+                                  }
+                                }}
+                                className={`w-full py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-xs ${
+                                  isBlocked 
+                                    ? "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-350"
+                                    : "bg-[#007A5E] hover:bg-[#005E48] text-white active:scale-[0.99]"
+                                }`}
+                              >
+                                <Send className="h-3.5 w-3.5" />
+                                Export Securely to Client MSP
+                              </button>
+                            </div>
+                          );
+                        })()}
                       </div>
 
                       {/* Screen 1 detailed checks */}
@@ -657,82 +968,104 @@ export default function RecruiterDashboard() {
                     </div>
                   )}
 
-                  {/* Tab 3: Documents Checklist (Screenshot 2) with Anomaly Checks */}
+                  {/* Tab 3: Documents Checklist with Anomaly Checks */}
                   {inspectorTab === "documents" && (
-                    <div className="overflow-x-auto border border-slate-200 rounded-xl shadow-2xs bg-white">
+                    <div className="overflow-x-auto border border-slate-200 rounded-xl shadow-2xs bg-white text-left">
                       <table className="w-full text-left border-collapse text-xs">
                         <thead>
-                          <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                            <th className="p-4">Document Name</th>
+                          <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                            <th className="p-4 pl-6">Document Name</th>
                             <th className="p-4">Uploaded File</th>
                             <th className="p-4">Submission Status</th>
-                            <th className="p-4">OB Approval Status</th>
-                            <th className="p-4 text-center">Action</th>
+                            <th className="p-4">OCR Integrity Verification</th>
+                            <th className="p-4 text-center pr-6">Action</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 text-xs font-semibold text-slate-600">
-                          
-                          {/* Doc Row 1 (With Anomaly Check warning) */}
-                          <tr className="hover:bg-slate-50/50 transition-colors">
-                            <td className="p-4 font-bold text-slate-800">401K Benefit Option Form</td>
-                            <td className="p-4 text-[#0052CC] font-bold">401K_Benefit.pdf</td>
-                            <td className="p-4">
-                              <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-full text-[10px] font-bold">Completed</span>
-                            </td>
-                            <td className="p-4">
-                              <span className="px-2 py-0.5 bg-[#EBF3FC] text-[#0052CC] border border-[#DEEAF7] rounded-full text-[10px] font-bold">Submitted</span>
-                            </td>
-                            <td className="p-4 text-center">
-                              <button className="px-3 py-1 bg-slate-100 border border-slate-200 hover:bg-slate-200 rounded text-[10px] font-bold transition-colors">
-                                View File
-                              </button>
-                            </td>
-                          </tr>
+                        <tbody className="divide-y divide-slate-100 text-xs font-semibold text-slate-655 bg-white">
+                          {activeCandidate?.erpDocuments.map((doc, idx) => {
+                            const isUploaded = doc.fileName !== "-";
+                            // Check if this document has associated anomalies matching substring of document name
+                            const docAnom = anomalies.find(a => a.candidateId === activeCandidate.id && a.title.toLowerCase().includes(doc.name.substring(0, 8).toLowerCase()) && (a.status === "open" || a.status === "in_review"));
 
-                          {/* Doc Row 2 (With active Anomaly Alert warning!) */}
-                          <tr className="hover:bg-slate-50/50 bg-rose-50/10 transition-colors">
-                            <td className="p-4 font-bold text-slate-800">
-                              <span>W-4 Form Tax Declaration</span>
-                              <span className="mt-1 block text-[10px] text-rose-500 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded w-fit font-bold uppercase tracking-wider">
-                                ⚠️ Anomaly Flagged
-                              </span>
-                            </td>
-                            <td className="p-4 text-[#0052CC] font-bold">W4_Mani_MN.pdf</td>
-                            <td className="p-4">
-                              <span className="px-2 py-0.5 bg-rose-50 text-rose-600 border border-rose-105 rounded-full text-[10px] font-bold">Verification Warning</span>
-                            </td>
-                            <td className="p-4">
-                              <span className="px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-full text-[10px] font-bold">Waiting Re-upload</span>
-                            </td>
-                            <td className="p-4 text-center">
-                              <div className="flex items-center justify-center gap-1.5">
-                                <button className="px-2.5 py-1 bg-rose-500 hover:bg-rose-600 text-white rounded text-[10px] font-bold transition-colors">
-                                  Request Fix
-                                </button>
-                                <span className="text-[10px] text-slate-400 font-semibold" title="Signature Name Mismatch detected by OCR system">
-                                  Name Mismatch Signature
-                                </span>
-                              </div>
-                            </td>
-                          </tr>
-
-                          {/* Doc Row 3 */}
-                          <tr className="hover:bg-slate-50/50 transition-colors">
-                            <td className="p-4 font-bold text-slate-800">Background Verification Consent</td>
-                            <td className="p-4 text-slate-400">—</td>
-                            <td className="p-4">
-                              <span className="px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-full text-[10px] font-bold">Pending</span>
-                            </td>
-                            <td className="p-4">
-                              <span className="px-2 py-0.5 bg-slate-50 text-slate-400 border border-slate-200 rounded-full text-[10px] font-bold">Waiting</span>
-                            </td>
-                            <td className="p-4 text-center">
-                              <button className="px-3 py-1 bg-[#007A5E] hover:bg-[#005E48] text-white rounded text-[10px] font-bold transition-colors">
-                                Send Alert
-                              </button>
-                            </td>
-                          </tr>
-
+                            return (
+                              <tr key={idx} className={`hover:bg-slate-50/50 transition-colors ${docAnom ? "bg-rose-50/10" : ""}`}>
+                                <td className="p-4 pl-6">
+                                  <div className="space-y-1">
+                                    <span className="font-extrabold text-slate-800">{doc.name}</span>
+                                    {docAnom && (
+                                      <span className="block text-[8px] font-black bg-rose-50 text-rose-600 border border-rose-200 rounded px-1.5 py-0.5 w-fit uppercase tracking-wider">
+                                        ⚠️ {docAnom.title}
+                                      </span>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="p-4">
+                                  {isUploaded ? (
+                                    <span className="text-[#0052CC] font-bold">{doc.fileName}</span>
+                                  ) : (
+                                    <span className="text-slate-400 font-normal">—</span>
+                                  )}
+                                </td>
+                                <td className="p-4">
+                                  <span className={`px-2 py-0.5 rounded text-[9.5px] font-bold ${
+                                    isUploaded 
+                                      ? "bg-emerald-50 text-[#007A5E] border border-emerald-100" 
+                                      : "bg-slate-50 text-slate-450 border border-slate-200"
+                                  }`}>
+                                    {isUploaded ? "Completed" : "Pending"}
+                                  </span>
+                                </td>
+                                <td className="p-4">
+                                  {isUploaded ? (
+                                    <div className="space-y-1">
+                                      <span className={`px-2 py-0.5 rounded text-[9.5px] font-bold uppercase ${
+                                        docAnom ? "bg-rose-50 text-rose-600 border border-rose-100 animate-pulse animate-duration-1000" : "bg-emerald-50 text-[#007A5E] border border-emerald-100"
+                                      }`}>
+                                        {docAnom ? "⚠️ Hash Discrepancy" : "✓ Verified Hash"}
+                                      </span>
+                                      <div className="text-[9px] text-[#007A5E] font-bold flex items-center gap-1 font-mono">
+                                        <Lock className="h-3 w-3 shrink-0" /> original-tamper-protected
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <span className="text-slate-400 font-normal">—</span>
+                                  )}
+                                </td>
+                                <td className="p-4 text-center pr-6">
+                                  <div className="flex justify-center gap-2">
+                                    {isUploaded && activeRole === "audit" && (
+                                      <button 
+                                        onClick={() => {
+                                          alert(`Securely downloaded "${doc.fileName}" for audit purposes. Action logged.`);
+                                        }}
+                                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded text-[10px] font-bold transition-all active:scale-95"
+                                      >
+                                        Download Audit Copy
+                                      </button>
+                                    )}
+                                    {isUploaded && (
+                                      <button 
+                                        onClick={() => {
+                                          alert(`Transferred "${doc.fileName}" secure system-to-system packet to client portal. Code logged.`);
+                                        }}
+                                        className="px-2.5 py-1 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold transition-all active:scale-95 shadow-xs"
+                                      >
+                                        Forward System-to-System
+                                      </button>
+                                    )}
+                                    {!isUploaded && (
+                                      <button 
+                                        onClick={() => alert("Notification reminder alert routed to candidate via SMS.")}
+                                        className="px-2.5 py-1 bg-[#007A5E] hover:bg-[#005E48] text-white rounded text-[10px] font-bold transition-all"
+                                      >
+                                        Send Reminder
+                                      </button>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
@@ -930,6 +1263,83 @@ export default function RecruiterDashboard() {
                     </div>
                   )}
 
+                  {/* Tab 7: Compliance Audit Trail */}
+                  {inspectorTab === "sla-audit" && (
+                    <div className="space-y-6 text-left">
+                      <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <h4 className="font-bold text-xs uppercase tracking-wider text-slate-700">Onboarding Compliance Audit Ledger</h4>
+                        <span className="px-2 py-0.5 bg-[#EBF3FC] text-[#0052CC] border border-[#DEEAF7] rounded text-[9.5px] font-bold">Immutable Ledger</span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Column 1: SLA Target Milestones Logs */}
+                        <div className="space-y-3">
+                          <h5 className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">SLA Target Milestones</h5>
+                          <div className="space-y-2 max-h-[360px] overflow-y-auto no-scrollbar">
+                            {slaAuditLogs.filter(log => log.candidateId === activeCandidate?.id).length > 0 ? (
+                              slaAuditLogs
+                                .filter(log => log.candidateId === activeCandidate?.id)
+                                .map((log) => {
+                                  const isWaiver = log.eventType === "waiver";
+                                  const isBreach = log.eventType === "breach";
+                                  const bgClass = isWaiver ? "bg-blue-50/50 border-blue-200 text-blue-900" : isBreach ? "bg-rose-50/50 border-rose-200 text-rose-900" : "bg-slate-50 border-slate-200 text-slate-800";
+
+                                  return (
+                                    <div key={log.id} className={`border rounded-xl p-3 flex gap-2 items-start text-xs font-semibold ${bgClass}`}>
+                                      <Clock className="h-4 w-4 shrink-0 mt-0.5" />
+                                      <div className="flex-1 space-y-0.5">
+                                        <div className="flex justify-between text-[9px] text-slate-400 font-normal">
+                                          <span>{log.eventType.toUpperCase()} EVENT (STEP {log.stepNumber})</span>
+                                          <span>{log.timestamp}</span>
+                                        </div>
+                                        <p className="font-bold text-[10.5px]">{log.description}</p>
+                                        <p className="text-[9.5px] text-slate-450 font-normal">Operator: <span className="font-bold">{log.operator}</span></p>
+                                      </div>
+                                    </div>
+                                  );
+                                })
+                            ) : (
+                              <p className="text-xs text-slate-400 font-normal py-4">No SLA logs recorded yet.</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Column 2: Document Anomaly Audit Logs */}
+                        <div className="space-y-3">
+                          <h5 className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Document Integrity & Security Logs</h5>
+                          <div className="space-y-2 max-h-[360px] overflow-y-auto no-scrollbar">
+                            {anomalyAuditLogs.filter(log => log.candidateId === activeCandidate?.id).length > 0 ? (
+                              anomalyAuditLogs
+                                .filter(log => log.candidateId === activeCandidate?.id)
+                                .map((log) => {
+                                  const isTransfer = log.action.includes("Transfer");
+                                  const isWaiver = log.action.includes("Waived") || log.action.includes("Override") || log.action.includes("Anomaly");
+                                  const bgClass = isTransfer ? "bg-emerald-50/50 border-emerald-200 text-emerald-900" : isWaiver ? "bg-blue-50/50 border-blue-200 text-blue-900" : "bg-slate-50 border-slate-200 text-slate-800";
+
+                                  return (
+                                    <div key={log.id} className={`border rounded-xl p-3 flex gap-2 items-start text-xs font-semibold ${bgClass}`}>
+                                      <Lock className="h-4 w-4 shrink-0 mt-0.5" />
+                                      <div className="flex-1 space-y-0.5">
+                                        <div className="flex justify-between text-[9px] text-slate-400 font-normal">
+                                          <span>{log.action.toUpperCase()}</span>
+                                          <span>{log.timestamp}</span>
+                                        </div>
+                                        <p className="font-bold text-[10.5px]">{log.details}</p>
+                                        <p className="text-[9.5px] text-slate-450 font-normal">Operator: <span className="font-bold">{log.operator}</span></p>
+                                      </div>
+                                    </div>
+                                  );
+                                })
+                            ) : (
+                              <p className="text-xs text-slate-400 font-normal py-4">No security/tampering audit logs recorded yet.</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  )}
+
                 </div>
               </div>
 
@@ -1089,15 +1499,57 @@ export default function RecruiterDashboard() {
                     </p>
                   </div>
 
-                  {/* Search & Filter tools */}
-                  <div className="flex items-center gap-3">
+                  {/* Search, Clock & Filter tools */}
+                  <div className="flex items-center gap-3 flex-wrap">
+                    {/* Simulated Time Offset Control widget */}
+                    <div className="flex items-center gap-2 bg-[#EBF3FC] border border-[#DEEAF7] rounded-lg px-3 py-1.5 text-xs text-[#0052CC]">
+                      <Clock className="h-3.5 w-3.5 animate-pulse" />
+                      <span className="font-bold">Simulated Time: +{simulationOffsetDays} Days</span>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); advanceSimulationTime(1); }}
+                        className="ml-2 px-2.5 py-0.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold shadow-xs transition-all active:scale-95"
+                      >
+                        +1 Day
+                      </button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); advanceSimulationTime(-1); }}
+                        disabled={simulationOffsetDays <= 0}
+                        className="px-2.5 py-0.5 bg-slate-200 text-slate-500 rounded text-[10px] font-bold shadow-xs transition-all hover:bg-slate-300 disabled:opacity-50 disabled:pointer-events-none"
+                      >
+                        -1 Day
+                      </button>
+                    </div>
+
+                    {/* Simulated Anomaly Trigger widget */}
+                    <div className="flex items-center gap-1.5 bg-[#FFF0F0] border border-[#FFD5D5] rounded-lg px-3 py-1.5 text-xs text-[#C53030]">
+                      <ShieldAlert className="h-3.5 w-3.5 text-rose-600 animate-pulse" />
+                      <span className="font-bold">Simulate Anomaly</span>
+                      <select
+                        onChange={(e) => {
+                          const type = e.target.value as any;
+                          if (type) {
+                            triggerMockAnomaly("candidate-mani", type);
+                            alert(`Mock Anomaly "${type}" injected for candidate Mani!`);
+                            e.target.value = "";
+                          }
+                        }}
+                        className="bg-white border border-[#FFD5D5] rounded text-[10px] py-0.5 px-1 font-bold focus:outline-none text-rose-800 cursor-pointer"
+                      >
+                        <option value="">-- Select Type --</option>
+                        <option value="identity_mismatch">Identity Mismatch (Step 3)</option>
+                        <option value="document_tampering">Document Tampering (Step 3)</option>
+                        <option value="bgc_anomaly">Sterling BGC Discrepancy (Step 2)</option>
+                        <option value="step_skip">Step Completed, No File (Step 2)</option>
+                      </select>
+                    </div>
+
                     <div className="relative">
                       <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search candidate by name or # ..."
-                        className="pl-9 pr-4 py-2 bg-white border border-slate-250 rounded-lg text-xs focus:outline-none focus:border-[#007A5E] w-64 text-slate-800 font-semibold"
+                        className="pl-9 pr-4 py-2 bg-white border border-slate-250 rounded-lg text-xs focus:outline-none focus:border-[#007A5E] w-52 text-slate-800 font-semibold"
                       />
                       <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                     </div>
@@ -1132,7 +1584,7 @@ export default function RecruiterDashboard() {
                         return (
                           <React.Fragment key={cand.id}>
                             <tr 
-                              className={`transition-colors cursor-pointer ${isBreached ? "bg-rose-50/20 hover:bg-rose-50/40" : "hover:bg-slate-50/50"}`}
+                              className={`transition-colors cursor-pointer ${isBreached ? "bg-rose-50/20 hover:bg-rose-50/40 border-l-4 border-rose-500 text-rose-700" : "hover:bg-slate-50/50"}`}
                               onClick={() => {
                                 setSelectedCandidateId(cand.id);
                                 setInspectorTab("dashboard");
@@ -1144,8 +1596,21 @@ export default function RecruiterDashboard() {
                                     {cand.name.substring(0, 2)}
                                   </div>
                                   <div>
-                                    <span className="font-extrabold text-slate-800 block hover:text-[#007A5E]">{cand.name}</span>
-                                    <span className="text-[10px] text-slate-450 block">Candidate #: {cand.candidateNo} • {cand.jobTitle}</span>
+                                    <div className="flex items-center">
+                                      <span className={`font-extrabold block hover:text-[#007A5E] ${isBreached ? "text-rose-700 font-black" : "text-slate-800"}`}>{cand.name}</span>
+                                      {anomalies.filter(a => a.candidateId === cand.id && (a.status === "open" || a.status === "in_review")).length > 0 && (() => {
+                                        const count = anomalies.filter(a => a.candidateId === cand.id && (a.status === "open" || a.status === "in_review")).length;
+                                        const isHard = anomalies.some(a => a.candidateId === cand.id && a.severity === "hard-block" && (a.status === "open" || a.status === "in_review"));
+                                        return (
+                                          <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ml-2 border ${
+                                            isHard ? "bg-rose-50 text-rose-600 border-rose-200 animate-pulse" : "bg-amber-50 text-amber-600 border-amber-200"
+                                          }`}>
+                                            ⚠️ {count} {isHard ? "Blocked" : "Flagged"}
+                                          </span>
+                                        );
+                                      })()}
+                                    </div>
+                                    <span className={`text-[10px] block ${isBreached ? "text-rose-600/70" : "text-slate-455"}`}>Candidate #: {cand.candidateNo} • {cand.jobTitle}</span>
                                   </div>
                                 </div>
                               </td>
@@ -1413,7 +1878,7 @@ export default function RecruiterDashboard() {
                 </div>
 
               </div>
-            ) :
+            ) : currentView === "agencies" ? (
 
             /* ========================================================================= */
             /* VIEW 4: VERIFICATION AGENCY LISTING (Slide 1)                             */
@@ -1481,7 +1946,274 @@ export default function RecruiterDashboard() {
               </div>
 
             </div>
-          )}
+          ) : currentView === "sla-config" ? (
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm space-y-4 text-left p-6">
+              <div>
+                <h1 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-[#007A5E]" />
+                  SLA configuration screen (admin)
+                </h1>
+                <p className="text-xs text-slate-450 font-semibold mt-0.5">Manage SLA target times, warning margins, step ownership, and escalation hierarchies across all 7 steps.</p>
+              </div>
+              <div className="overflow-x-auto border border-slate-100 rounded-xl">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                      <th className="p-4 pl-6">Step</th>
+                      <th className="p-4">Target Duration</th>
+                      <th className="p-4">Step Owner</th>
+                      <th className="p-4">Reminder Lead Time</th>
+                      <th className="p-4">Escalation Target</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 bg-white font-semibold text-slate-655">
+                    {slaSettings.map((config, index) => (
+                      <tr key={config.stepNumber} className="hover:bg-slate-50/50">
+                        <td className="p-4 pl-6 font-bold text-slate-850">
+                          {config.stepNumber}. {config.stepName}
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            <input 
+                              type="number"
+                              value={config.durationValue}
+                              onChange={(e) => {
+                                const val = Number(e.target.value);
+                                const next = [...slaSettings];
+                                next[index] = { ...config, durationValue: val };
+                                updateSlaConfig(next);
+                              }}
+                              className="w-16 px-2 py-1 border border-slate-200 rounded font-bold text-slate-700 text-center"
+                            />
+                            <select
+                              value={config.durationUnit}
+                              onChange={(e) => {
+                                const unit = e.target.value as "hours" | "days";
+                                const next = [...slaSettings];
+                                next[index] = { ...config, durationUnit: unit };
+                                updateSlaConfig(next);
+                              }}
+                              className="px-2 py-1 border border-slate-200 rounded font-semibold text-slate-750"
+                            >
+                              <option value="hours">Hours</option>
+                              <option value="days">Days</option>
+                            </select>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <select
+                            value={config.owner}
+                            onChange={(e) => {
+                              const owner = e.target.value as any;
+                              const next = [...slaSettings];
+                              next[index] = { ...config, owner };
+                              updateSlaConfig(next);
+                            }}
+                            className="px-2 py-1 border border-slate-200 rounded font-semibold text-slate-750"
+                          >
+                            <option value="candidate">Candidate</option>
+                            <option value="recruiter">Recruiter</option>
+                            <option value="onboarder">Onboarder</option>
+                            <option value="vendor">Vendor</option>
+                          </select>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            <input 
+                              type="number"
+                              value={config.reminderLeadTime}
+                              onChange={(e) => {
+                                const val = Number(e.target.value);
+                                const next = [...slaSettings];
+                                next[index] = { ...config, reminderLeadTime: val };
+                                updateSlaConfig(next);
+                              }}
+                              className="w-16 px-2 py-1 border border-slate-200 rounded font-bold text-slate-700 text-center"
+                            />
+                            <select
+                              value={config.reminderLeadUnit}
+                              onChange={(e) => {
+                                const unit = e.target.value as "hours" | "days";
+                                const next = [...slaSettings];
+                                next[index] = { ...config, reminderLeadUnit: unit };
+                                updateSlaConfig(next);
+                              }}
+                              className="px-2 py-1 border border-slate-200 rounded font-semibold text-slate-750"
+                            >
+                              <option value="hours">Hours</option>
+                              <option value="days">Days</option>
+                            </select>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <select
+                            value={config.escalationTarget}
+                            onChange={(e) => {
+                              const target = e.target.value as any;
+                              const next = [...slaSettings];
+                              next[index] = { ...config, escalationTarget: target };
+                              updateSlaConfig(next);
+                            }}
+                            className="px-2 py-1 border border-slate-200 rounded font-semibold text-slate-750"
+                          >
+                            <option value="recruiter">Recruiter</option>
+                            <option value="team lead">Team Lead</option>
+                            <option value="manager">Manager</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="flex gap-4 pt-4 border-t border-slate-100 justify-end">
+                <button 
+                  onClick={() => {
+                    updateSlaConfig([
+                      { stepNumber: 1, stepName: "Application", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: "recruiter" },
+                      { stepNumber: 2, stepName: "Screening", durationValue: 2, durationUnit: "days", owner: "vendor", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "team lead" },
+                      { stepNumber: 3, stepName: "Credentialing", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
+                      { stepNumber: 4, stepName: "Interview", durationValue: 2, durationUnit: "days", owner: "recruiter", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: "team lead" },
+                      { stepNumber: 5, stepName: "Contract", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
+                      { stepNumber: 6, stepName: "Compliance", durationValue: 4, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
+                      { stepNumber: 7, stepName: "Ready", durationValue: 1, durationUnit: "days", owner: "onboarder", reminderLeadTime: 6, reminderLeadUnit: "hours", escalationTarget: "recruiter" }
+                    ]);
+                    alert("Reset to default SLA configurations successfully.");
+                  }}
+                  className="px-4 py-2 border border-slate-250 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-lg transition-all"
+                >
+                  Reset Defaults
+                </button>
+                <button 
+                  onClick={() => alert("SLA configurations saved and persisted inside local storage.")}
+                  className="px-4 py-2 bg-[#007A5E] hover:bg-[#005E48] text-white text-xs font-bold rounded-lg shadow-sm transition-all"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          ) : currentView === "anomaly-queue" ? (
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm space-y-6 text-left p-6">
+              <div>
+                <h1 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <ShieldAlert className="h-5 w-5 text-rose-600 animate-pulse animate-duration-1000" />
+                  Compliance Anomaly Review Queue
+                </h1>
+                <p className="text-xs text-slate-450 font-semibold mt-0.5">Audit flagged document discrepancies, tampering flags, background hit indicators, and step completion failures.</p>
+              </div>
+
+              {/* Anomaly Review Queue Table */}
+              <div className="overflow-x-auto border border-slate-100 rounded-xl">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                      <th className="p-4 pl-6">Candidate</th>
+                      <th className="p-4">Anomaly Flag Details</th>
+                      <th className="p-4">Step</th>
+                      <th className="p-4">Confidence</th>
+                      <th className="p-4">Severity</th>
+                      <th className="p-4">Status</th>
+                      <th className="p-4 text-center pr-6">Override / Resolution Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 bg-white font-semibold text-slate-655">
+                    {anomalies.map((anom) => {
+                      const cand = candidates.find(c => c.id === anom.candidateId);
+                      const candName = cand ? cand.name : "Unknown";
+
+                      return (
+                        <tr key={anom.id} className="hover:bg-slate-50/50 transition-colors">
+                          <td className="p-4 pl-6 font-extrabold text-[#0052CC]">
+                            {candName}
+                          </td>
+                          <td className="p-4">
+                            <div>
+                              <span className="font-extrabold text-slate-850 block">{anom.title}</span>
+                              <span className="text-[10px] text-slate-400 font-normal leading-normal">{anom.description}</span>
+                              {anom.waiverReason && (
+                                <span className="block mt-1 text-[9.5px] italic text-[#007A5E] bg-emerald-50 rounded px-1.5 py-0.5 border border-emerald-100">
+                                  Waiver justification: "{anom.waiverReason}"
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="p-4 text-slate-500">Step {anom.stepNumber}</td>
+                          <td className="p-4">
+                            <span className="bg-[#EBF3FC] text-[#0052CC] border border-[#DEEAF7] px-2 py-0.5 rounded text-[10px] font-bold">
+                              {anom.confidencePercent}%
+                            </span>
+                          </td>
+                          <td className="p-4">
+                            <span className={`px-2 py-0.5 rounded text-[9.5px] font-bold uppercase ${
+                              anom.severity === "hard-block" ? "bg-rose-50 text-rose-600 border border-rose-100" :
+                              anom.severity === "soft-flag" ? "bg-amber-50 text-amber-600 border border-amber-100" :
+                              "bg-slate-50 text-slate-500 border border-slate-200"
+                            }`}>
+                              {anom.severity}
+                            </span>
+                          </td>
+                          <td className="p-4">
+                            <span className={`px-2 py-0.5 rounded text-[9.5px] font-bold uppercase ${
+                              anom.status === "open" ? "bg-red-50 text-red-600 border border-red-100" :
+                              anom.status === "in_review" ? "bg-amber-50 text-amber-600 border border-amber-100" :
+                              anom.status === "resolved" ? "bg-emerald-50 text-[#007A5E] border border-emerald-100" :
+                              anom.status === "waived" ? "bg-blue-50 text-[#0052CC] border border-[#DEEAF7]" :
+                              "bg-slate-50 text-slate-400 border border-slate-200"
+                            }`}>
+                              {anom.status}
+                            </span>
+                          </td>
+                          <td className="p-4 text-center pr-6">
+                            <div className="flex justify-center gap-1.5">
+                              {anom.status !== "resolved" && anom.status !== "waived" && anom.status !== "false_positive" ? (
+                                <>
+                                  <button
+                                    onClick={() => {
+                                      updateAnomalyStatus(anom.id, "resolved");
+                                      alert("Anomaly marked as Resolved.");
+                                    }}
+                                    className="px-2 py-1 bg-[#007A5E] hover:bg-[#005E48] text-white rounded text-[10px] font-bold transition-all shadow-xs active:scale-95"
+                                    title="Mark document resolved/corrected"
+                                  >
+                                    Resolve
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      const reason = prompt("Enter override justification reason:");
+                                      if (reason) {
+                                        updateAnomalyStatus(anom.id, "waived", reason);
+                                        alert("Anomaly waived successfully.");
+                                      }
+                                    }}
+                                    className="px-2 py-1 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold transition-all shadow-xs active:scale-95"
+                                    title="Waive security lock requirements"
+                                  >
+                                    Waive
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      updateAnomalyStatus(anom.id, "false_positive");
+                                      alert("Anomaly marked as False Positive.");
+                                    }}
+                                    className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-bold transition-all border border-slate-200 active:scale-95"
+                                    title="Mark system flag as false positive"
+                                  >
+                                    FP
+                                  </button>
+                                </>
+                              ) : (
+                                <span className="text-[10px] text-slate-400 italic">No Action Needed</span>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : null)}
 
         </div>
 
@@ -1552,6 +2284,64 @@ export default function RecruiterDashboard() {
 
           <div className="pt-4 border-t border-slate-100 text-[10px] text-slate-405 italic">
             Automated alerts are dispatched via AWS Pinpoint & Outlook Web API.
+          </div>
+        </div>
+      )}
+
+      {/* Waiver / Extend SLA Modal Overlay */}
+      {showWaiverModal && waiverStepNumber !== null && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 text-left space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+              <h3 className="font-extrabold text-sm text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-[#0052CC]" />
+                Waive / Extend SLA Target
+              </h3>
+              <button 
+                onClick={() => { setShowWaiverModal(false); setWaiverReasonText(""); }}
+                className="p-1 hover:bg-slate-100 rounded-full text-slate-400"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="text-xs space-y-2">
+              <p className="text-slate-500 leading-relaxed font-semibold">
+                You are overriding the SLA policy requirements for **Step {waiverStepNumber}: {activeCandidate?.onboardingSteps.find(s => s.number === waiverStepNumber)?.name}** for candidate **{activeCandidate?.name}**.
+              </p>
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">Justification / Reason for Waiver</label>
+                <textarea
+                  value={waiverReasonText}
+                  onChange={(e) => setWaiverReasonText(e.target.value)}
+                  placeholder="e.g. Awaiting licensing board confirmation letter..."
+                  rows={3}
+                  className="w-full p-3 border border-slate-250 rounded-xl focus:outline-none focus:border-[#007A5E] font-semibold text-slate-850"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 text-xs font-bold pt-2">
+              <button
+                onClick={() => { setShowWaiverModal(false); setWaiverReasonText(""); }}
+                className="px-4 py-2 border border-slate-250 hover:bg-slate-50 text-slate-700 rounded-lg transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (!waiverReasonText.trim()) {
+                    alert("Please provide a justification reason.");
+                    return;
+                  }
+                  applySlaWaiver(activeCandidate!.id, waiverStepNumber, waiverReasonText, "Alex");
+                  setShowWaiverModal(false);
+                  setWaiverReasonText("");
+                  alert(`SLA waived successfully for Step ${waiverStepNumber}.`);
+                }}
+                className="px-4 py-2 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg shadow-sm transition-all"
+              >
+                Apply Waiver
+              </button>
+            </div>
           </div>
         </div>
       )}
