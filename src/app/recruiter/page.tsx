@@ -1523,29 +1523,6 @@ export default function RecruiterDashboard() {
                   {/* Search, Clock & Filter tools */}
                   <div className="flex items-center gap-3 flex-wrap">
 
-                    {/* Simulated Anomaly Trigger widget */}
-                    <div className="flex items-center gap-1.5 bg-[#FFF0F0] border border-[#FFD5D5] rounded-lg px-3 py-1.5 text-xs text-[#C53030]">
-                      <ShieldAlert className="h-3.5 w-3.5 text-rose-600 animate-pulse" />
-                      <span className="font-bold">Simulate Anomaly</span>
-                      <select
-                        onChange={(e) => {
-                          const type = e.target.value as any;
-                          if (type) {
-                            triggerMockAnomaly("candidate-mani", type);
-                            alert(`Mock Anomaly "${type}" injected for candidate Mani!`);
-                            e.target.value = "";
-                          }
-                        }}
-                        className="bg-white border border-[#FFD5D5] rounded text-[10px] py-0.5 px-1 font-bold focus:outline-none text-rose-800 cursor-pointer"
-                      >
-                        <option value="">-- Select Type --</option>
-                        <option value="identity_mismatch">Identity Mismatch (Step 3)</option>
-                        <option value="document_tampering">Document Tampering (Step 3)</option>
-                        <option value="bgc_anomaly">Sterling BGC Discrepancy (Step 2)</option>
-                        <option value="step_skip">Step Completed, No File (Step 2)</option>
-                      </select>
-                    </div>
-
                     <div className="relative">
                       <input
                         type="text"
