@@ -1006,7 +1006,7 @@ export default function RecruiterDashboard() {
                           {activeCandidate?.erpDocuments?.map((doc, idx) => {
                             const isUploaded = doc.fileName !== "-";
                             // Check if this document has associated anomalies matching substring of document name
-                            const docAnom = anomalies.find(a => a.candidateId === activeCandidate.id && a.title.toLowerCase().includes(doc.name.substring(0, 8).toLowerCase()) && (a.status === "open" || a.status === "in_review"));
+                            const docAnom = anomalies.find(a => a.candidateId === activeCandidate?.id && a.title.toLowerCase().includes(doc.name.substring(0, 8).toLowerCase()) && (a.status === "open" || a.status === "in_review"));
 
                             return (
                               <tr key={idx} className={`hover:bg-slate-50/50 transition-colors ${docAnom ? "bg-rose-50/10" : ""}`}>
@@ -1097,7 +1097,7 @@ export default function RecruiterDashboard() {
                     <div className="space-y-4">
                       <div className="h-64 border border-slate-200 rounded-xl bg-slate-50 p-4 overflow-y-auto space-y-4">
                         {messages
-                          .filter((m) => m.candidateId === activeCandidate.id)
+                          .filter((m) => m.candidateId === activeCandidate?.id)
                           .map((msg) => (
                             <div 
                               key={msg.id} 
