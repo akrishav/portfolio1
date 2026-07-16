@@ -1941,6 +1941,18 @@ export default function RecruiterDashboard() {
                 </h1>
                 <p className="text-xs text-slate-450 font-semibold mt-0.5">Manage SLA target times, warning margins, step ownership, and escalation hierarchies across all 7 steps.</p>
               </div>
+
+              {/* Active Global SLA Policy Notice Banner */}
+              <div className="bg-[#EBF3FC] border border-[#DEEAF7] rounded-xl p-4 flex items-start gap-3 text-xs text-[#0052CC]">
+                <Clock className="h-4.5 w-4.5 mt-0.5 shrink-0 animate-pulse" />
+                <div>
+                  <span className="font-extrabold block">Active Global SLA Policy</span>
+                  <p className="text-slate-600 font-semibold leading-relaxed mt-0.5 text-[11px]">
+                    These configuration parameters apply globally across all active candidate placements in the system (including **Mani**, **Debra**, and **Marcos**). Modifying these targets will dynamically recalculate elapsed time status checks on all active timelines.
+                  </p>
+                </div>
+              </div>
+
               <div className="overflow-x-auto border border-slate-100 rounded-xl">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
