@@ -10,7 +10,7 @@ import {
   Smartphone, Mail, Check, RefreshCw, MessageSquare, ArrowRight, 
   Settings, Clock, Bell, Filter, Award, ChevronRight, Search, 
   Plus, Edit2, Download, Eye, ArrowLeft, Calendar, LayoutGrid, 
-  Building2, ShieldCheck, DollarSign, HelpCircle, HardDrive, ListCollapse, X, ChevronDown, Lock, Info
+  Building2, ShieldCheck, DollarSign, HelpCircle, HardDrive, ListCollapse, X, ChevronDown, Lock
 } from "lucide-react";
 
 export default function RecruiterDashboard() {
@@ -37,7 +37,6 @@ export default function RecruiterDashboard() {
     advanceSimulationTime,
     applySlaWaiver,
     toggleActiveRole,
-    setActiveRoleContext,
     updateAnomalyStatus,
     triggerMockAnomaly,
     transferToClient
@@ -63,7 +62,6 @@ export default function RecruiterDashboard() {
 
   // Search filter
   const [searchQuery, setSearchQuery] = useState("");
-  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
 
   // Role perspective switcher: recruiter | onboarder
   const [currentRole, setCurrentRole] = useState<"recruiter" | "onboarder">("recruiter");
@@ -76,7 +74,6 @@ export default function RecruiterDashboard() {
   const [showWaiverModal, setShowWaiverModal] = useState(false);
   const [waiverStepNumber, setWaiverStepNumber] = useState<number | null>(null);
   const [waiverReasonText, setWaiverReasonText] = useState("");
-  const [pendingSimChange, setPendingSimChange] = useState<number | null>(null);
 
   // Chat message state
   const [replyMessage, setReplyMessage] = useState("");
@@ -271,38 +268,6 @@ export default function RecruiterDashboard() {
   // Active candidate object helper
   const activeCandidate = candidates.find((c) => c.id === selectedCandidateId);
 
-  const getCandidateOnboardingStatus = (cand: any) => {
-    if (cand.stepStatus === "completed") {
-      return {
-        text: "Employee Created",
-        className: "bg-emerald-50 text-[#007A5E] border border-emerald-100 font-bold"
-      };
-    }
-    if (cand.stepStatus === "terminated") {
-      return {
-        text: "OB Terminated",
-        className: "bg-slate-50 text-slate-400 border border-slate-200"
-      };
-    }
-
-    const activeStep = cand.onboardingSteps?.find((s: any) => s.status !== "completed");
-    const stepNum = activeStep ? activeStep.number : cand.currentStep;
-    const stepName = activeStep ? activeStep.name : "Onboarding";
-    const ageDays = 3 + simulationOffsetDays;
-
-    if (cand.stepStatus === "stuck" || cand.slaStatus === "breached") {
-      return {
-        text: `Stuck at Step ${stepNum}: ${stepName} — ${ageDays} days`,
-        className: "bg-rose-50 text-rose-600 border border-rose-100 font-bold"
-      };
-    }
-
-    return {
-      text: `Step ${stepNum}: ${stepName} — ${ageDays} days`,
-      className: "bg-blue-50 text-blue-600 border border-[#DEEAF7] font-semibold"
-    };
-  };
-
   return (
     <main className="min-h-screen bg-[#F4F6FC] text-[#1E293B] flex flex-col font-sans antialiased">
       <DemoNavbar />
@@ -324,100 +289,25 @@ export default function RecruiterDashboard() {
 
           {/* Right Profile settings */}
           <div className="flex items-center gap-3">
-                   {/* 3-Role Custom Dropdown Perspective in Header */}
-            <div className="relative inline-block text-left">
+            
+            {/* Role Switcher Toggle */}
+            <div className="flex items-center gap-1 bg-[#F0F5FA] border border-[#DEEAF7] rounded-full p-1 shadow-3xs text-xs">
               <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowRoleDropdown(!showRoleDropdown);
-                }}
-                className="px-3.5 py-1.5 rounded-full font-bold uppercase tracking-wider text-[10px] bg-white border border-slate-220 hover:border-slate-300 text-slate-700 hover:bg-slate-50 transition-all flex items-center gap-2 shadow-3xs hover:shadow-2xs active:scale-[0.98] cursor-pointer"
+                onClick={toggleActiveRole}
+                className={`px-3 py-1 rounded-full font-bold uppercase transition-all text-[9.5px] ${
+                  activeRole === "recruiter" ? "bg-[#0052CC] text-white shadow-xs" : "text-[#0052CC] hover:bg-blue-50/50"
+                }`}
               >
-                <span className={`h-2 w-2 rounded-full shrink-0 animate-pulse ${
-                  activeRole === 'recruiter' 
-                    ? 'bg-[#6366F1] shadow-[0_0_8px_rgba(99,102,241,0.5)]' 
-                    : activeRole === 'onboarder' 
-                    ? 'bg-[#007A5E] shadow-[0_0_8px_rgba(0,122,94,0.5)]' 
-                    : 'bg-[#0284C7] shadow-[0_0_8px_rgba(2,132,199,0.5)]'
-                }`}></span>
-                <span className="font-extrabold tracking-wider">
-                  {activeRole === "recruiter" 
-                    ? "Recruiter" 
-                    : activeRole === "onboarder" 
-                    ? "OB Owner" 
-                    : "Auditor"
-                  }
-                </span>
-                <ChevronDown className="h-3 w-3 shrink-0 text-slate-400" />
+                Recruiter
               </button>
-
-              {showRoleDropdown && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setShowRoleDropdown(false)}></div>
-                  <div className="absolute right-0 mt-2 w-60 rounded-2xl bg-white border border-slate-200/80 shadow-2xl py-2 z-50 text-xs font-semibold text-slate-655 animate-dropdown-slide text-left backdrop-blur-md">
-                    <div className="px-3.5 py-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2 mb-1.5 select-none">
-                      Change Perspective
-                    </div>
-                    
-                    <button
-                      onClick={() => {
-                        setActiveRoleContext("recruiter");
-                        setShowRoleDropdown(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-3.5 py-2 text-left hover:bg-slate-50/80 transition-colors ${
-                        activeRole === "recruiter" ? "text-[#6366F1] bg-indigo-50/15" : "text-slate-700"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span className="h-2 w-2 rounded-full bg-[#6366F1] shrink-0"></span>
-                        <div className="flex flex-col">
-                          <span className="font-bold text-[11.5px]">Recruiter</span>
-                          <span className="text-[9px] text-slate-400 font-normal">Standard candidate coordinator view</span>
-                        </div>
-                      </div>
-                      {activeRole === "recruiter" && <Check className="h-4 w-4 text-[#6366F1] font-bold shrink-0" />}
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setActiveRoleContext("onboarder");
-                        setShowRoleDropdown(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-3.5 py-2 text-left hover:bg-slate-50/80 transition-colors ${
-                        activeRole === "onboarder" ? "text-[#007A5E] bg-emerald-50/15" : "text-slate-700"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span className="h-2 w-2 rounded-full bg-[#007A5E] shrink-0"></span>
-                        <div className="flex flex-col">
-                          <span className="font-bold text-[11.5px]">OB Owner</span>
-                          <span className="text-[9px] text-slate-400 font-normal">Extend/waive onboarding control view</span>
-                        </div>
-                      </div>
-                      {activeRole === "onboarder" && <Check className="h-4 w-4 text-[#007A5E] font-bold shrink-0" />}
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setActiveRoleContext("audit");
-                        setShowRoleDropdown(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-3.5 py-2 text-left hover:bg-slate-50/80 transition-colors ${
-                        activeRole === "audit" ? "text-[#0284C7] bg-sky-50/15" : "text-slate-700"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span className="h-2 w-2 rounded-full bg-[#0284C7] shrink-0"></span>
-                        <div className="flex flex-col">
-                          <span className="font-bold text-[11.5px]">Auditor</span>
-                          <span className="text-[9px] text-slate-400 font-normal">Audit download & export access view</span>
-                        </div>
-                      </div>
-                      {activeRole === "audit" && <Check className="h-4 w-4 text-[#0284C7] font-bold shrink-0" />}
-                    </button>
-                  </div>
-                </>
-              )}
+              <button 
+                onClick={toggleActiveRole}
+                className={`px-3 py-1 rounded-full font-bold uppercase transition-all text-[9.5px] ${
+                  activeRole === "audit" ? "bg-[#0052CC] text-white shadow-xs" : "text-[#0052CC] hover:bg-blue-50/50"
+                }`}
+              >
+                Audit Role
+              </button>
             </div>
 
             {/* Notification system routing logs trigger - moved to side near profile */}
@@ -592,14 +482,9 @@ export default function RecruiterDashboard() {
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-base font-extrabold text-slate-800">{activeCandidate?.name}</span>
-                        {(() => {
-                          const statusDisp = getCandidateOnboardingStatus(activeCandidate);
-                          return (
-                            <span className={`px-2.5 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider ${statusDisp.className}`}>
-                              {statusDisp.text}
-                            </span>
-                          );
-                        })()}
+                        <span className="px-2.5 py-0.5 bg-emerald-50 text-[#007A5E] border border-emerald-100 rounded-full text-[9.5px] font-bold uppercase tracking-wider">
+                          Active Onboarding
+                        </span>
                       </div>
                       <span className="text-xs text-slate-400 font-semibold block mt-0.5">
                         Candidate #: {activeCandidate?.candidateNo} • {activeCandidate?.jobTitle}
@@ -834,73 +719,22 @@ export default function RecruiterDashboard() {
                           </div>
                           <div className="flex items-center gap-3">
                             {/* Simulated Time Offset Control widget */}
-                            {/* Simulated Time Offset Control widget */}
-                            <div className="flex items-center gap-2 bg-[#EBF3FC] border border-[#DEEAF7] rounded-lg px-3 py-1.5 text-[11px] text-[#0052CC] relative">
-                              <Clock className="h-3.5 w-3.5 shrink-0 animate-pulse text-[#0052CC]" />
-                              
-                              <div className="flex items-center gap-1.5">
-                                <span className="font-extrabold select-none">Simulate: +{simulationOffsetDays} Days</span>
-                                
-                                {/* Info Icon explainer */}
-                                <div className="relative group/info flex items-center">
-                                  <Info className="h-3.5 w-3.5 text-slate-400 hover:text-[#0052CC] cursor-help" />
-                                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover/info:block bg-slate-800 text-white text-[9.5px] font-medium p-2.5 rounded-lg shadow-xl w-48 z-50 text-left leading-normal animate-dropdown-slide">
-                                    Simulates the passage of time to test how SLA milestones, warnings, and stuck step blockages respond.
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-1 border-l border-blue-200/50 pl-2 ml-1 min-h-[22px]">
-                                {pendingSimChange === null ? (
-                                  <>
-                                    <button 
-                                      onClick={(e) => { 
-                                        e.stopPropagation(); 
-                                        setPendingSimChange(-1); 
-                                      }}
-                                      disabled={simulationOffsetDays <= 0}
-                                      className="px-1.5 py-0.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-[10px] font-bold rounded transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
-                                      title="-1 Day"
-                                    >
-                                      -1d
-                                    </button>
-                                    <button 
-                                      onClick={(e) => { 
-                                        e.stopPropagation(); 
-                                        setPendingSimChange(1); 
-                                      }}
-                                      className="px-1.5 py-0.5 bg-[#0052CC] text-white hover:bg-[#0042A3] text-[10px] font-bold rounded transition-all cursor-pointer shadow-3xs"
-                                      title="+1 Day"
-                                    >
-                                      +1d
-                                    </button>
-                                  </>
-                                ) : (
-                                  <div className="flex items-center gap-1 text-[9.5px] font-black text-[#0052CC] animate-scale-in">
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        advanceSimulationTime(pendingSimChange);
-                                        setPendingSimChange(null);
-                                      }}
-                                      className="px-1.5 py-0.5 bg-[#007A5E] text-white hover:bg-[#005E48] font-bold rounded transition-colors cursor-pointer"
-                                      title={`Confirm ${pendingSimChange > 0 ? "+1" : "-1"} day?`}
-                                    >
-                                      ✓
-                                    </button>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setPendingSimChange(null);
-                                      }}
-                                      className="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 border border-[#DEEAF7] text-slate-655 font-bold rounded transition-colors cursor-pointer"
-                                      title="Cancel"
-                                    >
-                                      ✗
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
+                            <div className="flex items-center gap-2 bg-[#EBF3FC] border border-[#DEEAF7] rounded-lg px-3 py-1.5 text-[11px] text-[#0052CC]">
+                              <Clock className="h-3.5 w-3.5 animate-pulse" />
+                              <span className="font-bold">Simulated Time: +{simulationOffsetDays} Days</span>
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); advanceSimulationTime(1); }}
+                                className="ml-2 px-2.5 py-0.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold shadow-xs transition-all active:scale-95"
+                              >
+                                +1 Day
+                              </button>
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); advanceSimulationTime(-1); }}
+                                disabled={simulationOffsetDays <= 0}
+                                className="px-2.5 py-0.5 bg-slate-200 text-slate-500 rounded text-[10px] font-bold shadow-xs transition-all hover:bg-slate-300 disabled:opacity-50 disabled:pointer-events-none"
+                              >
+                                -1 Day
+                              </button>
                             </div>
 
                             <span className={`px-2 py-0.5 rounded text-[9.5px] font-bold uppercase ${
@@ -910,23 +744,6 @@ export default function RecruiterDashboard() {
                             </span>
                           </div>
                         </div>
-
-                        {/* Dynamic Stuck Onboarding step banner */}
-                        {activeCandidate?.stepStatus !== "completed" && activeCandidate?.stepStatus !== "terminated" && (() => {
-                          const activeStep = activeCandidate.onboardingSteps?.find(s => s.status !== "completed");
-                          const stepNum = activeStep ? activeStep.number : activeCandidate.currentStep;
-                          const stepName = activeStep ? activeStep.name : "Onboarding Step";
-                          const ageDays = 3 + simulationOffsetDays;
-                          return (
-                            <div className="bg-rose-50 border border-rose-100 rounded-xl p-4 flex items-center gap-3 text-rose-800 text-xs font-bold my-2 shadow-2xs">
-                              <AlertCircle className="h-5 w-5 text-rose-600 shrink-0 animate-bounce" />
-                              <div>
-                                <span className="block text-rose-700 uppercase tracking-wider text-[9px] font-black">Action Required: Candidate is currently blocked</span>
-                                <span className="text-[13px] font-black block mt-0.5">Stuck at Step {stepNum}: {stepName} — {ageDays} days</span>
-                              </div>
-                            </div>
-                          );
-                        })()}
 
                         {/* Horizontal Timeline Track */}
                         <div className="grid grid-cols-1 md:grid-cols-7 gap-3 pt-2">
@@ -1741,17 +1558,19 @@ export default function RecruiterDashboard() {
                         <th className="p-4">MSP</th>
                         <th className="p-4">State</th>
                         <th className="p-4">Start Date</th>
+                        <th className="p-4">SLA Status</th>
+                        <th className="p-4 text-right pr-6">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 bg-white font-semibold text-slate-655">
                       {filteredCandidates.map((cand) => {
                         const isBreached = cand.slaStatus === "breached";
-                        const statusDisp = getCandidateOnboardingStatus(cand);
+                        const hasAnomaly = !!cand.anomalyAlert;
                         
                         return (
                           <React.Fragment key={cand.id}>
                             <tr 
-                              className={`transition-colors cursor-pointer ${isBreached ? "bg-rose-50/10 hover:bg-rose-50/20 border-l-4 border-rose-500 text-rose-700" : "hover:bg-slate-50/50"}`}
+                              className={`transition-colors cursor-pointer ${isBreached ? "bg-rose-50/20 hover:bg-rose-50/40 border-l-4 border-rose-500 text-rose-700" : "hover:bg-slate-50/50"}`}
                               onClick={() => {
                                 setSelectedCandidateId(cand.id);
                                 setInspectorTab("dashboard");
@@ -1763,14 +1582,42 @@ export default function RecruiterDashboard() {
                                     {cand.name.substring(0, 2)}
                                   </div>
                                   <div>
-                                    <span className={`font-extrabold block hover:text-[#007A5E] ${isBreached ? "text-[#0F172A] font-black" : "text-slate-800"}`}>{cand.name}</span>
+                                    <div className="flex items-center">
+                                      <span className={`font-extrabold block hover:text-[#007A5E] ${isBreached ? "text-rose-700 font-black" : "text-slate-800"}`}>{cand.name}</span>
+                                      {anomalies.filter(a => a.candidateId === cand.id && (a.status === "open" || a.status === "in_review")).length > 0 && (() => {
+                                        const count = anomalies.filter(a => a.candidateId === cand.id && (a.status === "open" || a.status === "in_review")).length;
+                                        const isHard = anomalies.some(a => a.candidateId === cand.id && a.severity === "hard-block" && (a.status === "open" || a.status === "in_review"));
+                                        return (
+                                          <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ml-2 border ${
+                                            isHard ? "bg-rose-50 text-rose-600 border-rose-200 animate-pulse" : "bg-amber-50 text-amber-600 border-amber-200"
+                                          }`}>
+                                            ⚠️ {count} {isHard ? "Blocked" : "Flagged"}
+                                          </span>
+                                        );
+                                      })()}
+                                    </div>
                                     <span className={`text-[10px] block ${isBreached ? "text-rose-600/70" : "text-slate-455"}`}>Candidate #: {cand.candidateNo} • {cand.jobTitle}</span>
                                   </div>
                                 </div>
                               </td>
                               <td className="p-4">
-                                <span className={`px-2.5 py-0.5 rounded text-[9.5px] uppercase ${statusDisp.className}`}>
-                                  {statusDisp.text}
+                                <span className={`px-2.5 py-0.5 rounded-full text-[9.5px] font-bold uppercase ${
+                                  cand.stepStatus === "completed" 
+                                    ? "bg-emerald-50 text-emerald-600 border border-emerald-100" 
+                                    : cand.stepStatus === "stuck"
+                                    ? "bg-rose-50 text-rose-600 border border-rose-100"
+                                    : cand.stepStatus === "terminated"
+                                    ? "bg-rose-100 text-rose-700 border border-rose-205"
+                                    : "bg-blue-50 text-blue-600 border border-blue-100"
+                                }`}>
+                                  {cand.stepStatus === "completed" 
+                                    ? "Employee Created" 
+                                    : cand.stepStatus === "stuck"
+                                    ? "Stuck Onboarding"
+                                    : cand.stepStatus === "terminated"
+                                    ? "OB Terminated"
+                                    : "Active Onboarding"
+                                  }
                                 </span>
                               </td>
                               <td className="p-4">
@@ -1789,8 +1636,51 @@ export default function RecruiterDashboard() {
                               <td className="p-4 text-slate-800">{cand.clientName}</td>
                               <td className="p-4 text-slate-400">{cand.mspName}</td>
                               <td className="p-4">{cand.stateCode}</td>
-                              <td className="p-4 text-slate-855">{cand.startDate}</td>
+                              <td className="p-4 text-slate-805">{cand.startDate}</td>
+                              <td className="p-4">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setExpandedCandidateId(expandedCandidateId === cand.id ? null : cand.id);
+                                  }}
+                                  className={`px-2.5 py-1 rounded-full text-[9.5px] font-bold uppercase tracking-wide flex items-center gap-1 transition-all ${
+                                    isBreached 
+                                      ? "bg-rose-100 hover:bg-rose-200 text-rose-600 border border-rose-200 animate-pulse" 
+                                      : "bg-emerald-50 hover:bg-emerald-100 text-[#007A5E] border border-emerald-100"
+                                  }`}
+                                >
+                                  {isBreached ? "⚠️ SLA Breached" : "SLA Active"}
+                                  <ChevronDown className={`h-3 w-3 shrink-0 transition-transform ${expandedCandidateId === cand.id ? "rotate-180" : ""}`} />
+                                </button>
+                              </td>
+                              <td className="p-4 text-right pr-6">
+                                <button className="p-1.5 hover:bg-slate-100 rounded transition-colors text-slate-400">
+                                  <Eye className="h-4.5 w-4.5" />
+                                </button>
+                              </td>
                             </tr>
+                            {expandedCandidateId === cand.id && (
+                              <tr className="bg-rose-50/20 text-xs">
+                                <td colSpan={9} className="p-4 pl-12 border-t border-rose-100/30 text-rose-700">
+                                  <div className="space-y-2 text-left">
+                                    <div className="flex items-center gap-2 font-bold text-rose-650">
+                                      <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
+                                      <span>SLA Status Warning: {cand.slaBreachDetails || "General compliance delay detected."}</span>
+                                    </div>
+                                    {cand.onboardingSteps && cand.onboardingSteps.length > 0 && (
+                                      <div className="flex flex-wrap gap-2.5 font-bold text-slate-500 mt-1 pl-6">
+                                        <span>Missing compliance checks:</span>
+                                        {cand.onboardingSteps.filter(s => s.status !== "completed").map(s => (
+                                          <span key={s.number} className="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-[10px]">
+                                            {s.name} ({s.status === "stuck" ? "Stuck" : "Pending"})
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
                           </React.Fragment>
                         );
                       })}
@@ -2043,7 +1933,7 @@ export default function RecruiterDashboard() {
 
             </div>
           ) : currentView === "sla-config" ? (
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm space-y-4 text-left p-6 overflow-visible">
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm space-y-4 text-left p-6">
               <div>
                 <h1 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                   <Clock className="h-5 w-5 text-[#007A5E]" />
@@ -2063,7 +1953,7 @@ export default function RecruiterDashboard() {
                 </div>
               </div>
 
-              <div className="border border-slate-100 rounded-xl overflow-visible">
+              <div className="overflow-x-auto border border-slate-100 rounded-xl">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
                     <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
@@ -2154,66 +2044,20 @@ export default function RecruiterDashboard() {
                           </div>
                         </td>
                         <td className="p-4">
-                          {(() => {
-                            const targets = Array.isArray(config.escalationTarget) 
-                              ? config.escalationTarget 
-                              : typeof config.escalationTarget === "string" && config.escalationTarget
-                              ? [
-                                  config.escalationTarget === "recruiter" ? "Recruiter" :
-                                  config.escalationTarget === "team lead" ? "Team Lead" :
-                                  config.escalationTarget === "manager" ? "OB Manager" : config.escalationTarget
-                                ]
-                              : ["Recruiter"];
-                              
-                            const options = [
-                              "Recruiter",
-                              "Team Lead",
-                              "OB Manager",
-                              "Delivery Manager",
-                              "OB Owner"
-                            ];
-                            
-                            return (
-                              <div className="relative inline-block text-left group">
-                                <button className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-700 font-semibold text-[11px] hover:bg-slate-50 flex items-center justify-between gap-1.5 min-w-[125px] cursor-pointer shadow-3xs">
-                                  <span className="truncate max-w-[90px] text-left">
-                                    {targets.join(", ") || "Select Targets"}
-                                  </span>
-                                  <ChevronDown className="h-3.5 w-3.5 shrink-0 text-slate-400" />
-                                </button>
-                                
-                                <div className="absolute right-0 top-full mt-1 z-40 hidden group-hover:block bg-white border border-slate-200 rounded-xl shadow-xl p-2.5 space-y-1.5 min-w-[170px] text-left animate-scale-in">
-                                  <div className="text-[9px] font-black text-slate-400 uppercase tracking-wider pb-1 border-b border-slate-100 mb-1 select-none">
-                                    Escalation Targets
-                                  </div>
-                                  {options.map((opt) => {
-                                    const checked = targets.includes(opt);
-                                    return (
-                                      <label key={opt} className="flex items-center gap-2 text-[10.5px] text-slate-700 font-bold hover:bg-slate-50 p-1.5 rounded-lg cursor-pointer select-none transition-colors">
-                                        <input
-                                          type="checkbox"
-                                          checked={checked}
-                                          onChange={(e) => {
-                                            let nextTargets = [...targets];
-                                            if (e.target.checked) {
-                                              if (!nextTargets.includes(opt)) nextTargets.push(opt);
-                                            } else {
-                                              nextTargets = nextTargets.filter(t => t !== opt);
-                                            }
-                                            const next = [...slaSettings];
-                                            next[index] = { ...config, escalationTarget: nextTargets };
-                                            updateSlaConfig(next);
-                                          }}
-                                          className="rounded border-slate-300 text-[#007A5E] focus:ring-0 h-3.5 w-3.5"
-                                        />
-                                        {opt}
-                                      </label>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            );
-                          })()}
+                          <select
+                            value={config.escalationTarget}
+                            onChange={(e) => {
+                              const target = e.target.value as any;
+                              const next = [...slaSettings];
+                              next[index] = { ...config, escalationTarget: target };
+                              updateSlaConfig(next);
+                            }}
+                            className="px-2 py-1 border border-slate-200 rounded font-semibold text-slate-750"
+                          >
+                            <option value="recruiter">Recruiter</option>
+                            <option value="team lead">Team Lead</option>
+                            <option value="manager">Manager</option>
+                          </select>
                         </td>
                       </tr>
                     ))}
@@ -2224,13 +2068,13 @@ export default function RecruiterDashboard() {
                 <button 
                   onClick={() => {
                     updateSlaConfig([
-                      { stepNumber: 1, stepName: "Application", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Recruiter"] },
-                      { stepNumber: 2, stepName: "Screening", durationValue: 2, durationUnit: "days", owner: "vendor", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Team Lead"] },
-                      { stepNumber: 3, stepName: "Credentialing", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
-                      { stepNumber: 4, stepName: "Interview", durationValue: 2, durationUnit: "days", owner: "recruiter", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Team Lead"] },
-                      { stepNumber: 5, stepName: "Contract", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
-                      { stepNumber: 6, stepName: "Compliance", durationValue: 4, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
-                      { stepNumber: 7, stepName: "Ready", durationValue: 1, durationUnit: "days", owner: "onboarder", reminderLeadTime: 6, reminderLeadUnit: "hours", escalationTarget: ["Recruiter"] }
+                      { stepNumber: 1, stepName: "Application", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: "recruiter" },
+                      { stepNumber: 2, stepName: "Screening", durationValue: 2, durationUnit: "days", owner: "vendor", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "team lead" },
+                      { stepNumber: 3, stepName: "Credentialing", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
+                      { stepNumber: 4, stepName: "Interview", durationValue: 2, durationUnit: "days", owner: "recruiter", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: "team lead" },
+                      { stepNumber: 5, stepName: "Contract", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
+                      { stepNumber: 6, stepName: "Compliance", durationValue: 4, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
+                      { stepNumber: 7, stepName: "Ready", durationValue: 1, durationUnit: "days", owner: "onboarder", reminderLeadTime: 6, reminderLeadUnit: "hours", escalationTarget: "recruiter" }
                     ]);
                     alert("Reset to default SLA configurations successfully.");
                   }}

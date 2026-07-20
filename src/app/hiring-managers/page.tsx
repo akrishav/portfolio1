@@ -42,7 +42,7 @@ export default function HiringManagersPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
             {/* Recruiter Card */}
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center space-y-4">
               <div className="h-12 w-12 rounded-xl bg-[#EBF3FC] flex items-center justify-center text-[#0052CC]">
@@ -53,7 +53,7 @@ export default function HiringManagersPage() {
                 <p className="text-xs text-slate-400">Manage candidates, compliance checklists, and job matching.</p>
               </div>
               <Link 
-                href="/recruiter?userRole=recruiter"
+                href="/recruiter?role=recruiter"
                 className="w-full py-2.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all text-center"
               >
                 Access Recruiter Portal
@@ -70,27 +70,10 @@ export default function HiringManagersPage() {
                 <p className="text-xs text-slate-400">Review credential compliance, SLA monitoring, and background checks.</p>
               </div>
               <Link 
-                href="/recruiter?userRole=onboarder"
+                href="/recruiter?role=onboarder"
                 className="w-full py-2.5 bg-[#007A5E] hover:bg-[#005E48] text-white text-xs font-bold rounded-lg transition-all text-center"
               >
                 Access On-boarder Portal
-              </Link>
-            </div>
-
-            {/* Compliance Auditor Card */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center space-y-4">
-              <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-700 border border-indigo-100">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 11 2 2 4-4"/></svg>
-              </div>
-              <div className="space-y-1 text-center">
-                <h3 className="text-sm font-bold text-slate-900">Compliance Auditor</h3>
-                <p className="text-xs text-slate-400">Review document verification overrides, security logs, and compliance logs.</p>
-              </div>
-              <Link 
-                href="/recruiter?userRole=audit"
-                className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-all text-center animate-fade-in"
-              >
-                Access Auditor Portal
               </Link>
             </div>
           </div>
