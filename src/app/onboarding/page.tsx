@@ -135,7 +135,7 @@ export default function OnboardingPage() {
 
         {/* Header matching Image 2 */}
         <header className="bg-white border-b border-slate-100 shadow-sm sticky top-0 z-40">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <img
                 src="/staffhc-logo.png"
@@ -303,7 +303,7 @@ export default function OnboardingPage() {
       <main className="min-h-screen bg-[#F4F6FC] text-[#1E293B] flex flex-col font-sans antialiased">
         <DemoNavbar />
         <header className="bg-white border-b border-slate-100 shadow-sm sticky top-0 z-40">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <img
                 src="/staffhc-logo.png"
@@ -364,7 +364,7 @@ export default function OnboardingPage() {
 
       {/* Corporate Dashboard Header */}
       <header className="bg-white border-b border-slate-100 shadow-sm z-30 shrink-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
               src="/staffhc-logo.png"
@@ -504,7 +504,7 @@ export default function OnboardingPage() {
 
           {/* Main dashboard content area split into sidebar, middle, and right columns */}
           {activeHeaderTab === "dashboard" ? (
-            <div className="grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8 items-start">
+            <div className="grow max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8 items-start">
               
               {/* COLUMN 1: LEFT SIDEBAR (Always visible on large screens) */}
               <aside className="w-full lg:w-60 bg-white border border-slate-200 rounded-2xl p-6 lg:flex flex-col h-[560px] shadow-sm justify-between shrink-0 hidden">
@@ -634,51 +634,112 @@ export default function OnboardingPage() {
                   )}
                 </div>
 
-                {/* Horizontal Timeline */}
-                <div className="relative pt-6 pb-2">
-                  {/* Connected background bar line (Horizontal center of circles) */}
-                  <div className="absolute top-[32px] left-[6%] right-[6%] h-[3px] bg-slate-100 -z-0"></div>
-                  {/* Connected blue progress bar line */}
-                  <div 
-                    className="absolute top-[32px] left-[6%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
-                    style={{
-                      width: `${(((candidate?.onboardingSteps?.filter(s => s.status === "completed")?.length || 1) - 0.5) / 6) * 88}%`
-                    }}
-                  ></div>
+                {/* Two-Row Timeline */}
+                <div className="space-y-12 pt-4 pb-4 px-12">
+                  {/* Row 1: Steps 1-7 */}
+                  <div className="relative h-8 pb-10">
+                    <div className="flex justify-between items-center w-full h-8 relative z-10">
+                      {candidate?.onboardingSteps?.slice(0, 7)?.map((step, index) => {
+                        const isDone = step.status === "completed";
+                        const isActive = step.number === candidate?.currentStep;
+                        const isStuck = step.status === "stuck";
 
-                  <div className="flex justify-between items-start relative z-10">
-                    {candidate?.onboardingSteps?.map((step) => {
-                      const isDone = step.status === "completed";
-                      const isActive = step.number === candidate?.currentStep;
+                        return (
+                          <React.Fragment key={step.number}>
+                            {/* Circle Node */}
+                            <div className="w-8 h-8 flex items-center justify-center shrink-0 relative">
+                              <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
+                                isDone 
+                                  ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10" 
+                                  : isActive
+                                  ? isStuck
+                                    ? "bg-rose-500 border-rose-500 text-white animate-pulse"
+                                    : "bg-white border-2 border-[#0052CC] text-[#0052CC] ring-4 ring-[#0052CC]/15"
+                                  : "bg-slate-100 border-slate-200 text-slate-400"
+                              }`}>
+                                {isDone ? (
+                                  <Check className="h-4 w-4 stroke-[3px]" />
+                                ) : (
+                                  step.number
+                                )}
+                              </div>
 
-                      return (
-                        <div key={step.number} className="flex flex-col items-center text-center w-[12%]">
-                          {/* Circle Node */}
-                          <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
-                            isDone 
-                              ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10" 
-                              : isActive
-                              ? "bg-white border-2 border-[#0052CC] text-[#0052CC] ring-4 ring-[#0052CC]/15"
-                              : "bg-slate-100 border-slate-200 text-slate-400"
-                          }`}>
-                            {isDone ? (
-                              <Check className="h-4 w-4 stroke-[3px]" />
-                            ) : step.number === 7 ? (
-                              <span className="text-[10px]">🏁</span>
-                            ) : (
-                              step.number
+                              {/* Label aligned directly under circle */}
+                              <div className="absolute top-10 left-1/2 -translate-x-1/2 text-center w-24">
+                                <span className={`text-[10px] font-bold block truncate max-w-full leading-tight ${
+                                  isActive ? "text-[#0052CC] font-extrabold" : "text-slate-500"
+                                }`}>
+                                  {step.name}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Connecting Line segment */}
+                            {index < 6 && (
+                              <div className="grow h-[3px] bg-slate-100 mx-1">
+                                <div className={`h-full bg-[#0052CC] transition-all duration-300 ${
+                                  isDone && candidate?.onboardingSteps[index + 1]?.status !== "pending" ? "w-full" : "w-0"
+                                }`}></div>
+                              </div>
                             )}
-                          </div>
-                          
-                          {/* Step Name */}
-                          <span className={`text-[10.5px] mt-2.5 font-bold block truncate max-w-full ${
-                            isActive ? "text-[#0052CC] font-extrabold" : "text-slate-450"
-                          }`}>
-                            {step.name}
-                          </span>
-                        </div>
-                      );
-                    })}
+                          </React.Fragment>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Row 2: Steps 8-13 */}
+                  <div className="relative h-8 pb-10">
+                    <div className="flex justify-between items-center w-full h-8 relative z-10">
+                      {candidate?.onboardingSteps?.slice(7)?.map((step, index) => {
+                        const isDone = step.status === "completed";
+                        const isActive = step.number === candidate?.currentStep;
+                        const isStuck = step.status === "stuck";
+
+                        return (
+                          <React.Fragment key={step.number}>
+                            {/* Circle Node */}
+                            <div className="w-8 h-8 flex items-center justify-center shrink-0 relative">
+                              <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
+                                isDone 
+                                  ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10" 
+                                  : isActive
+                                  ? isStuck
+                                    ? "bg-rose-500 border-rose-500 text-white animate-pulse"
+                                    : "bg-white border-2 border-[#0052CC] text-[#0052CC] ring-4 ring-[#0052CC]/15"
+                                  : "bg-slate-100 border-slate-200 text-slate-400"
+                              }`}>
+                                {isDone ? (
+                                  <Check className="h-4 w-4 stroke-[3px]" />
+                                ) : step.number === 13 ? (
+                                  <span className="text-[10px]">🏁</span>
+                                ) : (
+                                  step.number
+                                )}
+                              </div>
+
+                              {/* Label aligned directly under circle */}
+                              <div className="absolute top-10 left-1/2 -translate-x-1/2 text-center w-24">
+                                <span className={`text-[10px] font-bold block truncate max-w-full leading-tight ${
+                                  isActive ? "text-[#0052CC] font-extrabold" : "text-slate-500"
+                                }`}>
+                                  {step.name}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Connecting Line segment */}
+                            {index < 5 && (
+                              <div className="grow h-[3px] bg-slate-100 mx-1">
+                                <div className={`h-full bg-[#0052CC] transition-all duration-300 ${
+                                  isDone && candidate?.onboardingSteps[index + 8]?.status !== "pending" ? "w-full" : "w-0"
+                                }`}></div>
+                              </div>
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 
@@ -1104,7 +1165,7 @@ export default function OnboardingPage() {
         </aside>
       </div>
       ) : (
-        <div className="grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8 items-start">
+        <div className="grow max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8 items-start">
           
           {/* Stepper column */}
           <section className="flex-1 space-y-6 w-full text-left">
@@ -1114,7 +1175,7 @@ export default function OnboardingPage() {
                 Onboarding Portal
               </h1>
               <p className="text-xs text-slate-400 font-medium">
-                Complete the 7-step compliance checks below to start your shift.
+                Complete the 13-step compliance checks below to start your shift.
               </p>
             </div>
 
@@ -1138,46 +1199,106 @@ export default function OnboardingPage() {
                 )}
               </div>
 
-              {/* Horizontal Timeline Circles */}
-              <div className="relative pt-6 pb-2">
-                {/* Progress bar line */}
-                <div className="absolute top-1/2 left-[6%] right-[6%] h-1 bg-slate-100 -translate-y-1/2 rounded z-0"></div>
-                <div 
-                  className="absolute top-1/2 left-[6%] h-1 bg-[#0052CC] -translate-y-1/2 rounded z-0 transition-all duration-500"
-                  style={{
-                    width: `${((candidate?.onboardingSteps.filter(s => s.status === "completed").length - 0.5) / 6) * 88}%`
-                  }}
-                ></div>
+              {/* Two-Row Timeline */}
+              <div className="space-y-12 pt-4 pb-4 px-12">
+                {/* Row 1: Steps 1-7 */}
+                <div className="relative h-8 pb-10">
+                  <div className="flex justify-between items-center w-full h-8 relative z-10 px-1">
+                    {candidate?.onboardingSteps?.slice(0, 7)?.map((step, index) => {
+                      const isCompleted = step.status === "completed";
+                      const isInProgress = step.status === "in_progress";
+                      const isStuck = step.status === "stuck";
 
-                <div className="relative z-10 flex justify-between items-center px-1">
-                  {candidate?.onboardingSteps.map((step) => {
-                    const isCompleted = step.status === "completed";
-                    const isInProgress = step.status === "in_progress";
-                    const isStuck = step.status === "stuck";
-                    
-                    return (
-                      <div key={step.number} className="flex flex-col items-center gap-2">
-                        <button 
-                          className={`h-8 w-8 rounded-full border-2 flex items-center justify-center font-bold text-xs transition-all ${
-                            isCompleted 
-                              ? "bg-[#0052CC] border-[#0052CC] text-white" 
-                              : isInProgress
-                              ? "bg-white border-[#0052CC] text-[#0052CC]"
-                              : isStuck
-                              ? "bg-red-500 border-red-500 text-white animate-pulse"
-                              : "bg-white border-slate-200 text-slate-400"
-                          }`}
-                        >
-                          {isCompleted ? <Check className="h-4 w-4" /> : step.number}
-                        </button>
-                        <span className={`text-[10px] font-bold ${
-                          isCompleted || isInProgress || isStuck ? "text-slate-800" : "text-slate-400"
-                        }`}>
-                          {step.name}
-                        </span>
-                      </div>
-                    );
-                  })}
+                      return (
+                        <React.Fragment key={step.number}>
+                          {/* Circle Node */}
+                          <div className="w-8 h-8 flex items-center justify-center shrink-0 relative">
+                            <button 
+                              className={`h-8 w-8 rounded-full border-2 flex items-center justify-center font-bold text-xs transition-all ${
+                                isCompleted 
+                                  ? "bg-[#0052CC] border-[#0052CC] text-white" 
+                                  : isInProgress
+                                  ? "bg-white border-[#0052CC] text-[#0052CC]"
+                                  : isStuck
+                                  ? "bg-red-500 border-red-500 text-white animate-pulse"
+                                  : "bg-white border-slate-200 text-slate-400"
+                              }`}
+                            >
+                              {isCompleted ? <Check className="h-4 w-4" /> : step.number}
+                            </button>
+
+                            {/* Label aligned directly under circle */}
+                            <div className="absolute top-10 left-1/2 -translate-x-1/2 text-center w-24">
+                              <span className={`text-[10px] font-bold block truncate max-w-full leading-tight text-center ${
+                                isCompleted || isInProgress || isStuck ? "text-slate-850 font-extrabold" : "text-slate-400"
+                              }`}>
+                                {step.name}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Connecting Line segment */}
+                          {index < 6 && (
+                            <div className="grow h-[3px] bg-slate-100 mx-1">
+                              <div className={`h-full bg-[#0052CC] transition-all duration-300 ${
+                                isCompleted && candidate?.onboardingSteps[index + 1]?.status !== "pending" ? "w-full" : "w-0"
+                              }`}></div>
+                            </div>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Row 2: Steps 8-13 */}
+                <div className="relative h-8 pb-10">
+                  <div className="flex justify-between items-center w-full h-8 relative z-10 px-1">
+                    {candidate?.onboardingSteps?.slice(7)?.map((step, index) => {
+                      const isCompleted = step.status === "completed";
+                      const isInProgress = step.status === "in_progress";
+                      const isStuck = step.status === "stuck";
+
+                      return (
+                        <React.Fragment key={step.number}>
+                          {/* Circle Node */}
+                          <div className="w-8 h-8 flex items-center justify-center shrink-0 relative">
+                            <button 
+                              className={`h-8 w-8 rounded-full border-2 flex items-center justify-center font-bold text-xs transition-all ${
+                                isCompleted 
+                                  ? "bg-[#0052CC] border-[#0052CC] text-white" 
+                                  : isInProgress
+                                  ? "bg-white border-[#0052CC] text-[#0052CC]"
+                                  : isStuck
+                                  ? "bg-red-500 border-red-500 text-white animate-pulse"
+                                  : "bg-white border-slate-200 text-slate-400"
+                              }`}
+                            >
+                              {isCompleted ? <Check className="h-4 w-4" /> : step.number === 13 ? "🏁" : step.number}
+                            </button>
+
+                            {/* Label aligned directly under circle */}
+                            <div className="absolute top-10 left-1/2 -translate-x-1/2 text-center w-24">
+                              <span className={`text-[10px] font-bold block truncate max-w-full leading-tight text-center ${
+                                isCompleted || isInProgress || isStuck ? "text-slate-850 font-extrabold" : "text-slate-400"
+                              }`}>
+                                {step.name}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Connecting Line segment */}
+                          {index < 5 && (
+                            <div className="grow h-[3px] bg-slate-100 mx-1">
+                              <div className={`h-full bg-[#0052CC] transition-all duration-300 ${
+                                isCompleted && candidate?.onboardingSteps[index + 8]?.status !== "pending" ? "w-full" : "w-0"
+                              }`}></div>
+                            </div>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1388,7 +1509,7 @@ export default function OnboardingPage() {
 
       {/* Footer */}
       <footer className="bg-slate-55 border-t border-slate-200 shrink-0 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-455 font-medium">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-455 font-medium">
           <div>
             © 2026 Staff HC INC. All rights reserved.
           </div>

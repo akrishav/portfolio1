@@ -103,7 +103,7 @@ export interface SlaStepConfig {
   owner: "candidate" | "recruiter" | "onboarder" | "vendor";
   reminderLeadTime: number;
   reminderLeadUnit: "hours" | "days";
-  escalationTarget: "recruiter" | "team lead" | "manager";
+  escalationTarget: string[];
 }
 
 export interface SlaAuditLog {
@@ -130,7 +130,7 @@ export interface AnomalyRecord {
   title: string;
   description: string;
   severity: "hard-block" | "soft-flag" | "warning";
-  status: "open" | "in_review" | "resolved" | "waived" | "false_positive";
+  status: "open" | "resolved" | "closed";
   stepNumber: number;
   readStatus: "readable" | "unreadable" | "uncertain";
   fieldComparisons?: FieldComparison[];
@@ -141,9 +141,16 @@ export interface AnomalyRecord {
 export interface AnomalyAuditLog {
   id: string;
   candidateId: string;
+  anomalyId: string;
+  previousState: string;
+  newState: string;
+  actor: string;
+  timestamp: string;
+  reason?: string;
+  
+  // Backward compatibility / UI Helpers
   action: string;
   details: string;
-  timestamp: string;
   operator: string;
 }
 
@@ -156,7 +163,7 @@ interface OnboardingContextType {
   slaSettings: SlaStepConfig[];
   simulationOffsetDays: number;
   slaAuditLogs: SlaAuditLog[];
-  activeRole: "recruiter" | "audit";
+  activeRole: "recruiter" | "onboarder" | "audit";
   anomalies: AnomalyRecord[];
   anomalyAuditLogs: AnomalyAuditLog[];
   login: (email: string, role: "candidate" | "recruiter") => boolean;
@@ -172,6 +179,7 @@ interface OnboardingContextType {
   advanceSimulationTime: (days: number) => void;
   applySlaWaiver: (candidateId: string, stepNumber: number, reason: string, operator: string) => void;
   toggleActiveRole: () => void;
+  setActiveRoleContext: (role: "recruiter" | "onboarder" | "audit") => void;
   updateAnomalyStatus: (id: string, nextStatus: AnomalyRecord["status"], reason?: string) => void;
   triggerMockAnomaly: (candidateId: string, type: AnomalyRecord["type"]) => void;
   transferToClient: (candidateId: string) => { success: boolean; error?: string };
@@ -179,22 +187,19 @@ interface OnboardingContextType {
 }
 
 const defaultSteps = (): OnboardingStep[] => [
-  { number: 1, name: "Application", description: "Submit application form", status: "completed", uploadedFiles: [], startedAt: "2026-07-04 09:00 AM" },
-  { number: 2, name: "Screening", description: "Clinical background check", status: "completed", uploadedFiles: [], startedAt: "2026-07-05 10:00 AM" },
-  {
-    number: 3,
-    name: "Credentialing",
-    description: "Verify licenses and certifications",
-    status: "stuck",
-    actionRequiredText: "Missing or expired license file.",
-    actionType: "upload",
-    uploadedFiles: [],
-    startedAt: "2026-07-06 09:00 AM"
-  },
-  { number: 4, name: "Interview", description: "Clinical specialist interview", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 11:00 AM" },
-  { number: 5, name: "Contract", description: "Placement agreement contract", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 01:00 PM" },
-  { number: 6, name: "Compliance", description: "Facility compliance modules", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 02:00 PM" },
-  { number: 7, name: "Ready", description: "Final onboarding sign-off", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 04:00 PM" }
+  { number: 1, name: "Personal Details", description: "Provide legal name and contact details", status: "completed", uploadedFiles: [], startedAt: "2026-07-04 09:00 AM" },
+  { number: 2, name: "Addresses", description: "Current and historical residential addresses", status: "completed", uploadedFiles: [], startedAt: "2026-07-05 10:00 AM" },
+  { number: 3, name: "Equal Employment", description: "EEO self-identification and declarations", status: "completed", uploadedFiles: [], startedAt: "2026-07-06 09:00 AM" },
+  { number: 4, name: "Emergency Contact", description: "Primary and secondary emergency contacts", status: "completed", uploadedFiles: [], startedAt: "2026-07-06 10:30 AM" },
+  { number: 5, name: "Onboarding", description: "Core profile initiation", status: "completed", uploadedFiles: [], startedAt: "2026-07-06 11:30 AM" },
+  { number: 6, name: "Benefits", description: "Health insurance and 401K enrollment selection", status: "completed", uploadedFiles: [], startedAt: "2026-07-06 01:00 PM" },
+  { number: 7, name: "I-9 Eligibility", description: "Employment eligibility verification documentation", status: "completed", uploadedFiles: [], startedAt: "2026-07-07 09:00 AM" },
+  { number: 8, name: "Acknowledgments", description: "Company policy and handbook sign-off", status: "completed", uploadedFiles: [], startedAt: "2026-07-07 02:00 PM" },
+  { number: 9, name: "W-4 Withholding", description: "Federal income tax withholding forms", status: "in_progress", uploadedFiles: [], startedAt: "2026-07-08 09:00 AM" },
+  { number: 10, name: "State Withholding", description: "State-specific tax withholding certificates", status: "pending", uploadedFiles: [], startedAt: "2026-07-08 11:00 AM" },
+  { number: 11, name: "Method of Payment", description: "Direct deposit authorization details", status: "pending", uploadedFiles: [], startedAt: "2026-07-08 01:00 PM" },
+  { number: 12, name: "Education Details — Optional (not required to submit)", description: "Academic degrees and credentials", status: "pending", uploadedFiles: [], startedAt: "2026-07-08 02:00 PM", isOptional: true },
+  { number: 13, name: "Previous Employers — Optional", description: "Work history verification references", status: "pending", uploadedFiles: [], startedAt: "2026-07-08 03:00 PM", isOptional: true }
 ];
 
 const initialCandidates = (): Candidate[] => [
@@ -218,13 +223,17 @@ const initialCandidates = (): Candidate[] => [
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R",
     slaStatus: "active",
-    currentStep: 3,
+    currentStep: 9,
     stepStatus: "stuck",
-    stuckReason: "Upload Professional Nursing License",
-    stuckExplanation: "Missing or expired license file. Please upload a valid Professional Nursing License.",
-    onboardingSteps: defaultSteps(),
+    stuckReason: "Complete Form W-4 Withholding",
+    stuckExplanation: "Simulation shows Mani has not completed Form W-4 Withholding. Please complete and upload PDF to resolve.",
+    onboardingSteps: defaultSteps().map((s, idx) => {
+      if (idx < 8) return { ...s, status: "completed" as const };
+      if (idx === 8) return { ...s, status: "stuck" as const };
+      return s;
+    }),
     erpDocuments: [
-      { name: "Professional Nursing License", fileName: "-", submissionStatus: "Pending", approvalStatus: "Waiting" },
+      { name: "Professional Nursing License", fileName: "Nursing_License_Mani.pdf", submissionStatus: "Completed", approvalStatus: "Approved" },
       { name: "Immunization Records", fileName: "-", submissionStatus: "Pending", approvalStatus: "Waiting" },
       { name: "Background Check Consent", fileName: "Background_Consent_Signed.pdf", submissionStatus: "Completed", approvalStatus: "Submitted" }
     ],
@@ -257,12 +266,13 @@ const initialCandidates = (): Candidate[] => [
     initiatedBy: "Bindhu R (Jul 08, 2026 07:13)",
     slaStatus: "breached",
     slaBreachDetails: "Drug screening voucher expired — background check checkmark blocked for 5 days.",
-    currentStep: 3,
+    currentStep: 9,
     stepStatus: "in_progress",
-    onboardingSteps: defaultSteps().map((s, idx) => ({
-      ...s,
-      status: idx < 2 ? "completed" as const : idx === 2 ? "in_progress" : "pending"
-    })),
+    onboardingSteps: defaultSteps().map((s, idx) => {
+      if (idx < 8) return { ...s, status: "completed" as const };
+      if (idx === 8) return { ...s, status: "in_progress" as const };
+      return s;
+    }),
     erpDocuments: [
       { name: "401K Benefit", fileName: "401K_Benefit.pdf", submissionStatus: "Completed", approvalStatus: "Submitted" },
       { name: "Annual Evaluation", fileName: "-", submissionStatus: "Pending", approvalStatus: "Waiting" },
@@ -306,11 +316,15 @@ const initialCandidates = (): Candidate[] => [
     initiatedBy: "Bindhu R",
     slaStatus: "active",
     anomalyAlert: "Signatures mismatch: FCRA form name differs from profile name 'Tiffany Vance'.",
-    currentStep: 3,
+    currentStep: 7,
     stepStatus: "stuck",
-    stuckReason: "Missing Background Authorization Form",
-    stuckExplanation: "Background verification cannot begin without a signed FCRA Consent form.",
-    onboardingSteps: defaultSteps(),
+    stuckReason: "Complete I-9 Eligibility",
+    stuckExplanation: "I-9 eligibility documents are missing. Please upload verified documentation.",
+    onboardingSteps: defaultSteps().map((s, idx) => {
+      if (idx < 6) return { ...s, status: "completed" as const };
+      if (idx === 6) return { ...s, status: "stuck" as const };
+      return s;
+    }),
     erpDocuments: [
       { name: "Background Check Consent", fileName: "-", submissionStatus: "Pending", approvalStatus: "Waiting" }
     ],
@@ -340,7 +354,7 @@ const initialCandidates = (): Candidate[] => [
     obClassification: "Clinical - Patient Facing",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R (Jul 08, 2026 08:17)",
-    currentStep: 7,
+    currentStep: 13,
     stepStatus: "completed",
     onboardingSteps: defaultSteps().map(s => ({ ...s, status: "completed" as const })),
     erpDocuments: [],
@@ -367,7 +381,7 @@ const initialCandidates = (): Candidate[] => [
     obClassification: "Computers",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R",
-    currentStep: 7,
+    currentStep: 13,
     stepStatus: "completed",
     onboardingSteps: defaultSteps().map(s => ({ ...s, status: "completed" as const })),
     erpDocuments: [],
@@ -394,7 +408,7 @@ const initialCandidates = (): Candidate[] => [
     obClassification: "Administrative",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R",
-    currentStep: 7,
+    currentStep: 13,
     stepStatus: "completed",
     onboardingSteps: defaultSteps().map(s => ({ ...s, status: "completed" as const })),
     erpDocuments: [],
@@ -421,9 +435,13 @@ const initialCandidates = (): Candidate[] => [
     obClassification: "Computers",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R",
-    currentStep: 3,
+    currentStep: 9,
     stepStatus: "in_progress",
-    onboardingSteps: defaultSteps(),
+    onboardingSteps: defaultSteps().map((s, idx) => {
+      if (idx < 8) return { ...s, status: "completed" as const };
+      if (idx === 8) return { ...s, status: "in_progress" as const };
+      return s;
+    }),
     erpDocuments: [],
     erpPlacementItems: [],
     backgroundStatus: "Completed",
@@ -484,8 +502,8 @@ const initialNotifications = (): NotificationLog[] => [
     recipient: "candidate",
     recipientName: "Mani",
     channel: "email",
-    subject: "Action Required: Complete Onboarding Step 3",
-    message: "Hi Mani, your credentials package is missing your Nursing License file. Please log in to your dashboard to upload it.",
+    subject: "Action Required: Complete Onboarding Step 9",
+    message: "Hi Mani, your onboarding package is missing your W-4 Withholding form. Please log in to your dashboard to upload it.",
     timestamp: "2026-07-09 10:45 AM",
     status: "delivered",
   },
@@ -506,9 +524,9 @@ const initialNotifications = (): NotificationLog[] => [
     recipient: "recruiter",
     recipientName: "Alex",
     channel: "email",
-    subject: "RE: Professional Nursing License submission question",
+    subject: "RE: W-4 Withholding Form submission question",
     sender: "Mani <mani@staffhc.com>",
-    message: "Incoming synced message from candidate's personal Gmail (mani@staffhc.com):\n\n\"I am having trouble uploading the state registration PDF, is a scanned copy fine?\"",
+    message: "Incoming synced message from candidate's personal Gmail (mani@staffhc.com):\n\n\"I am having trouble uploading the W-4 Withholding PDF, is a scanned copy fine?\"",
     timestamp: "2026-07-09 11:15 AM",
     status: "synced",
     isExternalSync: true
@@ -529,13 +547,19 @@ const initialNotifications = (): NotificationLog[] => [
 ];
 
 const DEFAULT_SLA_CONFIGS: SlaStepConfig[] = [
-  { stepNumber: 1, stepName: "Application", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: "recruiter" },
-  { stepNumber: 2, stepName: "Screening", durationValue: 2, durationUnit: "days", owner: "vendor", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "team lead" },
-  { stepNumber: 3, stepName: "Credentialing", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
-  { stepNumber: 4, stepName: "Interview", durationValue: 2, durationUnit: "days", owner: "recruiter", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: "team lead" },
-  { stepNumber: 5, stepName: "Contract", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
-  { stepNumber: 6, stepName: "Compliance", durationValue: 4, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
-  { stepNumber: 7, stepName: "Ready", durationValue: 1, durationUnit: "days", owner: "onboarder", reminderLeadTime: 6, reminderLeadUnit: "hours", escalationTarget: "recruiter" }
+  { stepNumber: 1, stepName: "Personal Details", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Recruiter"] },
+  { stepNumber: 2, stepName: "Addresses", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Recruiter"] },
+  { stepNumber: 3, stepName: "Equal Employment", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Recruiter"] },
+  { stepNumber: 4, stepName: "Emergency Contact", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Recruiter"] },
+  { stepNumber: 5, stepName: "Onboarding", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Recruiter"] },
+  { stepNumber: 6, stepName: "Benefits", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Team Lead"] },
+  { stepNumber: 7, stepName: "I-9 Eligibility", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
+  { stepNumber: 8, stepName: "Acknowledgments", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Team Lead"] },
+  { stepNumber: 9, stepName: "W-4 Withholding", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
+  { stepNumber: 10, stepName: "State Withholding", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Team Lead"] },
+  { stepNumber: 11, stepName: "Method of Payment", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Team Lead"] },
+  { stepNumber: 12, stepName: "Education Details — Optional (not required to submit)", durationValue: 5, durationUnit: "days", owner: "candidate", reminderLeadTime: 2, reminderLeadUnit: "days", escalationTarget: ["Recruiter"] },
+  { stepNumber: 13, stepName: "Previous Employers — Optional", durationValue: 5, durationUnit: "days", owner: "candidate", reminderLeadTime: 2, reminderLeadUnit: "days", escalationTarget: ["Recruiter"] }
 ];
 
 const DEFAULT_ANOMALIES: AnomalyRecord[] = [
@@ -609,7 +633,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [slaSettings, setSlaSettings] = useState<SlaStepConfig[]>([]);
   const [simulationOffsetDays, setSimulationOffsetDays] = useState<number>(0);
   const [slaAuditLogs, setSlaAuditLogs] = useState<SlaAuditLog[]>([]);
-  const [activeRole, setActiveRole] = useState<"recruiter" | "audit">("recruiter");
+  const [activeRole, setActiveRole] = useState<"recruiter" | "onboarder" | "audit">("recruiter");
   const [anomalies, setAnomalies] = useState<AnomalyRecord[]>([]);
   const [anomalyAuditLogs, setAnomalyAuditLogs] = useState<AnomalyAuditLog[]>([]);
 
@@ -674,7 +698,33 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const savedSimOffset = localStorage.getItem("staffhc_sim_offset");
 
     if (savedSlaConfig) {
-      setSlaSettings(JSON.parse(savedSlaConfig));
+      try {
+        const parsed = JSON.parse(savedSlaConfig);
+        const mapped = parsed.map((item: any) => {
+          let targets: string[] = [];
+          if (Array.isArray(item.escalationTarget)) {
+            targets = item.escalationTarget.map((t: string) => t === "OB Owner (OB Rep)" ? "OB Owner" : t);
+          } else if (typeof item.escalationTarget === "string" && item.escalationTarget) {
+            // Map legacy string values to new clean ones
+            const lower = item.escalationTarget.toLowerCase();
+            if (lower === "recruiter") targets = ["Recruiter"];
+            else if (lower === "team lead") targets = ["Team Lead"];
+            else if (lower === "manager" || lower === "ob manager") targets = ["OB Manager"];
+            else if (lower === "delivery manager") targets = ["Delivery Manager"];
+            else if (lower === "ob owner" || lower === "ob owner (ob rep)") targets = ["OB Owner"];
+            else targets = [item.escalationTarget];
+          } else {
+            targets = ["Recruiter"];
+          }
+          return {
+            ...item,
+            escalationTarget: targets
+          };
+        });
+        setSlaSettings(mapped);
+      } catch (e) {
+        setSlaSettings(DEFAULT_SLA_CONFIGS);
+      }
     } else {
       setSlaSettings(DEFAULT_SLA_CONFIGS);
     }
@@ -1163,8 +1213,8 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             recipient: "candidate",
             recipientName: "Mani",
             channel: "email",
-            subject: "Action Required: Complete Onboarding Step 3 immediately",
-            message: `Hi Mani, your Credentialing step is approaching its final deadline. Please upload your Nursing License file now to complete.`,
+            subject: "Action Required: Complete Onboarding Step 9 immediately",
+            message: `Hi Mani, your W-4 Withholding step is approaching its final deadline. Please upload your W-4 forms now to complete.`,
             timestamp: `Today 09:12 AM`,
             status: "delivered"
           });
@@ -1179,8 +1229,8 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             recipient: "recruiter",
             recipientName: "Alex",
             channel: "system",
-            subject: "SLA Breach Escalation: Step 3 Credentialing (Mani)",
-            message: `⚠️ System escalated SLA breach for Mani (Step 3: Credentialing). Target exceeded. Notification routed to manager.`,
+            subject: "SLA Breach Escalation: Step 9 W-4 Withholding (Mani)",
+            message: `⚠️ System escalated SLA breach for Mani (Step 9: W-4 Withholding). Target exceeded. Notification routed to manager.`,
             timestamp: `Today 10:30 AM`,
             status: "delivered"
           });
@@ -1192,7 +1242,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
                 return {
                   ...c,
                   slaStatus: "breached" as const,
-                  slaBreachDetails: "Step 3 (Credentialing) exceeded 3-day SLA target."
+                  slaBreachDetails: "Step 9 (W-4 Withholding) exceeded 3-day SLA target."
                 };
               }
               return c;
@@ -1278,10 +1328,17 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setActiveRole(prev => prev === "recruiter" ? "audit" : "recruiter");
   };
 
+  const setActiveRoleContext = (role: "recruiter" | "onboarder" | "audit") => {
+    setActiveRole(role);
+  };
+
   const updateAnomalyStatus = (id: string, nextStatus: AnomalyRecord["status"], reason?: string) => {
+    let prevStatus: AnomalyRecord["status"] = "open";
+
     setAnomalies(prev => {
       const updated = prev.map(anom => {
         if (anom.id === id) {
+          prevStatus = anom.status;
           return { ...anom, status: nextStatus, waiverReason: reason };
         }
         return anom;
@@ -1292,16 +1349,31 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     const targetAnomaly = anomalies.find(a => a.id === id);
     if (targetAnomaly) {
-      const actionText = nextStatus === "waived" ? "Anomaly Waived" : nextStatus === "resolved" ? "Anomaly Resolved" : "Anomaly Marked False Positive";
+      const actionText = nextStatus === "closed" ? "Anomaly Closed" : nextStatus === "resolved" ? "Anomaly Resolved" : "Anomaly Modified";
+      const detailsText = `Status changed from ${prevStatus} to ${nextStatus}. Reason: "${reason || 'N/A'}"`;
+      const actorName = activeRole === "audit" ? "Alex (Compliance Audit)" : activeRole === "recruiter" ? "Alex (Recruiter)" : "Alex (Onboarding Rep)";
+
       const newLog: AnomalyAuditLog = {
         id: `anom-audit-${Date.now()}`,
         candidateId: targetAnomaly.candidateId,
-        action: actionText,
-        details: `Status changed to ${nextStatus}. Reason: "${reason || 'N/A'}"`,
+        anomalyId: id,
+        previousState: prevStatus,
+        newState: nextStatus,
+        actor: actorName,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " + new Date().toLocaleDateString(),
-        operator: activeRole === "audit" ? "Alex (Compliance Audit)" : "Alex (Recruiter)"
+        reason: reason || "",
+
+        // UI Helpers
+        action: actionText,
+        details: detailsText,
+        operator: actorName
       };
-      setAnomalyAuditLogs(prev => [...prev, newLog]);
+
+      setAnomalyAuditLogs(prev => {
+        const nextLogs = [...prev, newLog];
+        localStorage.setItem("staffhc_anomaly_audit", JSON.stringify(nextLogs));
+        return nextLogs;
+      });
     }
   };
 
@@ -1371,12 +1443,23 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const newLog: AnomalyAuditLog = {
       id: `anom-audit-${Date.now()}`,
       candidateId,
+      anomalyId: "system-transfer",
+      previousState: "onboarding",
+      newState: "transferred",
+      actor: "Alex (System)",
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " + new Date().toLocaleDateString(),
+      reason: "Candidate onboarding file successfully uploaded system-to-system to CDK Global MSP portal.",
+      
+      // UI Helpers
       action: "Client Transfer Successful",
       details: "Candidate onboarding file successfully uploaded system-to-system to CDK Global MSP portal.",
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " + new Date().toLocaleDateString(),
       operator: "Alex"
     };
-    setAnomalyAuditLogs(prev => [...prev, newLog]);
+    setAnomalyAuditLogs(prev => {
+      const nextLogs = [...prev, newLog];
+      localStorage.setItem("staffhc_anomaly_audit", JSON.stringify(nextLogs));
+      return nextLogs;
+    });
 
     return { success: true };
   };
@@ -1432,6 +1515,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         advanceSimulationTime,
         applySlaWaiver,
         toggleActiveRole,
+        setActiveRoleContext,
         updateAnomalyStatus,
         triggerMockAnomaly,
         transferToClient,
