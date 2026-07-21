@@ -739,7 +739,22 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const savedActiveRole = localStorage.getItem("staffhc_active_role_v2");
 
     if (savedAnomalies) {
-      setAnomalies(JSON.parse(savedAnomalies));
+      try {
+        const parsed = JSON.parse(savedAnomalies);
+        if (Array.isArray(parsed)) {
+          const upgraded = parsed.map((a: any) => {
+            if (a.status === "waived" || a.status === "false_positive" || a.status === "in_review") {
+              return { ...a, status: "closed" as const };
+            }
+            return a;
+          });
+          setAnomalies(upgraded);
+        } else {
+          setAnomalies(DEFAULT_ANOMALIES);
+        }
+      } catch (err) {
+        setAnomalies(DEFAULT_ANOMALIES);
+      }
     } else {
       setAnomalies(DEFAULT_ANOMALIES);
     }
