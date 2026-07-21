@@ -129,7 +129,8 @@ export default function OnboardingPage() {
     fullName: "Mani Ganesan",
     email: "mani@staffhc.com",
     phone: "(512) 555-0199",
-    ssn: "XXX-XX-1234"
+    ssn: "XXX-XX-1234",
+    dob: "1992-04-12"
   });
   const [addressDetails, setAddressDetails] = useState({
     address1: "1042 Maple Ave",
@@ -198,6 +199,14 @@ export default function OnboardingPage() {
     const emailToMatch = cleanEmail === "candidate@healthcare.com" ? "mani@staffhc.com" : cleanEmail;
     return c.email.toLowerCase() === emailToMatch;
   });
+
+  useEffect(() => {
+    if (candidate) {
+      const { groupIndex, subStepIndex } = findFirstIncompleteSubStep();
+      setActiveGroupIndex(groupIndex);
+      setActiveSubStepIndex(subStepIndex);
+    }
+  }, [candidate?.id]);
 
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
@@ -402,7 +411,7 @@ export default function OnboardingPage() {
             {/* Section 1: Identity */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Identity</span>
+                <span className="text-[13px] font-semibold text-slate-800">Identity</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -412,6 +421,15 @@ export default function OnboardingPage() {
                     type="text" 
                     value={personalDetails.fullName}
                     onChange={e => setPersonalDetails(p => ({ ...p, fullName: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Date of birth <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="date" 
+                    value={personalDetails.dob}
+                    onChange={e => setPersonalDetails(p => ({ ...p, dob: e.target.value }))}
                     className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                   />
                 </div>
@@ -430,7 +448,7 @@ export default function OnboardingPage() {
             {/* Section 2: Contact */}
             <div className="space-y-4 pt-2">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Contact Details</span>
+                <span className="text-[13px] font-semibold text-slate-800">Contact</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -467,7 +485,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Mailing Address</span>
+                <span className="text-[13px] font-semibold text-slate-800">Mailing address</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -522,7 +540,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Primary Contact</span>
+                <span className="text-[13px] font-semibold text-slate-800">Primary contact</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -568,7 +586,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Demographics</span>
+                <span className="text-[13px] font-semibold text-slate-800">Demographics</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -625,7 +643,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Placement Details</span>
+                <span className="text-[13px] font-semibold text-slate-800">Placement details</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -671,7 +689,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Verification details</span>
+                <span className="text-[13px] font-semibold text-slate-800">Verification details</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -723,7 +741,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Degree details</span>
+                <span className="text-[13px] font-semibold text-slate-800">Degree details</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -772,7 +790,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Employment history</span>
+                <span className="text-[13px] font-semibold text-slate-800">Employment history</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -818,7 +836,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Federal withholding</span>
+                <span className="text-[13px] font-semibold text-slate-800">Federal withholding</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -867,7 +885,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">State withholding</span>
+                <span className="text-[13px] font-semibold text-slate-800">State withholding</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -898,7 +916,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Account details</span>
+                <span className="text-[13px] font-semibold text-slate-800">Account details</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -944,7 +962,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Health Coverage Options</span>
+                <span className="text-[13px] font-semibold text-slate-800">Health coverage options</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="space-y-3.5">
@@ -1020,7 +1038,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Required documents</span>
+                <span className="text-[13px] font-semibold text-slate-800">Required documents</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="space-y-3">
@@ -1110,7 +1128,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Document uploads</span>
+                <span className="text-[13px] font-semibold text-slate-800">Document uploads</span>
               </div>
               <div className="border-t border-slate-100 my-2"></div>
               <div className="space-y-4">
@@ -1975,53 +1993,58 @@ export default function OnboardingPage() {
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-6">
               {/* Segmented Sub-step Navigation Row */}
               <div className="border-b border-slate-200 -mx-8 px-8 pb-3.5 mb-6">
-                <div className="flex flex-wrap items-center gap-6">
-                  {ONBOARDING_GROUPS[activeGroupIndex].subSteps.map((sub, idx) => {
-                    const stepState = candidate.onboardingSteps.find(st => st.number === sub.stepNumber);
-                    const isCompleted = stepState?.status === "completed";
-                    const isStuck = stepState?.status === "stuck";
-                    const isActive = activeSubStepIndex === idx;
-                    
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => setActiveSubStepIndex(idx)}
-                        className={`pb-3.5 text-xs transition-all cursor-pointer flex items-center gap-2 font-bold relative -mb-3.5 ${
-                          isActive
-                            ? "text-[#0052CC] border-b-2 border-[#0052CC]"
-                            : isCompleted
-                            ? "text-[#007A5E] hover:text-[#005E48]"
-                            : isStuck
-                            ? "text-rose-600 hover:text-rose-700"
-                            : "text-slate-400 hover:text-slate-600 font-semibold"
-                        }`}
-                      >
-                        {isCompleted ? (
-                          <div className="h-4.5 w-4.5 rounded-full bg-[#007A5E]/10 border border-[#007A5E]/20 text-[#007A5E] flex items-center justify-center">
-                            <Check className="h-3 w-3 stroke-[3px]" />
-                          </div>
-                        ) : isStuck ? (
-                          <div className="h-4.5 w-4.5 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center">
-                            <AlertCircle className="h-3 w-3 stroke-[3px]" />
-                          </div>
-                        ) : isActive ? (
-                          <div className="h-4.5 w-4.5 rounded-full bg-[#0052CC] text-white flex items-center justify-center text-[10px] font-black">
-                            {idx + 1}
-                          </div>
-                        ) : (
-                          <div className="h-4.5 w-4.5 rounded-full bg-slate-100 border border-slate-200 text-slate-400 flex items-center justify-center text-[10px] font-bold">
-                            {idx + 1}
-                          </div>
-                        )}
-                        <span>{sub.name}</span>
-                        {sub.isOptional && (
-                          <span className="text-[8px] font-black bg-slate-100 text-slate-500 px-1 py-0.5 rounded select-none uppercase">
-                            Optional
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
+                <div className="flex flex-wrap items-center justify-between gap-6">
+                  <div className="flex flex-wrap items-center gap-6">
+                    {ONBOARDING_GROUPS[activeGroupIndex].subSteps.map((sub, idx) => {
+                      const stepState = candidate.onboardingSteps.find(st => st.number === sub.stepNumber);
+                      const isCompleted = stepState?.status === "completed";
+                      const isStuck = stepState?.status === "stuck";
+                      const isActive = activeSubStepIndex === idx;
+                      
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => setActiveSubStepIndex(idx)}
+                          className={`pb-3.5 text-xs transition-all cursor-pointer flex items-center gap-2 font-bold relative -mb-3.5 ${
+                            isActive
+                              ? "text-[#0052CC] border-b-2 border-[#0052CC]"
+                              : isCompleted
+                              ? "text-[#007A5E] hover:text-[#005E48]"
+                              : isStuck
+                              ? "text-rose-600 hover:text-rose-700"
+                              : "text-slate-400 hover:text-slate-600 font-semibold"
+                          }`}
+                        >
+                          {isCompleted ? (
+                            <div className="h-4.5 w-4.5 rounded-full bg-[#007A5E]/10 border border-[#007A5E]/20 text-[#007A5E] flex items-center justify-center">
+                              <Check className="h-3 w-3 stroke-[3px]" />
+                            </div>
+                          ) : isStuck ? (
+                            <div className="h-4.5 w-4.5 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center">
+                              <AlertCircle className="h-3 w-3 stroke-[3px]" />
+                            </div>
+                          ) : isActive ? (
+                            <div className="h-4.5 w-4.5 rounded-full bg-[#0052CC] text-white flex items-center justify-center text-[10px] font-black">
+                              {idx + 1}
+                            </div>
+                          ) : (
+                            <div className="h-4.5 w-4.5 rounded-full bg-slate-100 border border-slate-200 text-slate-400 flex items-center justify-center text-[10px] font-bold">
+                              {idx + 1}
+                            </div>
+                          )}
+                          <span>{sub.name}</span>
+                          {sub.isOptional && (
+                            <span className="text-[8px] font-black bg-slate-100 text-slate-500 px-1 py-0.5 rounded select-none uppercase">
+                              Optional
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap shrink-0">
+                    Step {activeSubStepIndex + 1} of {ONBOARDING_GROUPS[activeGroupIndex].subSteps.length} in this section
+                  </span>
                 </div>
               </div>
 
@@ -2031,7 +2054,7 @@ export default function OnboardingPage() {
               </div>
 
               {/* Stepper Navigation Footer Action Strip */}
-              <div className="bg-slate-55/75 border-t border-slate-200 px-8 py-5 -mx-8 -mb-8 rounded-b-2xl flex justify-between items-center mt-8">
+              <div className="bg-slate-50 border-t border-slate-200 px-8 py-5 -mx-8 -mb-8 rounded-b-2xl flex justify-between items-center mt-8">
                 <div>
                   <button
                     onClick={handlePrevStep}

@@ -189,9 +189,9 @@ const defaultSteps = (): OnboardingStep[] => [
   { number: 3, name: "Equal Employment", description: "Equal Employment Opportunity disclosures", status: "completed", uploadedFiles: [], startedAt: "2026-07-06 09:00 AM" },
   { number: 4, name: "Emergency Contact", description: "Provide primary emergency contact", status: "completed", uploadedFiles: [], startedAt: "2026-07-06 11:00 AM" },
   { number: 5, name: "Onboarding", description: "Standard client onboarding form", status: "completed", uploadedFiles: [], startedAt: "2026-07-07 09:00 AM" },
-  { number: 6, name: "Benefits", description: "Select medical & retirement benefits", status: "completed", uploadedFiles: [], startedAt: "2026-07-08 09:00 AM" },
+  { number: 6, name: "Benefits", description: "Select medical & retirement benefits", status: "pending", uploadedFiles: [], startedAt: "2026-07-08 09:00 AM" },
   { number: 7, name: "I-9 Eligibility", description: "Employment eligibility check (Form I-9)", status: "completed", uploadedFiles: [], startedAt: "2026-07-08 11:00 AM" },
-  { number: 8, name: "Acknowledgments", description: "Acknowledge employee handbooks", status: "completed", uploadedFiles: [], startedAt: "2026-07-09 09:00 AM" },
+  { number: 8, name: "Acknowledgments", description: "Acknowledge employee handbooks", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 09:00 AM" },
   {
     number: 9,
     name: "W-4 Withholding",
@@ -686,7 +686,20 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
                 ...c,
                 name: "Mani",
                 email: "mani@staffhc.com",
-                hasNoApplication: false
+                hasNoApplication: false,
+                currentStep: 9,
+                stepStatus: "stuck",
+                onboardingSteps: defaultSteps()
+              };
+            }
+            if (c.id === "candidate-debra") {
+              return {
+                ...c,
+                name: "Debra Bailey",
+                email: "debra@example.com",
+                currentStep: 10,
+                stepStatus: "stuck",
+                onboardingSteps: debraSteps()
               };
             }
             return c;
