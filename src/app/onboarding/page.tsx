@@ -635,14 +635,14 @@ export default function OnboardingPage() {
                 </div>
 
                 {/* Horizontal Timeline (Two Rows for 13 steps) */}
-                <div className="space-y-6 py-4">
+                <div className="space-y-6 py-4 relative">
                   {/* Row 1: Steps 1 - 7 */}
                   <div className="relative pt-6 pb-2">
                     {/* Background bar line */}
-                    <div className="absolute top-[32px] left-[6%] right-[6%] h-[3px] bg-slate-100 -z-0"></div>
+                    <div className="absolute top-[40px] left-[6%] right-[6%] h-[3px] bg-slate-100 -z-0"></div>
                     {/* Blue progress bar line for Row 1 */}
                     <div 
-                      className="absolute top-[32px] left-[6%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
+                      className="absolute top-[40px] left-[6%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
                       style={{
                         width: `${Math.min(100, Math.max(0, (((candidate?.onboardingSteps?.slice(0, 7).filter(s => s.status === "completed").length || 0) - 0.5) / 6) * 88))}%`
                       }}
@@ -673,13 +673,33 @@ export default function OnboardingPage() {
                     </div>
                   </div>
 
+                  {/* Transition SVG connector between Row 1 and Row 2 */}
+                  <svg className="absolute inset-0 w-full h-[190px] pointer-events-none -z-10" viewBox="0 0 100 190" preserveAspectRatio="none">
+                    <path
+                      d="M 94 40 C 99 40, 99 95, 50 95 C 1 95, 1 150, 7 150"
+                      fill="none"
+                      stroke="#F1F5F9"
+                      strokeWidth="3"
+                      strokeDasharray="4 4"
+                    />
+                    {candidate?.onboardingSteps[7]?.status === "completed" && (
+                      <path
+                        d="M 94 40 C 99 40, 99 95, 50 95 C 1 95, 1 150, 7 150"
+                        fill="none"
+                        stroke="#0052CC"
+                        strokeWidth="3"
+                        className="transition-all duration-500"
+                      />
+                    )}
+                  </svg>
+
                   {/* Row 2: Steps 8 - 13 */}
                   <div className="relative pt-6 pb-2">
                     {/* Background bar line */}
-                    <div className="absolute top-[32px] left-[7%] right-[7%] h-[3px] bg-slate-100 -z-0"></div>
+                    <div className="absolute top-[40px] left-[7%] right-[7%] h-[3px] bg-slate-100 -z-0"></div>
                     {/* Blue progress bar line for Row 2 */}
                     <div 
-                      className="absolute top-[32px] left-[7%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
+                      className="absolute top-[40px] left-[7%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
                       style={{
                         width: `${Math.min(100, Math.max(0, (((candidate?.onboardingSteps?.slice(7).filter(s => s.status === "completed").length || 0) - 0.5) / 5) * 86))}%`
                       }}
@@ -1177,14 +1197,14 @@ export default function OnboardingPage() {
               </div>
 
               {/* Horizontal Timeline Circles (Two Rows for 13 steps) */}
-              <div className="space-y-6 py-4">
+              <div className="space-y-6 py-4 relative">
                 {/* Row 1: Steps 1 - 7 */}
                 <div className="relative pt-6 pb-2">
                   {/* Background bar line */}
-                  <div className="absolute top-[32px] left-[6%] right-[6%] h-[3px] bg-slate-100 -z-0"></div>
+                  <div className="absolute top-[40px] left-[6%] right-[6%] h-[3px] bg-slate-100 -z-0"></div>
                   {/* Blue progress bar line for Row 1 */}
                   <div 
-                    className="absolute top-[32px] left-[6%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
+                    className="absolute top-[40px] left-[6%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
                     style={{
                       width: `${Math.min(100, Math.max(0, (((candidate?.onboardingSteps?.slice(0, 7).filter(s => s.status === "completed").length || 0) - 0.5) / 6) * 88))}%`
                     }}
@@ -1215,13 +1235,33 @@ export default function OnboardingPage() {
                   </div>
                 </div>
 
+                {/* Transition SVG connector between Row 1 and Row 2 */}
+                <svg className="absolute inset-0 w-full h-[190px] pointer-events-none -z-10" viewBox="0 0 100 190" preserveAspectRatio="none">
+                  <path
+                    d="M 94 40 C 99 40, 99 95, 50 95 C 1 95, 1 150, 7 150"
+                    fill="none"
+                    stroke="#F1F5F9"
+                    strokeWidth="3"
+                    strokeDasharray="4 4"
+                  />
+                  {candidate?.onboardingSteps[7]?.status === "completed" && (
+                    <path
+                      d="M 94 40 C 99 40, 99 95, 50 95 C 1 95, 1 150, 7 150"
+                      fill="none"
+                      stroke="#0052CC"
+                      strokeWidth="3"
+                      className="transition-all duration-500"
+                    />
+                  )}
+                </svg>
+
                 {/* Row 2: Steps 8 - 13 */}
                 <div className="relative pt-6 pb-2">
                   {/* Background bar line */}
-                  <div className="absolute top-[32px] left-[7%] right-[7%] h-[3px] bg-slate-100 -z-0"></div>
+                  <div className="absolute top-[40px] left-[7%] right-[7%] h-[3px] bg-slate-100 -z-0"></div>
                   {/* Blue progress bar line for Row 2 */}
                   <div 
-                    className="absolute top-[32px] left-[7%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
+                    className="absolute top-[40px] left-[7%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
                     style={{
                       width: `${Math.min(100, Math.max(0, (((candidate?.onboardingSteps?.slice(7).filter(s => s.status === "completed").length || 0) - 0.5) / 5) * 86))}%`
                     }}
