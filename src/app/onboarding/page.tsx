@@ -634,51 +634,89 @@ export default function OnboardingPage() {
                   )}
                 </div>
 
-                {/* Horizontal Timeline */}
-                <div className="relative pt-6 pb-2">
-                  {/* Connected background bar line (Horizontal center of circles) */}
-                  <div className="absolute top-[32px] left-[6%] right-[6%] h-[3px] bg-slate-100 -z-0"></div>
-                  {/* Connected blue progress bar line */}
-                  <div 
-                    className="absolute top-[32px] left-[6%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
-                    style={{
-                      width: `${(((candidate?.onboardingSteps?.filter(s => s.status === "completed")?.length || 1) - 0.5) / 6) * 88}%`
-                    }}
-                  ></div>
+                {/* Horizontal Timeline (Two Rows for 13 steps) */}
+                <div className="space-y-6 py-4">
+                  {/* Row 1: Steps 1 - 7 */}
+                  <div className="relative pt-6 pb-2">
+                    {/* Background bar line */}
+                    <div className="absolute top-[32px] left-[6%] right-[6%] h-[3px] bg-slate-100 -z-0"></div>
+                    {/* Blue progress bar line for Row 1 */}
+                    <div 
+                      className="absolute top-[32px] left-[6%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
+                      style={{
+                        width: `${Math.min(100, Math.max(0, (((candidate?.onboardingSteps?.slice(0, 7).filter(s => s.status === "completed").length || 0) - 0.5) / 6) * 88))}%`
+                      }}
+                    ></div>
 
-                  <div className="flex justify-between items-start relative z-10">
-                    {candidate?.onboardingSteps?.map((step) => {
-                      const isDone = step.status === "completed";
-                      const isActive = step.number === candidate?.currentStep;
+                    <div className="flex justify-between items-start relative z-10">
+                      {candidate?.onboardingSteps?.slice(0, 7).map((step) => {
+                        const isDone = step.status === "completed";
+                        const isActive = step.number === candidate?.currentStep;
 
-                      return (
-                        <div key={step.number} className="flex flex-col items-center text-center w-[12%]">
-                          {/* Circle Node */}
-                          <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
-                            isDone 
-                              ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10" 
-                              : isActive
-                              ? "bg-white border-2 border-[#0052CC] text-[#0052CC] ring-4 ring-[#0052CC]/15"
-                              : "bg-slate-100 border-slate-200 text-slate-400"
-                          }`}>
-                            {isDone ? (
-                              <Check className="h-4 w-4 stroke-[3px]" />
-                            ) : step.number === 7 ? (
-                              <span className="text-[10px]">🏁</span>
-                            ) : (
-                              step.number
-                            )}
+                        return (
+                          <div key={step.number} className="flex flex-col items-center text-center w-[12%]">
+                            <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
+                              isDone 
+                                ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10" 
+                                : isActive
+                                ? "bg-white border-2 border-[#0052CC] text-[#0052CC] ring-4 ring-[#0052CC]/15"
+                                : "bg-slate-100 border-slate-200 text-slate-400"
+                            }`}>
+                              {isDone ? <Check className="h-4 w-4 stroke-[3px]" /> : step.number}
+                            </div>
+                            <span className={`text-[9.5px] font-bold mt-2 truncate w-full ${isDone || isActive ? "text-slate-800" : "text-slate-400"}`}>
+                              {step.name}
+                            </span>
                           </div>
-                          
-                          {/* Step Name */}
-                          <span className={`text-[10.5px] mt-2.5 font-bold block truncate max-w-full ${
-                            isActive ? "text-[#0052CC] font-extrabold" : "text-slate-450"
-                          }`}>
-                            {step.name}
-                          </span>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Row 2: Steps 8 - 13 */}
+                  <div className="relative pt-6 pb-2">
+                    {/* Background bar line */}
+                    <div className="absolute top-[32px] left-[7%] right-[7%] h-[3px] bg-slate-100 -z-0"></div>
+                    {/* Blue progress bar line for Row 2 */}
+                    <div 
+                      className="absolute top-[32px] left-[7%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
+                      style={{
+                        width: `${Math.min(100, Math.max(0, (((candidate?.onboardingSteps?.slice(7).filter(s => s.status === "completed").length || 0) - 0.5) / 5) * 86))}%`
+                      }}
+                    ></div>
+
+                    <div className="flex justify-between items-start relative z-10 px-1">
+                      {candidate?.onboardingSteps?.slice(7).map((step) => {
+                        const isDone = step.status === "completed";
+                        const isActive = step.number === candidate?.currentStep;
+                        const isStuck = step.status === "stuck";
+
+                        return (
+                          <div key={step.number} className="flex flex-col items-center text-center w-[14%]">
+                            <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
+                              isDone 
+                                ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10" 
+                                : isStuck
+                                ? "bg-rose-500 border-rose-500 text-white animate-pulse"
+                                : isActive
+                                ? "bg-white border-2 border-[#0052CC] text-[#0052CC] ring-4 ring-[#0052CC]/15"
+                                : "bg-slate-100 border-slate-200 text-slate-400"
+                            }`}>
+                              {isDone ? (
+                                <Check className="h-4 w-4 stroke-[3px]" />
+                              ) : isStuck ? (
+                                <span className="text-[10px] font-black">{step.number}</span>
+                              ) : (
+                                step.number
+                              )}
+                            </div>
+                            <span className={`text-[9.5px] font-bold mt-2 truncate w-full ${isDone || isActive || isStuck ? "text-slate-800 font-extrabold" : "text-slate-455"}`}>
+                              {step.name}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 
@@ -711,15 +749,15 @@ export default function OnboardingPage() {
                     <p className="text-[10px] text-slate-400 font-semibold">PDF, JPEG, or PNG up to 10MB</p>
                     
                     <div className="mt-4">
-                      {candidate?.onboardingSteps[2]?.status === "completed" ? (
+                      {candidate?.onboardingSteps[8]?.status === "completed" ? (
                         <div className="h-8 w-8 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 text-emerald-500">
                           <Check className="h-4 w-4" />
                         </div>
-                      ) : candidate?.onboardingSteps[2]?.status === "in_progress" ? (
+                      ) : candidate?.onboardingSteps[8]?.status === "in_progress" ? (
                         <span className="text-[10px] font-bold text-amber-500 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded">Awaiting Review</span>
                       ) : (
                         <button 
-                          onClick={() => triggerUploadFile(3, "Nursing_License_Mani.pdf")}
+                          onClick={() => triggerUploadFile(9, "Nursing_License_Mani.pdf")}
                           className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all"
                         >
                           Upload File
@@ -735,7 +773,7 @@ export default function OnboardingPage() {
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="font-bold text-slate-800 text-sm">Required Documents</h3>
                   <span className="bg-[#EBF3FC] text-[#0052CC] font-bold text-[10px] px-2.5 py-0.5 rounded-full uppercase">
-                    {(candidate?.onboardingSteps?.filter(s => s.status !== "completed" && s.number <= 3)?.length) || 0} Pending
+                    {(candidate?.onboardingSteps?.filter(s => s.status !== "completed" && s.number <= 9)?.length) || 0} Pending
                   </span>
                 </div>
 
@@ -752,15 +790,15 @@ export default function OnboardingPage() {
                       </div>
                     </div>
                     <div>
-                      {candidate?.onboardingSteps[2]?.status === "completed" ? (
+                      {candidate?.onboardingSteps[8]?.status === "completed" ? (
                         <div className="h-8 w-8 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 text-emerald-500">
                           <Check className="h-4 w-4" />
                         </div>
-                      ) : candidate?.onboardingSteps[2]?.status === "in_progress" ? (
+                      ) : candidate?.onboardingSteps[8]?.status === "in_progress" ? (
                         <span className="text-[10px] font-bold text-amber-500 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded">Awaiting Review</span>
                       ) : (
                         <button 
-                          onClick={() => triggerUploadFile(3, "Nursing_License_Mani.pdf")}
+                          onClick={() => triggerUploadFile(9, "Nursing_License_Mani.pdf")}
                           className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all"
                         >
                           Upload
@@ -782,7 +820,7 @@ export default function OnboardingPage() {
                     </div>
                     <div>
                       <button 
-                        onClick={() => triggerUploadFile(3, "Immunization_Records_Mani.pdf")}
+                        onClick={() => triggerUploadFile(9, "Immunization_Records_Mani.pdf")}
                         className="px-4 py-1.5 bg-[#EBF3FC] hover:bg-[#DEEAF7] text-[#0052CC] text-xs font-bold rounded-lg transition-all"
                       >
                         Review
@@ -1114,7 +1152,7 @@ export default function OnboardingPage() {
                 Onboarding Portal
               </h1>
               <p className="text-xs text-slate-400 font-medium">
-                Complete the 7-step compliance checks below to start your shift.
+                Complete the 13-step compliance checks below to start your shift.
               </p>
             </div>
 
@@ -1138,46 +1176,89 @@ export default function OnboardingPage() {
                 )}
               </div>
 
-              {/* Horizontal Timeline Circles */}
-              <div className="relative pt-6 pb-2">
-                {/* Progress bar line */}
-                <div className="absolute top-1/2 left-[6%] right-[6%] h-1 bg-slate-100 -translate-y-1/2 rounded z-0"></div>
-                <div 
-                  className="absolute top-1/2 left-[6%] h-1 bg-[#0052CC] -translate-y-1/2 rounded z-0 transition-all duration-500"
-                  style={{
-                    width: `${((candidate?.onboardingSteps.filter(s => s.status === "completed").length - 0.5) / 6) * 88}%`
-                  }}
-                ></div>
+              {/* Horizontal Timeline Circles (Two Rows for 13 steps) */}
+              <div className="space-y-6 py-4">
+                {/* Row 1: Steps 1 - 7 */}
+                <div className="relative pt-6 pb-2">
+                  {/* Background bar line */}
+                  <div className="absolute top-[32px] left-[6%] right-[6%] h-[3px] bg-slate-100 -z-0"></div>
+                  {/* Blue progress bar line for Row 1 */}
+                  <div 
+                    className="absolute top-[32px] left-[6%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
+                    style={{
+                      width: `${Math.min(100, Math.max(0, (((candidate?.onboardingSteps?.slice(0, 7).filter(s => s.status === "completed").length || 0) - 0.5) / 6) * 88))}%`
+                    }}
+                  ></div>
 
-                <div className="relative z-10 flex justify-between items-center px-1">
-                  {candidate?.onboardingSteps.map((step) => {
-                    const isCompleted = step.status === "completed";
-                    const isInProgress = step.status === "in_progress";
-                    const isStuck = step.status === "stuck";
-                    
-                    return (
-                      <div key={step.number} className="flex flex-col items-center gap-2">
-                        <button 
-                          className={`h-8 w-8 rounded-full border-2 flex items-center justify-center font-bold text-xs transition-all ${
-                            isCompleted 
-                              ? "bg-[#0052CC] border-[#0052CC] text-white" 
-                              : isInProgress
-                              ? "bg-white border-[#0052CC] text-[#0052CC]"
+                  <div className="flex justify-between items-start relative z-10">
+                    {candidate?.onboardingSteps?.slice(0, 7).map((step) => {
+                      const isDone = step.status === "completed";
+                      const isActive = step.number === candidate?.currentStep;
+
+                      return (
+                        <div key={step.number} className="flex flex-col items-center text-center w-[12%]">
+                          <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
+                            isDone 
+                              ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10" 
+                              : isActive
+                              ? "bg-white border-2 border-[#0052CC] text-[#0052CC] ring-4 ring-[#0052CC]/15"
+                              : "bg-slate-100 border-slate-200 text-slate-400"
+                          }`}>
+                            {isDone ? <Check className="h-4 w-4 stroke-[3px]" /> : step.number}
+                          </div>
+                          <span className={`text-[9.5px] font-bold mt-2 truncate w-full ${isDone || isActive ? "text-slate-800" : "text-slate-400"}`}>
+                            {step.name}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Row 2: Steps 8 - 13 */}
+                <div className="relative pt-6 pb-2">
+                  {/* Background bar line */}
+                  <div className="absolute top-[32px] left-[7%] right-[7%] h-[3px] bg-slate-100 -z-0"></div>
+                  {/* Blue progress bar line for Row 2 */}
+                  <div 
+                    className="absolute top-[32px] left-[7%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
+                    style={{
+                      width: `${Math.min(100, Math.max(0, (((candidate?.onboardingSteps?.slice(7).filter(s => s.status === "completed").length || 0) - 0.5) / 5) * 86))}%`
+                    }}
+                  ></div>
+
+                  <div className="flex justify-between items-start relative z-10 px-1">
+                    {candidate?.onboardingSteps?.slice(7).map((step) => {
+                      const isDone = step.status === "completed";
+                      const isActive = step.number === candidate?.currentStep;
+                      const isStuck = step.status === "stuck";
+
+                      return (
+                        <div key={step.number} className="flex flex-col items-center text-center w-[14%]">
+                          <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
+                            isDone 
+                              ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10" 
                               : isStuck
-                              ? "bg-red-500 border-red-500 text-white animate-pulse"
-                              : "bg-white border-slate-200 text-slate-400"
-                          }`}
-                        >
-                          {isCompleted ? <Check className="h-4 w-4" /> : step.number}
-                        </button>
-                        <span className={`text-[10px] font-bold ${
-                          isCompleted || isInProgress || isStuck ? "text-slate-800" : "text-slate-400"
-                        }`}>
-                          {step.name}
-                        </span>
-                      </div>
-                    );
-                  })}
+                              ? "bg-rose-500 border-rose-500 text-white animate-pulse"
+                              : isActive
+                              ? "bg-white border-2 border-[#0052CC] text-[#0052CC] ring-4 ring-[#0052CC]/15"
+                              : "bg-slate-100 border-slate-200 text-slate-400"
+                          }`}>
+                            {isDone ? (
+                              <Check className="h-4 w-4 stroke-[3px]" />
+                            ) : isStuck ? (
+                              <span className="text-[10px] font-black">{step.number}</span>
+                            ) : (
+                              step.number
+                            )}
+                          </div>
+                          <span className={`text-[9.5px] font-bold mt-2 truncate w-full ${isDone || isActive || isStuck ? "text-slate-800 font-extrabold" : "text-slate-455"}`}>
+                            {step.name}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1187,7 +1268,7 @@ export default function OnboardingPage() {
               <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-left">
                 <div className="flex items-center gap-2 text-rose-600 mb-3">
                   <AlertCircle className="h-5 w-5" />
-                  <h3 className="font-bold text-sm">Step 3 Stuck: {candidate?.stuckReason}</h3>
+                  <h3 className="font-bold text-sm">Step {candidate?.currentStep} Stuck: {candidate?.stuckReason}</h3>
                 </div>
                 <p className="text-xs text-slate-500 font-medium leading-relaxed mb-6">
                   {candidate?.stuckExplanation}

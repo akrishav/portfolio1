@@ -179,22 +179,28 @@ interface OnboardingContextType {
 }
 
 const defaultSteps = (): OnboardingStep[] => [
-  { number: 1, name: "Application", description: "Submit application form", status: "completed", uploadedFiles: [], startedAt: "2026-07-04 09:00 AM" },
-  { number: 2, name: "Screening", description: "Clinical background check", status: "completed", uploadedFiles: [], startedAt: "2026-07-05 10:00 AM" },
+  { number: 1, name: "Personal Details", description: "Submit personal contact information", status: "completed", uploadedFiles: [], startedAt: "2026-07-04 09:00 AM" },
+  { number: 2, name: "Addresses", description: "Submit address history details", status: "completed", uploadedFiles: [], startedAt: "2026-07-05 10:00 AM" },
+  { number: 3, name: "Equal Employment", description: "Equal Employment Opportunity disclosures", status: "completed", uploadedFiles: [], startedAt: "2026-07-06 09:00 AM" },
+  { number: 4, name: "Emergency Contact", description: "Provide primary emergency contact", status: "completed", uploadedFiles: [], startedAt: "2026-07-06 11:00 AM" },
+  { number: 5, name: "Onboarding", description: "Standard client onboarding form", status: "completed", uploadedFiles: [], startedAt: "2026-07-07 09:00 AM" },
+  { number: 6, name: "Benefits", description: "Select medical & retirement benefits", status: "completed", uploadedFiles: [], startedAt: "2026-07-08 09:00 AM" },
+  { number: 7, name: "I-9 Eligibility", description: "Employment eligibility check (Form I-9)", status: "completed", uploadedFiles: [], startedAt: "2026-07-08 11:00 AM" },
+  { number: 8, name: "Acknowledgments", description: "Acknowledge employee handbooks", status: "completed", uploadedFiles: [], startedAt: "2026-07-09 09:00 AM" },
   {
-    number: 3,
-    name: "Credentialing",
-    description: "Verify licenses and certifications",
+    number: 9,
+    name: "W-4 Withholding",
+    description: "Complete IRS Form W-4",
     status: "stuck",
-    actionRequiredText: "Missing or expired license file.",
+    actionRequiredText: "Complete W-4 Withholding forms to proceed.",
     actionType: "upload",
     uploadedFiles: [],
-    startedAt: "2026-07-06 09:00 AM"
+    startedAt: "2026-07-09 10:00 AM"
   },
-  { number: 4, name: "Interview", description: "Clinical specialist interview", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 11:00 AM" },
-  { number: 5, name: "Contract", description: "Placement agreement contract", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 01:00 PM" },
-  { number: 6, name: "Compliance", description: "Facility compliance modules", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 02:00 PM" },
-  { number: 7, name: "Ready", description: "Final onboarding sign-off", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 04:00 PM" }
+  { number: 10, name: "State Withholding", description: "Complete state tax withholding form", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 11:00 AM" },
+  { number: 11, name: "Method of Payment", description: "Select direct deposit or check payment", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 01:00 PM" },
+  { number: 12, name: "Education Details — Optional", description: "Education history details", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 02:00 PM" },
+  { number: 13, name: "Previous Employers — Optional", description: "List prior employment history", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 04:00 PM" }
 ];
 
 const initialCandidates = (): Candidate[] => [
@@ -218,10 +224,10 @@ const initialCandidates = (): Candidate[] => [
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R",
     slaStatus: "active",
-    currentStep: 3,
+    currentStep: 9,
     stepStatus: "stuck",
-    stuckReason: "Upload Professional Nursing License",
-    stuckExplanation: "Missing or expired license file. Please upload a valid Professional Nursing License.",
+    stuckReason: "Complete Form W-4 Withholding",
+    stuckExplanation: "Complete W-4 Withholding forms to proceed.",
     onboardingSteps: defaultSteps(),
     erpDocuments: [
       { name: "Professional Nursing License", fileName: "-", submissionStatus: "Pending", approvalStatus: "Waiting" },
@@ -257,12 +263,11 @@ const initialCandidates = (): Candidate[] => [
     initiatedBy: "Bindhu R (Jul 08, 2026 07:13)",
     slaStatus: "breached",
     slaBreachDetails: "Drug screening voucher expired — background check checkmark blocked for 5 days.",
-    currentStep: 3,
-    stepStatus: "in_progress",
-    onboardingSteps: defaultSteps().map((s, idx) => ({
-      ...s,
-      status: idx < 2 ? "completed" as const : idx === 2 ? "in_progress" : "pending"
-    })),
+    currentStep: 9,
+    stepStatus: "stuck",
+    stuckReason: "Complete Form W-4 Withholding",
+    stuckExplanation: "Complete W-4 Withholding forms to proceed.",
+    onboardingSteps: defaultSteps(),
     erpDocuments: [
       { name: "401K Benefit", fileName: "401K_Benefit.pdf", submissionStatus: "Completed", approvalStatus: "Submitted" },
       { name: "Annual Evaluation", fileName: "-", submissionStatus: "Pending", approvalStatus: "Waiting" },
@@ -306,10 +311,10 @@ const initialCandidates = (): Candidate[] => [
     initiatedBy: "Bindhu R",
     slaStatus: "active",
     anomalyAlert: "Signatures mismatch: FCRA form name differs from profile name 'Tiffany Vance'.",
-    currentStep: 3,
+    currentStep: 9,
     stepStatus: "stuck",
-    stuckReason: "Missing Background Authorization Form",
-    stuckExplanation: "Background verification cannot begin without a signed FCRA Consent form.",
+    stuckReason: "Complete Form W-4 Withholding",
+    stuckExplanation: "Complete W-4 Withholding forms to proceed.",
     onboardingSteps: defaultSteps(),
     erpDocuments: [
       { name: "Background Check Consent", fileName: "-", submissionStatus: "Pending", approvalStatus: "Waiting" }
@@ -340,7 +345,7 @@ const initialCandidates = (): Candidate[] => [
     obClassification: "Clinical - Patient Facing",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R (Jul 08, 2026 08:17)",
-    currentStep: 7,
+    currentStep: 13,
     stepStatus: "completed",
     onboardingSteps: defaultSteps().map(s => ({ ...s, status: "completed" as const })),
     erpDocuments: [],
@@ -367,7 +372,7 @@ const initialCandidates = (): Candidate[] => [
     obClassification: "Computers",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R",
-    currentStep: 7,
+    currentStep: 13,
     stepStatus: "completed",
     onboardingSteps: defaultSteps().map(s => ({ ...s, status: "completed" as const })),
     erpDocuments: [],
@@ -394,7 +399,7 @@ const initialCandidates = (): Candidate[] => [
     obClassification: "Administrative",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R",
-    currentStep: 7,
+    currentStep: 13,
     stepStatus: "completed",
     onboardingSteps: defaultSteps().map(s => ({ ...s, status: "completed" as const })),
     erpDocuments: [],
@@ -421,9 +426,12 @@ const initialCandidates = (): Candidate[] => [
     obClassification: "Computers",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R",
-    currentStep: 3,
+    currentStep: 9,
     stepStatus: "in_progress",
-    onboardingSteps: defaultSteps(),
+    onboardingSteps: defaultSteps().map((s, idx) => ({
+      ...s,
+      status: idx < 8 ? "completed" as const : idx === 8 ? "in_progress" : "pending"
+    })),
     erpDocuments: [],
     erpPlacementItems: [],
     backgroundStatus: "Completed",
@@ -448,7 +456,7 @@ const initialCandidates = (): Candidate[] => [
     obClassification: "Computers",
     employmentType: "W2 - Hourly",
     initiatedBy: "Bindhu R",
-    currentStep: 1,
+    currentStep: 9,
     stepStatus: "terminated",
     onboardingSteps: defaultSteps(),
     erpDocuments: [],
@@ -529,13 +537,19 @@ const initialNotifications = (): NotificationLog[] => [
 ];
 
 const DEFAULT_SLA_CONFIGS: SlaStepConfig[] = [
-  { stepNumber: 1, stepName: "Application", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Recruiter"] },
-  { stepNumber: 2, stepName: "Screening", durationValue: 2, durationUnit: "days", owner: "vendor", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Team Lead"] },
-  { stepNumber: 3, stepName: "Credentialing", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
-  { stepNumber: 4, stepName: "Interview", durationValue: 2, durationUnit: "days", owner: "recruiter", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Team Lead"] },
-  { stepNumber: 5, stepName: "Contract", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
-  { stepNumber: 6, stepName: "Compliance", durationValue: 4, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
-  { stepNumber: 7, stepName: "Ready", durationValue: 1, durationUnit: "days", owner: "onboarder", reminderLeadTime: 6, reminderLeadUnit: "hours", escalationTarget: ["Recruiter"] }
+  { stepNumber: 1, stepName: "Personal Details", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Recruiter"] },
+  { stepNumber: 2, stepName: "Addresses", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Recruiter"] },
+  { stepNumber: 3, stepName: "Equal Employment", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Recruiter"] },
+  { stepNumber: 4, stepName: "Emergency Contact", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Recruiter"] },
+  { stepNumber: 5, stepName: "Onboarding", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Recruiter"] },
+  { stepNumber: 6, stepName: "Benefits", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Team Lead"] },
+  { stepNumber: 7, stepName: "I-9 Eligibility", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
+  { stepNumber: 8, stepName: "Acknowledgments", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Team Lead"] },
+  { stepNumber: 9, stepName: "W-4 Withholding", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
+  { stepNumber: 10, stepName: "State Withholding", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Team Lead"] },
+  { stepNumber: 11, stepName: "Method of Payment", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Team Lead"] },
+  { stepNumber: 12, stepName: "Education Details — Optional", durationValue: 5, durationUnit: "days", owner: "candidate", reminderLeadTime: 2, reminderLeadUnit: "days", escalationTarget: ["Recruiter"] },
+  { stepNumber: 13, stepName: "Previous Employers — Optional", durationValue: 5, durationUnit: "days", owner: "candidate", reminderLeadTime: 2, reminderLeadUnit: "days", escalationTarget: ["Recruiter"] }
 ];
 
 const DEFAULT_ANOMALIES: AnomalyRecord[] = [
