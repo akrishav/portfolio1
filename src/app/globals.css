@@ -71,3 +71,13 @@ body {
 @utility animate-dropdown-slide {
   animation: dropdownSlide 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Hide stray next/netlify/vercel development widgets */
+iframe#netlify-identity-widget,
+#netlify-modal,
+[class*="netlify"],
+[id*="netlify"],
+next-route-announcer,
+.netlify-backup {
+  display: none !important;
+}

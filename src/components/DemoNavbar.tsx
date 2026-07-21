@@ -20,16 +20,16 @@ export default function DemoNavbar() {
       {/* Floating Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="h-12 w-12 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-full flex items-center justify-center shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/35 transition-all transform hover:-translate-y-0.5 border border-indigo-400/20 relative"
+        className="h-8 w-8 bg-white/90 hover:bg-slate-50 text-slate-400 hover:text-slate-600 rounded-lg flex items-center justify-center border border-slate-200/80 shadow-xs transition-all relative cursor-pointer"
         title="Prototype Controls"
       >
         {isOpen ? (
-          <X className="h-5.5 w-5.5" />
+          <X className="h-4.5 w-4.5" />
         ) : (
-          <Settings className="h-5.5 w-5.5 animate-spin-slow" />
+          <Settings className="h-4.5 w-4.5" />
         )}
         {sortedNotifs.length > 0 && !isOpen && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white animate-bounce">
+          <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[8px] font-bold rounded-full h-4 w-4 flex items-center justify-center border border-white animate-bounce">
             {sortedNotifs.length}
           </span>
         )}
@@ -37,7 +37,7 @@ export default function DemoNavbar() {
 
       {/* Floating Popover Controls Panel */}
       {isOpen && (
-        <div className="absolute bottom-16 right-0 w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-4 space-y-4 text-xs z-50">
+        <div className="absolute bottom-10 right-0 w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-4 space-y-4 text-xs z-50">
           <div className="flex justify-between items-center pb-2 border-b border-slate-800">
             <div className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>

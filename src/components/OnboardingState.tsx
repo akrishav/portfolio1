@@ -209,6 +209,32 @@ const defaultSteps = (): OnboardingStep[] => [
   { number: 14, name: "Required Uploads", description: "Upload required licensing and certification files", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 05:00 PM" }
 ];
 
+const debraSteps = (): OnboardingStep[] => [
+  { number: 1, name: "Personal Details", description: "Submit personal contact information", status: "completed", uploadedFiles: [], startedAt: "2026-07-04 09:00 AM" },
+  { number: 2, name: "Addresses", description: "Submit address history details", status: "completed", uploadedFiles: [], startedAt: "2026-07-05 10:00 AM" },
+  { number: 3, name: "Equal Employment", description: "Equal Employment Opportunity disclosures", status: "completed", uploadedFiles: [], startedAt: "2026-07-06 09:00 AM" },
+  { number: 4, name: "Emergency Contact", description: "Provide primary emergency contact", status: "completed", uploadedFiles: [], startedAt: "2026-07-06 11:00 AM" },
+  { number: 5, name: "Onboarding", description: "Standard client onboarding form", status: "completed", uploadedFiles: [], startedAt: "2026-07-07 09:00 AM" },
+  { number: 6, name: "Benefits", description: "Select medical & retirement benefits", status: "pending", uploadedFiles: [], startedAt: "2026-07-08 09:00 AM" },
+  { number: 7, name: "I-9 Eligibility", description: "Employment eligibility check (Form I-9)", status: "completed", uploadedFiles: [], startedAt: "2026-07-08 11:00 AM" },
+  { number: 8, name: "Acknowledgments", description: "Acknowledge employee handbooks", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 09:00 AM" },
+  { number: 9, name: "W-4 Withholding", description: "Complete IRS Form W-4", status: "completed", uploadedFiles: [], startedAt: "2026-07-09 10:00 AM" },
+  {
+    number: 10,
+    name: "State Withholding",
+    description: "Complete state tax withholding form",
+    status: "stuck",
+    actionRequiredText: "Please complete state tax withholding details to proceed.",
+    actionType: "upload",
+    uploadedFiles: [],
+    startedAt: "2026-07-09 11:00 AM"
+  },
+  { number: 11, name: "Method of Payment", description: "Select direct deposit or check payment", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 01:00 PM" },
+  { number: 12, name: "Education Details — Optional", description: "Education history details", status: "completed", uploadedFiles: [], startedAt: "2026-07-09 02:00 PM" },
+  { number: 13, name: "Previous Employers — Optional", description: "List prior employment history", status: "completed", uploadedFiles: [], startedAt: "2026-07-09 04:00 PM" },
+  { number: 14, name: "Required Uploads", description: "Upload required licensing and certification files", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 05:00 PM" }
+];
+
 const initialCandidates = (): Candidate[] => [
   {
     id: "candidate-mani",
@@ -269,11 +295,11 @@ const initialCandidates = (): Candidate[] => [
     initiatedBy: "Bindhu R (Jul 08, 2026 07:13)",
     slaStatus: "breached",
     slaBreachDetails: "Drug screening voucher expired — background check checkmark blocked for 5 days.",
-    currentStep: 9,
+    currentStep: 10,
     stepStatus: "stuck",
-    stuckReason: "Complete Form W-4 Withholding",
-    stuckExplanation: "Complete W-4 Withholding forms to proceed.",
-    onboardingSteps: defaultSteps(),
+    stuckReason: "Complete State Withholding",
+    stuckExplanation: "Please complete state tax withholding details to proceed.",
+    onboardingSteps: debraSteps(),
     erpDocuments: [
       { name: "401K Benefit", fileName: "401K_Benefit.pdf", submissionStatus: "Completed", approvalStatus: "Submitted" },
       { name: "Annual Evaluation", fileName: "-", submissionStatus: "Pending", approvalStatus: "Waiting" },

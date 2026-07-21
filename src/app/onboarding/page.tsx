@@ -111,6 +111,10 @@ export default function OnboardingPage() {
   const [chatOpen, setChatOpen] = useState(false);
   const [unreadChatCount, setUnreadChatCount] = useState(1);
 
+  // Toast state
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
   // Document uploading modal state
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadTargetStep, setUploadTargetStep] = useState<number>(14);
@@ -386,52 +390,68 @@ export default function OnboardingPage() {
   // Dynamic Forms rendering logic
   const renderActiveSubForm = () => {
     const group = ONBOARDING_GROUPS[activeGroupIndex];
-    const subStep = group.subSteps[activeSubStepIndex];
-
-    switch (subStep.id) {
+    const subStep = group.subSteps[activeSubStepIndex];    switch (subStep.id) {
       case "personal_details":
         return (
-          <div className="space-y-5">
-            <div className="space-y-1 mb-5">
-              <h4 className="text-base font-semibold text-slate-800">Personal details</h4>
-              <p className="text-xs text-slate-455">Please verify your legal name and contact details.</p>
+          <div className="space-y-6">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-base font-bold text-slate-800">Personal details</h4>
+              <p className="text-xs text-slate-455 font-medium">Please verify your legal name and contact details.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Full legal name</label>
-                <input 
-                  type="text" 
-                  value={personalDetails.fullName}
-                  onChange={e => setPersonalDetails(p => ({ ...p, fullName: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+
+            {/* Section 1: Identity */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Identity</span>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Email address</label>
-                <input 
-                  type="email" 
-                  value={personalDetails.email}
-                  onChange={e => setPersonalDetails(p => ({ ...p, email: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-2 space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Full legal name <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={personalDetails.fullName}
+                    onChange={e => setPersonalDetails(p => ({ ...p, fullName: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Social security number <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={personalDetails.ssn}
+                    onChange={e => setPersonalDetails(p => ({ ...p, ssn: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Phone number</label>
-                <input 
-                  type="text" 
-                  value={personalDetails.phone}
-                  onChange={e => setPersonalDetails(p => ({ ...p, phone: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+            </div>
+
+            {/* Section 2: Contact */}
+            <div className="space-y-4 pt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Contact Details</span>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Social security number</label>
-                <input 
-                  type="text" 
-                  value={personalDetails.ssn}
-                  onChange={e => setPersonalDetails(p => ({ ...p, ssn: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-2 space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Email address <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="email" 
+                    value={personalDetails.email}
+                    onChange={e => setPersonalDetails(p => ({ ...p, email: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Phone number <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={personalDetails.phone}
+                    onChange={e => setPersonalDetails(p => ({ ...p, phone: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -439,47 +459,52 @@ export default function OnboardingPage() {
 
       case "addresses":
         return (
-          <div className="space-y-5">
-            <div className="space-y-1 mb-5">
-              <h4 className="text-base font-semibold text-slate-800">Permanent address</h4>
-              <p className="text-xs text-slate-455">Please provide your primary residence address details.</p>
+          <div className="space-y-6">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-base font-bold text-slate-800">Permanent address</h4>
+              <p className="text-xs text-slate-455 font-medium">Please provide your primary residence address details.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-              <div className="space-y-1.5 col-span-full">
-                <label className="text-[13px] font-medium text-slate-700 block">Street address</label>
-                <input 
-                  type="text" 
-                  value={addressDetails.address1}
-                  onChange={e => setAddressDetails(p => ({ ...p, address1: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Mailing Address</span>
               </div>
-              <div className="grid grid-cols-3 gap-6 col-span-full">
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-full space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Street address <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={addressDetails.address1}
+                    onChange={e => setAddressDetails(p => ({ ...p, address1: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
                 <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-slate-700 block">City</label>
+                  <label className="text-[13px] font-medium text-slate-700 block">City <span className="text-rose-500 font-bold">*</span></label>
                   <input 
                     type="text" 
                     value={addressDetails.city}
                     onChange={e => setAddressDetails(p => ({ ...p, city: e.target.value }))}
-                    className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-slate-700 block">State</label>
+                  <label className="text-[13px] font-medium text-slate-700 block">State <span className="text-rose-500 font-bold">*</span></label>
                   <input 
                     type="text" 
                     value={addressDetails.state}
                     onChange={e => setAddressDetails(p => ({ ...p, state: e.target.value }))}
-                    className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[13px] font-medium text-slate-700 block">Zip code</label>
+                  <label className="text-[13px] font-medium text-slate-700 block">Zip code <span className="text-rose-500 font-bold">*</span></label>
                   <input 
                     type="text" 
                     value={addressDetails.zip}
                     onChange={e => setAddressDetails(p => ({ ...p, zip: e.target.value }))}
-                    className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                   />
                 </div>
               </div>
@@ -489,38 +514,45 @@ export default function OnboardingPage() {
 
       case "emergency_contact":
         return (
-          <div className="space-y-5">
-            <div className="space-y-1 mb-5">
-              <h4 className="text-base font-semibold text-slate-800">Emergency contact</h4>
-              <p className="text-xs text-slate-455">Provide a contact in case of a medical or work emergency.</p>
+          <div className="space-y-6">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-base font-bold text-slate-800">Emergency contact</h4>
+              <p className="text-xs text-slate-455 font-medium">Provide a contact in case of a medical or work emergency.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Contact name</label>
-                <input 
-                  type="text" 
-                  value={emergencyDetails.contactName}
-                  onChange={e => setEmergencyDetails(p => ({ ...p, contactName: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Primary Contact</span>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Relationship</label>
-                <input 
-                  type="text" 
-                  value={emergencyDetails.relationship}
-                  onChange={e => setEmergencyDetails(p => ({ ...p, relationship: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
-              </div>
-              <div className="space-y-1.5 col-span-full">
-                <label className="text-[13px] font-medium text-slate-700 block">Phone number</label>
-                <input 
-                  type="text" 
-                  value={emergencyDetails.phone}
-                  onChange={e => setEmergencyDetails(p => ({ ...p, phone: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-2 space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Contact name <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={emergencyDetails.contactName}
+                    onChange={e => setEmergencyDetails(p => ({ ...p, contactName: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Relationship <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={emergencyDetails.relationship}
+                    onChange={e => setEmergencyDetails(p => ({ ...p, relationship: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-[13px] font-medium text-slate-700 block">Phone number <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={emergencyDetails.phone}
+                    onChange={e => setEmergencyDetails(p => ({ ...p, phone: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -528,49 +560,56 @@ export default function OnboardingPage() {
 
       case "equal_employment":
         return (
-          <div className="space-y-5">
-            <div className="space-y-1 mb-5">
-              <h4 className="text-base font-semibold text-slate-800">Equal employment disclosures</h4>
-              <p className="text-xs text-slate-455">Voluntary demographics statistics data requested under Federal regulations.</p>
+          <div className="space-y-6">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-base font-bold text-slate-800">Equal employment disclosures</h4>
+              <p className="text-xs text-slate-455 font-medium">Voluntary demographics statistics data requested under Federal regulations.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Gender selection</label>
-                <select 
-                  value={employmentDetails.gender}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, gender: e.target.value }))}
-                  className="w-full px-3 h-11 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                >
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Decline">Decline to Self-Identify</option>
-                </select>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Demographics</span>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Race / ethnicity</label>
-                <select 
-                  value={employmentDetails.ethnicity}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, ethnicity: e.target.value }))}
-                  className="w-full px-3 h-11 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                >
-                  <option value="Asian">Asian</option>
-                  <option value="White">White / Caucasian</option>
-                  <option value="Hispanic">Hispanic / Latino</option>
-                  <option value="Black">Black / African American</option>
-                  <option value="Decline">Decline to Self-Identify</option>
-                </select>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Veteran status</label>
-                <select 
-                  value={employmentDetails.veteranStatus}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, veteranStatus: e.target.value }))}
-                  className="w-full px-3 h-11 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                >
-                  <option value="No">No, I am not a veteran</option>
-                  <option value="Yes">Yes, protected veteran</option>
-                  <option value="Decline">Decline to Self-Identify</option>
-                </select>
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Gender selection</label>
+                  <select 
+                    value={employmentDetails.gender}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, gender: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  >
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Decline">Decline to Self-Identify</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Race / ethnicity</label>
+                  <select 
+                    value={employmentDetails.ethnicity}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, ethnicity: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  >
+                    <option value="Asian">Asian</option>
+                    <option value="White">White / Caucasian</option>
+                    <option value="Hispanic">Hispanic / Latino</option>
+                    <option value="Black">Black / African American</option>
+                    <option value="Decline">Decline to Self-Identify</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Veteran status</label>
+                  <select 
+                    value={employmentDetails.veteranStatus}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, veteranStatus: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  >
+                    <option value="No">No, I am not a veteran</option>
+                    <option value="Yes">Yes, protected veteran</option>
+                    <option value="Decline">Decline to Self-Identify</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -578,38 +617,45 @@ export default function OnboardingPage() {
 
       case "client_onboarding":
         return (
-          <div className="space-y-5">
-            <div className="space-y-1 mb-5">
-              <h4 className="text-base font-semibold text-slate-800">Client onboarding preference</h4>
-              <p className="text-xs text-slate-455">Verify your clinical specialty details for CDK Global assignment matching.</p>
+          <div className="space-y-6">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-base font-bold text-slate-800">Client onboarding preference</h4>
+              <p className="text-xs text-slate-455 font-medium">Verify your clinical specialty details for CDK Global assignment matching.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Clinical specialty</label>
-                <input 
-                  type="text" 
-                  value={employmentDetails.specialty}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, specialty: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Placement Details</span>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Shift preference</label>
-                <input 
-                  type="text" 
-                  value={employmentDetails.shifts}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, shifts: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Placement location</label>
-                <input 
-                  type="text" 
-                  value={employmentDetails.locations}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, locations: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Clinical specialty <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={employmentDetails.specialty}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, specialty: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Shift preference <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={employmentDetails.shifts}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, shifts: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Placement location <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={employmentDetails.locations}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, locations: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -617,41 +663,48 @@ export default function OnboardingPage() {
 
       case "i9_eligibility":
         return (
-          <div className="space-y-5">
-            <div className="space-y-1 mb-5">
-              <h4 className="text-base font-semibold text-slate-800">Form I-9 eligibility details</h4>
-              <p className="text-xs text-slate-455">Submit verification document details matching your I-9 requirements.</p>
+          <div className="space-y-6">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-base font-bold text-slate-800">Form I-9 eligibility details</h4>
+              <p className="text-xs text-slate-455 font-medium">Submit verification document details matching your I-9 requirements.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Work authorization status</label>
-                <select 
-                  value={employmentDetails.citizenStatus}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, citizenStatus: e.target.value }))}
-                  className="w-full px-3 h-11 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                >
-                  <option value="US Citizen">Citizen of the United States</option>
-                  <option value="Noncitizen National">Noncitizen National of the United States</option>
-                  <option value="Permanent Resident">Lawful Permanent Resident</option>
-                </select>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Verification details</span>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">List A document number</label>
-                <input 
-                  type="text" 
-                  value={employmentDetails.i9DocNum}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, i9DocNum: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Expiration date</label>
-                <input 
-                  type="date" 
-                  value={employmentDetails.i9Expiry}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, i9Expiry: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Work authorization status <span className="text-rose-500 font-bold">*</span></label>
+                  <select 
+                    value={employmentDetails.citizenStatus}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, citizenStatus: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  >
+                    <option value="US Citizen">Citizen of the United States</option>
+                    <option value="Noncitizen National">Noncitizen National of the United States</option>
+                    <option value="Permanent Resident">Lawful Permanent Resident</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">List A document number <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={employmentDetails.i9DocNum}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, i9DocNum: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Expiration date <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="date" 
+                    value={employmentDetails.i9Expiry}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, i9Expiry: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -659,41 +712,48 @@ export default function OnboardingPage() {
 
       case "education_details":
         return (
-          <div className="space-y-5">
-            <div className="flex items-center justify-between mb-5">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between mb-4">
               <div className="space-y-1">
-                <h4 className="text-base font-semibold text-slate-800">Education details</h4>
-                <p className="text-xs text-slate-455">Add educational degrees or certifications to your candidate history (non-blocking).</p>
+                <h4 className="text-base font-bold text-slate-800">Education details</h4>
+                <p className="text-xs text-slate-455 font-medium">Add educational degrees or certifications to your candidate history (non-blocking).</p>
               </div>
               <span className="text-[9.5px] font-bold bg-[#EBF3FC] border border-[#DEEAF7] text-[#0052CC] px-2 py-0.5 rounded uppercase select-none shrink-0">Optional</span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Degree / certification</label>
-                <input 
-                  type="text" 
-                  value={employmentDetails.degree}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, degree: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Degree details</span>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Institution / school</label>
-                <input 
-                  type="text" 
-                  value={employmentDetails.institution}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, institution: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Graduation year</label>
-                <input 
-                  type="text" 
-                  value={employmentDetails.gradYear}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, gradYear: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Degree / certification</label>
+                  <input 
+                    type="text" 
+                    value={employmentDetails.degree}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, degree: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Institution / school</label>
+                  <input 
+                    type="text" 
+                    value={employmentDetails.institution}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, institution: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Graduation year</label>
+                  <input 
+                    type="text" 
+                    value={employmentDetails.gradYear}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, gradYear: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -701,41 +761,48 @@ export default function OnboardingPage() {
 
       case "previous_employers":
         return (
-          <div className="space-y-5">
-            <div className="flex items-center justify-between mb-5">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between mb-4">
               <div className="space-y-1">
-                <h4 className="text-base font-semibold text-slate-800">Previous employers</h4>
-                <p className="text-xs text-slate-455">List prior employment assignments or hospital networks (non-blocking).</p>
+                <h4 className="text-base font-bold text-slate-800">Previous employers</h4>
+                <p className="text-xs text-slate-455 font-medium">List prior employment assignments or hospital networks (non-blocking).</p>
               </div>
               <span className="text-[9.5px] font-bold bg-[#EBF3FC] border border-[#DEEAF7] text-[#0052CC] px-2 py-0.5 rounded uppercase select-none shrink-0">Optional</span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Last employer name</label>
-                <input 
-                  type="text" 
-                  value={employmentDetails.lastEmployer}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, lastEmployer: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Employment history</span>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Role title</label>
-                <input 
-                  type="text" 
-                  value={employmentDetails.lastRole}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, lastRole: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Years worked</label>
-                <input 
-                  type="text" 
-                  value={employmentDetails.yearsWorked}
-                  onChange={e => setEmploymentDetails(p => ({ ...p, yearsWorked: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Last employer name</label>
+                  <input 
+                    type="text" 
+                    value={employmentDetails.lastEmployer}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, lastEmployer: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Role title</label>
+                  <input 
+                    type="text" 
+                    value={employmentDetails.lastRole}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, lastRole: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Years worked</label>
+                  <input 
+                    type="text" 
+                    value={employmentDetails.yearsWorked}
+                    onChange={e => setEmploymentDetails(p => ({ ...p, yearsWorked: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -743,41 +810,48 @@ export default function OnboardingPage() {
 
       case "w4_withholding":
         return (
-          <div className="space-y-5">
-            <div className="space-y-1 mb-5">
-              <h4 className="text-base font-semibold text-slate-800">Federal IRS W-4 withholding</h4>
-              <p className="text-xs text-slate-455">Verify your IRS federal tax withholding allowances preference.</p>
+          <div className="space-y-6">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-base font-bold text-slate-800">Federal IRS W-4 withholding</h4>
+              <p className="text-xs text-slate-455 font-medium">Verify your IRS federal tax withholding allowances preference.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Filing status</label>
-                <select 
-                  value={payrollDetails.filingStatus}
-                  onChange={e => setPayrollDetails(p => ({ ...p, filingStatus: e.target.value }))}
-                  className="w-full px-3 h-11 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                >
-                  <option value="Single">Single / Married Filing Separately</option>
-                  <option value="Married">Married Filing Jointly</option>
-                  <option value="HeadOfHousehold">Head of Household</option>
-                </select>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Federal withholding</span>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">W-4 claim dependents</label>
-                <input 
-                  type="text" 
-                  value={payrollDetails.allowances}
-                  onChange={e => setPayrollDetails(p => ({ ...p, allowances: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Extra withholding amount ($)</label>
-                <input 
-                  type="text" 
-                  value={payrollDetails.extraWithholding}
-                  onChange={e => setPayrollDetails(p => ({ ...p, extraWithholding: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Filing status <span className="text-rose-500 font-bold">*</span></label>
+                  <select 
+                    value={payrollDetails.filingStatus}
+                    onChange={e => setPayrollDetails(p => ({ ...p, filingStatus: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  >
+                    <option value="Single">Single / Married Filing Separately</option>
+                    <option value="Married">Married Filing Jointly</option>
+                    <option value="HeadOfHousehold">Head of Household</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">W-4 claim dependents <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={payrollDetails.allowances}
+                    onChange={e => setPayrollDetails(p => ({ ...p, allowances: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Extra withholding amount ($) <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={payrollDetails.extraWithholding}
+                    onChange={e => setPayrollDetails(p => ({ ...p, extraWithholding: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -785,23 +859,30 @@ export default function OnboardingPage() {
 
       case "state_withholding":
         return (
-          <div className="space-y-5">
-            <div className="space-y-1 mb-5">
-              <h4 className="text-base font-semibold text-slate-800">State tax withholding form</h4>
-              <p className="text-xs text-slate-455">Verify your state-level income tax filing status details.</p>
+          <div className="space-y-6">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-base font-bold text-slate-800">State tax withholding form</h4>
+              <p className="text-xs text-slate-455 font-medium">Verify your state-level income tax filing status details.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">State tax filing status</label>
-                <select 
-                  value={payrollDetails.stateFilingStatus}
-                  onChange={e => setPayrollDetails(p => ({ ...p, stateFilingStatus: e.target.value }))}
-                  className="w-full px-3 h-11 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                >
-                  <option value="Single">Single / Separately</option>
-                  <option value="Jointly">Married Filing Jointly</option>
-                  <option value="Exempt">Exempt / No Income State</option>
-                </select>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">State withholding</span>
+              </div>
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-[13px] font-medium text-slate-700 block">State tax filing status <span className="text-rose-500 font-bold">*</span></label>
+                  <select 
+                    value={payrollDetails.stateFilingStatus}
+                    onChange={e => setPayrollDetails(p => ({ ...p, stateFilingStatus: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  >
+                    <option value="Single">Single / Separately</option>
+                    <option value="Jointly">Married Filing Jointly</option>
+                    <option value="Exempt">Exempt / No Income State</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -809,38 +890,45 @@ export default function OnboardingPage() {
 
       case "method_of_payment":
         return (
-          <div className="space-y-5">
-            <div className="space-y-1 mb-5">
-              <h4 className="text-base font-semibold text-slate-800">Method of payment (direct deposit)</h4>
-              <p className="text-xs text-slate-455">Verify bank account details for direct deposit placement disbursements.</p>
+          <div className="space-y-6">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-base font-bold text-slate-800">Method of payment (direct deposit)</h4>
+              <p className="text-xs text-slate-455 font-medium">Verify bank account details for direct deposit placement disbursements.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Bank name</label>
-                <input 
-                  type="text" 
-                  value={payrollDetails.bankName}
-                  onChange={e => setPayrollDetails(p => ({ ...p, bankName: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Account details</span>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Routing transit number</label>
-                <input 
-                  type="text" 
-                  value={payrollDetails.routingNumber}
-                  onChange={e => setPayrollDetails(p => ({ ...p, routingNumber: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700 block">Account number</label>
-                <input 
-                  type="text" 
-                  value={payrollDetails.accountNumber}
-                  onChange={e => setPayrollDetails(p => ({ ...p, accountNumber: e.target.value }))}
-                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
-                />
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Bank name <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={payrollDetails.bankName}
+                    onChange={e => setPayrollDetails(p => ({ ...p, bankName: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Routing transit number <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={payrollDetails.routingNumber}
+                    onChange={e => setPayrollDetails(p => ({ ...p, routingNumber: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-medium text-slate-700 block">Account number <span className="text-rose-500 font-bold">*</span></label>
+                  <input 
+                    type="text" 
+                    value={payrollDetails.accountNumber}
+                    onChange={e => setPayrollDetails(p => ({ ...p, accountNumber: e.target.value }))}
+                    className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -848,213 +936,236 @@ export default function OnboardingPage() {
 
       case "benefits_election":
         return (
-          <div className="space-y-5">
-            <div className="space-y-1 mb-5">
-              <h4 className="text-base font-semibold text-slate-800">Benefits election</h4>
-              <p className="text-xs text-slate-455">Select your healthcare coverage and retirement plans, or submit a waiver.</p>
+          <div className="space-y-6">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-base font-bold text-slate-800">Benefits election</h4>
+              <p className="text-xs text-slate-455 font-medium">Select your healthcare coverage and retirement plans, or submit a waiver.</p>
             </div>
-            <div className="space-y-3.5">
-              <label className="flex items-center gap-3 p-3.5 bg-slate-50 border border-slate-105 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
-                <input 
-                  type="checkbox" 
-                  checked={benefitsDetails.medicalSelected}
-                  onChange={e => setBenefitsDetails(p => ({ ...p, medicalSelected: e.target.checked, benefitsWaived: false }))}
-                  className="h-4 w-4 rounded border-slate-300 text-[#0052CC] focus:ring-[#0052CC]"
-                />
-                <div className="text-left">
-                  <span className="block text-xs font-bold text-slate-800">Standard Medical PPO Plan</span>
-                  <span className="block text-[10px] text-slate-450 mt-0.5 font-semibold">Comprehensive coverage includes inpatient, outpatient, and prescriptions.</span>
-                </div>
-              </label>
 
-              <label className="flex items-center gap-3 p-3.5 bg-slate-50 border border-slate-105 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
-                <input 
-                  type="checkbox" 
-                  checked={benefitsDetails.dentalSelected}
-                  onChange={e => setBenefitsDetails(p => ({ ...p, dentalSelected: e.target.checked, benefitsWaived: false }))}
-                  className="h-4 w-4 rounded border-slate-300 text-[#0052CC] focus:ring-[#0052CC]"
-                />
-                <div className="text-left">
-                  <span className="block text-xs font-bold text-slate-800">Premier Dental Coverage</span>
-                  <span className="block text-[10px] text-slate-455 mt-0.5 font-semibold">Includes preventative diagnostic cleanings and basic/major restorative work.</span>
-                </div>
-              </label>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Health Coverage Options</span>
+              </div>
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="space-y-3.5">
+                <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
+                  <input 
+                    type="checkbox" 
+                    checked={benefitsDetails.medicalSelected}
+                    onChange={e => setBenefitsDetails(p => ({ ...p, medicalSelected: e.target.checked, benefitsWaived: false }))}
+                    className="h-4 w-4 rounded border-slate-300 text-[#0052CC] focus:ring-[#0052CC]"
+                  />
+                  <div className="text-left">
+                    <span className="block text-xs font-bold text-slate-800">Standard Medical PPO Plan</span>
+                    <span className="block text-[10px] text-slate-450 mt-0.5 font-semibold">Comprehensive coverage includes inpatient, outpatient, and prescriptions.</span>
+                  </div>
+                </label>
 
-              <label className="flex items-center gap-3 p-3.5 bg-slate-50 border border-slate-105 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
-                <input 
-                  type="checkbox" 
-                  checked={benefitsDetails.visionSelected}
-                  onChange={e => setBenefitsDetails(p => ({ ...p, visionSelected: e.target.checked, benefitsWaived: false }))}
-                  className="h-4 w-4 rounded border-slate-300 text-[#0052CC] focus:ring-[#0052CC]"
-                />
-                <div className="text-left">
-                  <span className="block text-xs font-bold text-slate-800">Basic Vision Care Plan</span>
-                  <span className="block text-[10px] text-slate-455 mt-0.5 font-semibold">Covers eye exams, corrective lenses, and allowance towards frames.</span>
-                </div>
-              </label>
+                <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
+                  <input 
+                    type="checkbox" 
+                    checked={benefitsDetails.dentalSelected}
+                    onChange={e => setBenefitsDetails(p => ({ ...p, dentalSelected: e.target.checked, benefitsWaived: false }))}
+                    className="h-4 w-4 rounded border-slate-300 text-[#0052CC] focus:ring-[#0052CC]"
+                  />
+                  <div className="text-left">
+                    <span className="block text-xs font-bold text-slate-800">Premier Dental Coverage</span>
+                    <span className="block text-[10px] text-slate-455 mt-0.5 font-semibold">Includes preventative diagnostic cleanings and basic/major restorative work.</span>
+                  </div>
+                </label>
 
-              <label className="flex items-center gap-3 p-3.5 bg-rose-50/30 border border-rose-100 rounded-xl cursor-pointer hover:bg-rose-50/50 transition-colors">
-                <input 
-                  type="checkbox" 
-                  checked={benefitsDetails.benefitsWaived}
-                  onChange={e => setBenefitsDetails(p => ({ 
-                    ...p, 
-                    benefitsWaived: e.target.checked,
-                    medicalSelected: !e.target.checked ? p.medicalSelected : false,
-                    dentalSelected: !e.target.checked ? p.dentalSelected : false,
-                    visionSelected: !e.target.checked ? p.visionSelected : false
-                  }))}
-                  className="h-4 w-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500"
-                />
-                <div className="text-left">
-                  <span className="block text-xs font-bold text-rose-800">Waive All Corporate Health Benefits</span>
-                  <span className="block text-[10px] text-rose-600/70 mt-0.5 font-semibold">Declining employer-sponsored health benefits. Proof of other coverage may be required.</span>
-                </div>
-              </label>
+                <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
+                  <input 
+                    type="checkbox" 
+                    checked={benefitsDetails.visionSelected}
+                    onChange={e => setBenefitsDetails(p => ({ ...p, visionSelected: e.target.checked, benefitsWaived: false }))}
+                    className="h-4 w-4 rounded border-slate-300 text-[#0052CC] focus:ring-[#0052CC]"
+                  />
+                  <div className="text-left">
+                    <span className="block text-xs font-bold text-slate-800">Basic Vision Care Plan</span>
+                    <span className="block text-[10px] text-slate-455 mt-0.5 font-semibold">Covers eye exams, corrective lenses, and allowance towards frames.</span>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-3 p-3 bg-rose-50/30 border border-rose-100 rounded-xl cursor-pointer hover:bg-rose-50/50 transition-colors">
+                  <input 
+                    type="checkbox" 
+                    checked={benefitsDetails.benefitsWaived}
+                    onChange={e => setBenefitsDetails(p => ({ 
+                      ...p, 
+                      benefitsWaived: e.target.checked,
+                      medicalSelected: !e.target.checked ? p.medicalSelected : false,
+                      dentalSelected: !e.target.checked ? p.dentalSelected : false,
+                      visionSelected: !e.target.checked ? p.visionSelected : false
+                    }))}
+                    className="h-4 w-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500"
+                  />
+                  <div className="text-left">
+                    <span className="block text-xs font-bold text-rose-800">Waive All Corporate Health Benefits</span>
+                    <span className="block text-[10px] text-rose-600/70 mt-0.5 font-semibold">Declining employer-sponsored health benefits. Proof of other coverage may be required.</span>
+                  </div>
+                </label>
+              </div>
             </div>
           </div>
         );
 
       case "agreements_signatures":
         return (
-          <div className="space-y-5">
-            <div className="space-y-1 mb-5">
-              <h4 className="text-base font-semibold text-slate-800">Agreements & signatures</h4>
-              <p className="text-xs text-slate-455">Review and sign standard agreements required for your onboarding.</p>
+          <div className="space-y-6">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-base font-bold text-slate-800">Agreements & signatures</h4>
+              <p className="text-xs text-slate-455 font-medium">Review and sign standard agreements required for your onboarding.</p>
             </div>
-            <div className="space-y-3">
-              <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
-                <div className="text-left">
-                  <span className="text-xs font-bold text-slate-800 block">1. Employee Handbook Acknowledgment</span>
-                  <span className="text-[10px] text-slate-400 block mt-0.5 font-medium">Acknowledged on file • Auto-Signed</span>
-                </div>
-                <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
-              </div>
 
-              <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
-                <div className="text-left">
-                  <span className="text-xs font-bold text-slate-800 block">2. 401(k) Voluntary Enrollment Form</span>
-                  <span className="text-[10px] text-slate-400 block mt-0.5 font-medium">Acknowledged on file • Auto-Signed</span>
-                </div>
-                <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Required documents</span>
               </div>
-
-              <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
-                <div className="text-left">
-                  <span className="text-xs font-bold text-slate-800 block">3. Employee Offer Letter - Hourly(Weekly)</span>
-                  <span className="text-[10px] text-slate-400 block mt-0.5 font-medium">
-                    {documentsDetails.signedOfferLetter ? "Signed Successfully" : "Action Required • Signature Pending"}
-                  </span>
-                </div>
-                {documentsDetails.signedOfferLetter ? (
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="space-y-3">
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                  <div className="text-left">
+                    <span className="text-xs font-bold text-slate-800 block">1. Employee Handbook Acknowledgment</span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5 font-semibold">Acknowledged on file • Auto-Signed</span>
+                  </div>
                   <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
-                ) : (
-                  <button 
-                    onClick={() => {
-                      const sig = prompt("Type your full name to sign your Employment Offer Letter contract:");
-                      if (sig) {
-                        setDocumentsDetails(d => ({ ...d, signedOfferLetter: true, signature: sig }));
-                        alert("Employee Offer Letter signed successfully.");
-                      }
-                    }}
-                    className="px-3 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg text-[10px] font-bold transition-all shadow-xs cursor-pointer shrink-0"
-                  >
-                    Sign Contract
-                  </button>
+                </div>
+
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                  <div className="text-left">
+                    <span className="text-xs font-bold text-slate-800 block">2. 401(k) Voluntary Enrollment Form</span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5 font-semibold">Acknowledged on file • Auto-Signed</span>
+                  </div>
+                  <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+                </div>
+
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                  <div className="text-left">
+                    <span className="text-xs font-bold text-slate-800 block">3. Employee Offer Letter - Hourly(Weekly)</span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5 font-semibold">
+                      {documentsDetails.signedOfferLetter ? "Signed Successfully" : "Action Required • Signature Pending"}
+                    </span>
+                  </div>
+                  {documentsDetails.signedOfferLetter ? (
+                    <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+                  ) : (
+                    <button 
+                      onClick={() => {
+                        const sig = prompt("Type your full name to sign your Employment Offer Letter contract:");
+                        if (sig) {
+                          setDocumentsDetails(d => ({ ...d, signedOfferLetter: true, signature: sig }));
+                          setToastMessage("Employee Offer Letter signed successfully.");
+                          setShowToast(true);
+                          setTimeout(() => setShowToast(false), 3000);
+                        }
+                      }}
+                      className="px-3 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg text-[10px] font-bold transition-all shadow-xs cursor-pointer shrink-0"
+                    >
+                      Sign Contract
+                    </button>
+                  )}
+                </div>
+
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                  <div className="text-left">
+                    <span className="text-xs font-bold text-slate-800 block">4. Drug Check Policy & Consent Form</span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5 font-semibold">Acknowledged on file • Auto-Signed</span>
+                  </div>
+                  <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+                </div>
+
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                  <div className="text-left">
+                    <span className="text-xs font-bold text-slate-800 block">5. Payroll Procedures & Acknowledgment</span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5 font-semibold">Acknowledged on file • Auto-Signed</span>
+                  </div>
+                  <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+                </div>
+
+                {documentsDetails.signedOfferLetter && (
+                  <div className="pt-2 text-left space-y-1.5">
+                    <label className="text-[13px] font-medium text-slate-700 block">Legal signature representation</label>
+                    <input 
+                      type="text" 
+                      value={documentsDetails.signature}
+                      onChange={e => setDocumentsDetails(p => ({ ...p, signature: e.target.value }))}
+                      className="w-full max-w-sm px-3 h-10 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 font-serif italic font-semibold text-slate-705"
+                      placeholder="Typed Legal Name Signature"
+                    />
+                  </div>
                 )}
               </div>
-
-              <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
-                <div className="text-left">
-                  <span className="text-xs font-bold text-slate-800 block">4. Drug Check Policy & Consent Form</span>
-                  <span className="text-[10px] text-slate-400 block mt-0.5 font-medium">Acknowledged on file • Auto-Signed</span>
-                </div>
-                <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
-              </div>
-
-              <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
-                <div className="text-left">
-                  <span className="text-xs font-bold text-slate-800 block">5. Payroll Procedures & Acknowledgment</span>
-                  <span className="text-[10px] text-slate-400 block mt-0.5 font-medium">Acknowledged on file • Auto-Signed</span>
-                </div>
-                <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
-              </div>
-
-              {documentsDetails.signedOfferLetter && (
-                <div className="pt-2 text-left space-y-1.5">
-                  <label className="text-[13px] font-medium text-slate-700 block">Legal signature representation</label>
-                  <input 
-                    type="text" 
-                    value={documentsDetails.signature}
-                    onChange={e => setDocumentsDetails(p => ({ ...p, signature: e.target.value }))}
-                    className="w-full max-w-sm px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 font-serif italic font-semibold text-slate-705"
-                    placeholder="Typed Legal Name Signature"
-                  />
-                </div>
-              )}
             </div>
           </div>
         );
 
       case "required_uploads":
         return (
-          <div className="space-y-5">
-            <div className="space-y-1 mb-5">
-              <h4 className="text-base font-semibold text-slate-800">Required document uploads</h4>
-              <p className="text-xs text-slate-455">Upload physical files representing credential licenses or healthcare screenings.</p>
+          <div className="space-y-6">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-base font-bold text-slate-800">Required document uploads</h4>
+              <p className="text-xs text-slate-455 font-medium">Upload physical files representing credential licenses or healthcare screenings.</p>
             </div>
+
             <div className="space-y-4">
-              {/* Professional License upload slot */}
-              <div className="border border-slate-200 bg-slate-50/50 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left">
-                <div>
-                  <h5 className="text-xs font-bold text-slate-800">Professional Nursing License</h5>
-                  <p className="text-[10px] text-slate-400 font-medium mt-0.5 font-semibold">State registered nursing license registry proof (PDF/JPEG).</p>
-                  
-                  {candidate?.onboardingSteps[13]?.status === "completed" ? (
-                    <div className="mt-2 text-emerald-600 text-[10px] font-bold flex items-center gap-1">
-                      <Check className="h-3.5 w-3.5 stroke-[3px]" /> 
-                      <span>License_Mani.pdf - Awaiting compliance review</span>
-                    </div>
-                  ) : candidate?.stepStatus === "stuck" ? (
-                    <div className="mt-2 bg-rose-50 border border-rose-100 rounded-lg p-2.5 text-[10px] text-rose-800 font-bold flex items-start gap-2 max-w-lg">
-                      <ShieldAlert className="h-4.5 w-4.5 text-rose-600 shrink-0 mt-0.5" />
-                      <div>
-                        <span className="block uppercase tracking-wider text-[8px] font-black text-rose-700">Blocker Anomaly Flagged</span>
-                        <span>SSN and Name mismatches detected on uploaded file. Please click upload below to upload a verified copy.</span>
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-slate-800 uppercase tracking-wider">Document uploads</span>
+              </div>
+              <div className="border-t border-slate-100 my-2"></div>
+              <div className="space-y-4">
+                {/* Professional License upload slot */}
+                <div className="border border-slate-200 bg-slate-50/50 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left">
+                  <div>
+                    <h5 className="text-xs font-bold text-slate-800">Professional Nursing License</h5>
+                    <p className="text-[10px] text-slate-400 font-medium mt-0.5 font-semibold">State registered nursing license registry proof (PDF/JPEG).</p>
+                    
+                    {candidate?.onboardingSteps[13]?.status === "completed" ? (
+                      <div className="mt-2 text-emerald-600 text-[10px] font-bold flex items-center gap-1">
+                        <Check className="h-3.5 w-3.5 stroke-[3px]" /> 
+                        <span>License_Mani.pdf - Awaiting compliance review</span>
                       </div>
-                    </div>
-                  ) : null}
+                    ) : candidate?.stepStatus === "stuck" ? (
+                      <div className="mt-2 bg-rose-50 border border-rose-100 rounded-lg p-2.5 text-[10px] text-rose-800 font-bold flex items-start gap-2 max-w-lg">
+                        <ShieldAlert className="h-4.5 w-4.5 text-rose-600 shrink-0 mt-0.5" />
+                        <div>
+                          <span className="block uppercase tracking-wider text-[8px] font-black text-rose-700">Blocker Anomaly Flagged</span>
+                          <span>SSN and Name mismatches detected on uploaded file. Please click upload below to upload a verified copy.</span>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div>
+                    {candidate?.onboardingSteps[13]?.status === "completed" ? (
+                      <div className="h-8 w-8 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 text-emerald-500">
+                        <Check className="h-4 w-4" />
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={() => triggerUploadFile(14, "Nursing_License_Mani.pdf")}
+                        className="h-10 px-4 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
+                      >
+                        Upload File
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                <div>
-                  {candidate?.onboardingSteps[13]?.status === "completed" ? (
-                    <div className="h-8 w-8 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 text-emerald-500">
-                      <Check className="h-4 w-4" />
-                    </div>
-                  ) : (
+                {/* Immunization records upload slot */}
+                <div className="border border-slate-200 bg-slate-50/50 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left">
+                  <div>
+                    <h5 className="text-xs font-bold text-slate-800">Immunization Records</h5>
+                    <p className="text-[10px] text-slate-400 font-medium mt-0.5 font-semibold">Tuberculosis screening and Hepatitis B series records.</p>
+                  </div>
+                  <div>
                     <button 
-                      onClick={() => triggerUploadFile(14, "Nursing_License_Mani.pdf")}
-                      className="h-10 px-4 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
+                      onClick={() => triggerUploadFile(14, "Immunization_Records_Mani.pdf")}
+                      className="h-10 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl border border-slate-200 text-xs font-bold transition-all cursor-pointer"
                     >
                       Upload File
                     </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Immunization records upload slot */}
-              <div className="border border-slate-200 bg-slate-50/50 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left">
-                <div>
-                  <h5 className="text-xs font-bold text-slate-800">Immunization Records</h5>
-                  <p className="text-[10px] text-slate-400 font-medium mt-0.5 font-semibold">Tuberculosis screening and Hepatitis B series records.</p>
-                </div>
-                <div>
-                  <button 
-                    onClick={() => triggerUploadFile(14, "Immunization_Records_Mani.pdf")}
-                    className="h-10 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl border border-slate-200 text-xs font-bold transition-all cursor-pointer"
-                  >
-                    Upload File
-                  </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1063,10 +1174,10 @@ export default function OnboardingPage() {
 
       case "review_submit":
         return (
-          <div className="space-y-5 text-left">
-            <div className="space-y-1 mb-5">
-              <h4 className="text-base font-semibold text-slate-800">Review & submit onboarding</h4>
-              <p className="text-xs text-slate-455">Verify your entered profile parameters before locking and exporting.</p>
+          <div className="space-y-6 text-left">
+            <div className="space-y-1 mb-4">
+              <h4 className="text-base font-bold text-slate-800">Review & submit onboarding</h4>
+              <p className="text-xs text-slate-455 font-medium">Verify your entered profile parameters before locking and exporting.</p>
             </div>
             
             <div className="space-y-4 max-h-[380px] overflow-y-auto pr-2 no-scrollbar text-xs">
@@ -1158,26 +1269,17 @@ export default function OnboardingPage() {
               </div>
             </div>
 
-            {/* Gated Submit button */}
-            <div className="pt-4 border-t border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-              <div>
-                {getRemainingRequiredSteps() > 0 ? (
-                  <span className="text-[10px] font-bold uppercase bg-rose-50 text-rose-600 border border-rose-100 rounded px-2.5 py-1.5 flex items-center gap-1.5 select-none">
-                    <Lock className="h-3 w-3" /> {getRemainingRequiredSteps()} required sections remaining
-                  </span>
-                ) : (
-                  <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-600 border border-emerald-100 rounded px-2.5 py-1.5 flex items-center gap-1.5 select-none">
-                    <Check className="h-3 w-3 stroke-[3px]" /> Checklist complete! Ready to submit.
-                  </span>
-                )}
-              </div>
-              <button
-                disabled={getRemainingRequiredSteps() > 0}
-                onClick={() => setShowSubmitSuccessModal(true)}
-                className="px-6 h-11 bg-[#0052CC] hover:bg-[#0042A3] disabled:bg-slate-300 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-95 disabled:scale-100 disabled:shadow-none cursor-pointer"
-              >
-                Submit Onboarding
-              </button>
+            {/* Status Banner */}
+            <div className="pt-2">
+              {getRemainingRequiredSteps() > 0 ? (
+                <span className="text-[10px] font-bold uppercase bg-rose-50 text-rose-600 border border-rose-100 rounded px-2.5 py-1.5 flex items-center gap-1.5 select-none w-fit">
+                  <Lock className="h-3 w-3" /> {getRemainingRequiredSteps()} required sections remaining
+                </span>
+              ) : (
+                <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-600 border border-emerald-100 rounded px-2.5 py-1.5 flex items-center gap-1.5 select-none w-fit">
+                  <Check className="h-3 w-3 stroke-[3px]" /> Checklist complete! Ready to submit.
+                </span>
+              )}
             </div>
           </div>
         );
@@ -1872,34 +1974,48 @@ export default function OnboardingPage() {
             {/* Sub-form container card */}
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-6">
               {/* Segmented Sub-step Navigation Row */}
-              <div className="space-y-3">
-                <div className="bg-slate-100/80 p-1.5 rounded-2xl flex flex-wrap items-center gap-1.5 w-fit max-w-full">
+              <div className="border-b border-slate-200 -mx-8 px-8 pb-3.5 mb-6">
+                <div className="flex flex-wrap items-center gap-6">
                   {ONBOARDING_GROUPS[activeGroupIndex].subSteps.map((sub, idx) => {
                     const stepState = candidate.onboardingSteps.find(st => st.number === sub.stepNumber);
                     const isCompleted = stepState?.status === "completed";
+                    const isStuck = stepState?.status === "stuck";
                     const isActive = activeSubStepIndex === idx;
+                    
                     return (
                       <button
                         key={idx}
                         onClick={() => setActiveSubStepIndex(idx)}
-                        className={`px-4 py-2 rounded-xl text-xs transition-all cursor-pointer flex items-center gap-2 font-semibold ${
+                        className={`pb-3.5 text-xs transition-all cursor-pointer flex items-center gap-2 font-bold relative -mb-3.5 ${
                           isActive
-                            ? "bg-white border border-[#0052CC] text-[#0052CC] shadow-xs"
+                            ? "text-[#0052CC] border-b-2 border-[#0052CC]"
                             : isCompleted
-                            ? "hover:bg-slate-200/50 text-slate-700"
-                            : "hover:bg-slate-200/30 text-slate-400 font-medium"
+                            ? "text-[#007A5E] hover:text-[#005E48]"
+                            : isStuck
+                            ? "text-rose-600 hover:text-rose-700"
+                            : "text-slate-400 hover:text-slate-600 font-semibold"
                         }`}
                       >
-                        {isActive ? (
-                          <span className="h-4.5 w-4.5 rounded-full bg-[#0052CC] text-white flex items-center justify-center text-[10px] font-black">
+                        {isCompleted ? (
+                          <div className="h-4.5 w-4.5 rounded-full bg-[#007A5E]/10 border border-[#007A5E]/20 text-[#007A5E] flex items-center justify-center">
+                            <Check className="h-3 w-3 stroke-[3px]" />
+                          </div>
+                        ) : isStuck ? (
+                          <div className="h-4.5 w-4.5 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center">
+                            <AlertCircle className="h-3 w-3 stroke-[3px]" />
+                          </div>
+                        ) : isActive ? (
+                          <div className="h-4.5 w-4.5 rounded-full bg-[#0052CC] text-white flex items-center justify-center text-[10px] font-black">
                             {idx + 1}
-                          </span>
-                        ) : isCompleted ? (
-                          <Check className="h-3.5 w-3.5 text-[#0052CC] stroke-[3px]" />
-                        ) : null}
+                          </div>
+                        ) : (
+                          <div className="h-4.5 w-4.5 rounded-full bg-slate-100 border border-slate-200 text-slate-400 flex items-center justify-center text-[10px] font-bold">
+                            {idx + 1}
+                          </div>
+                        )}
                         <span>{sub.name}</span>
                         {sub.isOptional && (
-                          <span className="text-[8.5px] font-bold bg-[#EBF3FC] border border-[#DEEAF7] text-[#0052CC] px-1.5 py-0.5 rounded select-none uppercase">
+                          <span className="text-[8px] font-black bg-slate-100 text-slate-500 px-1 py-0.5 rounded select-none uppercase">
                             Optional
                           </span>
                         )}
@@ -1907,11 +2023,6 @@ export default function OnboardingPage() {
                     );
                   })}
                 </div>
-                
-                {/* Progress Hint */}
-                <p className="text-[11px] text-slate-400 font-medium px-1">
-                  Step {activeSubStepIndex + 1} of {ONBOARDING_GROUPS[activeGroupIndex].subSteps.length} in this section.
-                </p>
               </div>
 
               {/* Dynamic subform area */}
@@ -1919,24 +2030,48 @@ export default function OnboardingPage() {
                 {renderActiveSubForm()}
               </div>
 
-              {/* Stepper Navigation */}
-              <div className="flex justify-between items-center border-t border-slate-100 pt-6 mt-8">
-                <button
-                  onClick={handlePrevStep}
-                  disabled={activeGroupIndex === 0 && activeSubStepIndex === 0}
-                  className="px-4 py-2.5 border border-slate-200 hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-transparent text-slate-600 rounded-lg text-xs font-bold transition-all cursor-pointer"
-                >
-                  Back
-                </button>
-
-                {ONBOARDING_GROUPS[activeGroupIndex].subSteps[activeSubStepIndex].id !== "review_submit" ? (
+              {/* Stepper Navigation Footer Action Strip */}
+              <div className="bg-slate-55/75 border-t border-slate-200 px-8 py-5 -mx-8 -mb-8 rounded-b-2xl flex justify-between items-center mt-8">
+                <div>
                   <button
-                    onClick={() => handleNextStep(ONBOARDING_GROUPS[activeGroupIndex].subSteps[activeSubStepIndex].stepNumber)}
-                    className="px-5 py-2.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
+                    onClick={handlePrevStep}
+                    disabled={activeGroupIndex === 0 && activeSubStepIndex === 0}
+                    className="px-4 py-2.5 border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent text-slate-700 rounded-lg text-xs font-bold transition-all cursor-pointer bg-white"
                   >
-                    {activeGroupIndex === 4 && activeSubStepIndex === ONBOARDING_GROUPS[activeGroupIndex].subSteps.length - 1 ? "Save & View Review" : "Save & Next"}
+                    Back
                   </button>
-                ) : null}
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setToastMessage("Progress saved successfully.");
+                      setShowToast(true);
+                      setTimeout(() => setShowToast(false), 3000);
+                    }}
+                    className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-bold transition-all cursor-pointer bg-white"
+                  >
+                    Save as Draft
+                  </button>
+                  {ONBOARDING_GROUPS[activeGroupIndex].subSteps[activeSubStepIndex].id !== "review_submit" ? (
+                    <button
+                      onClick={() => handleNextStep(ONBOARDING_GROUPS[activeGroupIndex].subSteps[activeSubStepIndex].stepNumber)}
+                      className="px-4.5 py-2 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
+                    >
+                      {activeGroupIndex === 4 && activeSubStepIndex === ONBOARDING_GROUPS[activeGroupIndex].subSteps.length - 1 ? "Save & View Review" : "Save & Next"}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        updateCandidateStepStatus(candidate.id, 15, "completed");
+                        setShowSubmitSuccessModal(true);
+                      }}
+                      disabled={getRemainingRequiredSteps() > 0}
+                      className="px-4.5 py-2 bg-[#007A5E] hover:bg-[#005E48] disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
+                    >
+                      Submit Onboarding
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -2172,6 +2307,12 @@ export default function OnboardingPage() {
           </div>
         </div>
       </footer>
+      {showToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white text-xs font-bold px-4.5 py-3 rounded-xl shadow-xl z-[999] flex items-center gap-2">
+          <Check className="h-4 w-4 text-emerald-400 stroke-[3px]" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
     </main>
   );
 }
