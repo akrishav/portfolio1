@@ -2137,7 +2137,7 @@ export default function RecruiterDashboard() {
                               "Recruiter",
                               "Team Lead",
                               "Delivery Manager",
-                              "OB Owner (OB Rep)",
+                              "OB Owner",
                               "OB Manager"
                             ];
                             

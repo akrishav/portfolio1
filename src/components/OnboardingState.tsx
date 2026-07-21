@@ -679,14 +679,14 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         const mapped = parsed.map((item: any) => {
           let targets: string[] = [];
           if (Array.isArray(item.escalationTarget)) {
-            targets = item.escalationTarget;
+            targets = item.escalationTarget.map((t: string) => t === "OB Owner (OB Rep)" ? "OB Owner" : t);
           } else if (typeof item.escalationTarget === "string" && item.escalationTarget) {
             const lower = item.escalationTarget.toLowerCase();
             if (lower === "recruiter") targets = ["Recruiter"];
             else if (lower === "team lead") targets = ["Team Lead"];
             else if (lower === "manager" || lower === "ob manager") targets = ["OB Manager"];
             else if (lower === "delivery manager") targets = ["Delivery Manager"];
-            else if (lower === "ob owner" || lower === "ob owner (ob rep)") targets = ["OB Owner (OB Rep)"];
+            else if (lower === "ob owner" || lower === "ob owner (ob rep)") targets = ["OB Owner"];
             else targets = [item.escalationTarget];
           } else {
             targets = ["Recruiter"];
