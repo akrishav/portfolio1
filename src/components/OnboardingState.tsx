@@ -132,7 +132,7 @@ export interface AnomalyRecord {
   title: string;
   description: string;
   severity: "hard-block" | "soft-flag" | "warning";
-  status: "open" | "in_review" | "resolved" | "waived" | "false_positive";
+  status: "open" | "resolved" | "closed";
   stepNumber: number;
   readStatus: "readable" | "unreadable" | "uncertain";
   fieldComparisons?: FieldComparison[];
@@ -1374,13 +1374,13 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         }
         return anom;
       });
-      localStorage.setItem("staffhc_anomalies_v2", JSON.stringify(updated));
+      localStorage.setItem("staffhc_anomalies_v3", JSON.stringify(updated));
       return updated;
     });
 
     const targetAnomaly = anomalies.find(a => a.id === id);
     if (targetAnomaly) {
-      const actionText = nextStatus === "waived" ? "Anomaly Waived" : nextStatus === "resolved" ? "Anomaly Resolved" : "Anomaly Marked False Positive";
+      const actionText = nextStatus === "closed" ? "Anomaly Overridden (Closed)" : "Anomaly Resolved";
       const newLog: AnomalyAuditLog = {
         id: `anom-audit-${Date.now()}`,
         candidateId: targetAnomaly.candidateId,
@@ -1450,7 +1450,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const transferToClient = (candidateId: string): { success: boolean; error?: string } => {
-    const blockers = anomalies.filter(a => a.candidateId === candidateId && a.severity === "hard-block" && (a.status === "open" || a.status === "in_review"));
+    const blockers = anomalies.filter(a => a.candidateId === candidateId && a.severity === "hard-block" && a.status === "open");
     if (blockers.length > 0) {
       return { 
         success: false, 

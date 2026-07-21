@@ -720,7 +720,7 @@ export default function RecruiterDashboard() {
                     <div className="space-y-6">
                                          {/* Active Anomalies List Banner */}
                       {(() => {
-                        const activeAnomalies = anomalies.filter(a => a.candidateId === activeCandidate?.id && (a.status === "open" || a.status === "in_review"));
+                        const activeAnomalies = anomalies.filter(a => a.candidateId === activeCandidate?.id && a.status === "open");
                         if (activeAnomalies.length === 0) return null;
                         
                         return (
@@ -1062,7 +1062,7 @@ export default function RecruiterDashboard() {
                         </div>
 
                         {(() => {
-                          const hardBlockers = anomalies.filter(a => a.candidateId === activeCandidate?.id && a.severity === "hard-block" && (a.status === "open" || a.status === "in_review"));
+                          const hardBlockers = anomalies.filter(a => a.candidateId === activeCandidate?.id && a.severity === "hard-block" && a.status === "open");
                           const isBlocked = hardBlockers.length > 0;
 
                           return (
@@ -1194,7 +1194,7 @@ export default function RecruiterDashboard() {
                           {activeCandidate?.erpDocuments?.map((doc, idx) => {
                             const isUploaded = doc.fileName !== "-";
                             // Check if this document has associated anomalies matching substring of document name
-                            const docAnom = anomalies.find(a => a.candidateId === activeCandidate?.id && a.title.toLowerCase().includes(doc.name.substring(0, 8).toLowerCase()) && (a.status === "open" || a.status === "in_review"));
+                            const docAnom = anomalies.find(a => a.candidateId === activeCandidate?.id && a.title.toLowerCase().includes(doc.name.substring(0, 8).toLowerCase()) && a.status === "open");
 
                             return (
                               <tr key={idx} className={`hover:bg-slate-50/50 transition-colors ${docAnom ? "bg-rose-50/10" : ""}`}>
@@ -2286,7 +2286,7 @@ export default function RecruiterDashboard() {
                       {anomalies.filter(a => a.status === "open").length} Open
                     </span>
                     <span className="text-slate-500 font-semibold">
-                      ({anomalies.filter(a => a.status === "resolved" || a.status === "waived" || a.status === "false_positive").length} Overridden)
+                      ({anomalies.filter(a => a.status === "resolved" || a.status === "closed").length} Overridden)
                     </span>
                   </div>
                   <p className="text-[10px] text-slate-400 font-semibold leading-relaxed">Deterministic OCR verification checks & system integrity logs.</p>
@@ -2386,9 +2386,8 @@ export default function RecruiterDashboard() {
                           <td className="p-4">
                             <span className={`px-2 py-0.5 rounded text-[9.5px] font-bold uppercase ${
                               anom.status === "open" ? "bg-red-50 text-red-600 border border-red-100" :
-                              anom.status === "in_review" ? "bg-amber-50 text-amber-600 border border-amber-100" :
                               anom.status === "resolved" ? "bg-emerald-50 text-[#007A5E] border border-emerald-100" :
-                              anom.status === "waived" ? "bg-blue-50 text-[#0052CC] border border-[#DEEAF7]" :
+                              anom.status === "closed" ? "bg-blue-50 text-[#0052CC] border border-[#DEEAF7]" :
                               "bg-slate-50 text-slate-400 border border-slate-200"
                             }`}>
                               {anom.status}
@@ -2396,7 +2395,7 @@ export default function RecruiterDashboard() {
                           </td>
                           <td className="p-4 text-center pr-6">
                             <div className="flex justify-center gap-1.5">
-                              {anom.status !== "resolved" && anom.status !== "waived" && anom.status !== "false_positive" ? (
+                              {anom.status !== "resolved" && anom.status !== "closed" ? (
                                 <>
                                   {anom.severity === "hard-block" && activeRole === "recruiter" ? (
                                     <span className="text-[10px] text-rose-655 font-bold bg-rose-50 border border-rose-100 rounded px-2.5 py-1 flex items-center gap-1 select-none">
@@ -2415,7 +2414,7 @@ export default function RecruiterDashboard() {
                                           updateAnomalyStatus(anom.id, "resolved", reason);
                                           alert("Anomaly marked as Resolved.");
                                         }}
-                                        className="px-2 py-1 bg-[#007A5E] hover:bg-[#005E48] text-white rounded text-[10px] font-bold transition-all shadow-xs active:scale-95"
+                                        className="px-2 py-1 bg-[#007A5E] hover:bg-[#005E48] text-white rounded text-[10px] font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
                                         title="Mark document resolved/corrected"
                                       >
                                         Resolve
@@ -2424,11 +2423,11 @@ export default function RecruiterDashboard() {
                                         onClick={() => {
                                           const reason = prompt("Enter override justification comments (Mandatory):");
                                           if (reason) {
-                                            updateAnomalyStatus(anom.id, "waived", reason);
-                                            alert("Anomaly waived successfully.");
+                                            updateAnomalyStatus(anom.id, "closed", reason);
+                                            alert("Anomaly waived successfully (Closed).");
                                           }
                                         }}
-                                        className="px-2 py-1 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold transition-all shadow-xs active:scale-95"
+                                        className="px-2 py-1 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
                                         title="Waive security lock requirements"
                                       >
                                         Waive
@@ -2441,10 +2440,10 @@ export default function RecruiterDashboard() {
                                             if (!res) return;
                                             reason = res;
                                           }
-                                          updateAnomalyStatus(anom.id, "false_positive", reason);
-                                          alert("Anomaly marked as False Positive.");
+                                          updateAnomalyStatus(anom.id, "closed", reason);
+                                          alert("Anomaly marked as False Positive (Closed).");
                                         }}
-                                        className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-bold transition-all border border-slate-200 active:scale-95"
+                                        className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-bold transition-all border border-slate-200 active:scale-95 cursor-pointer"
                                         title="Mark system flag as false positive"
                                       >
                                         FP
