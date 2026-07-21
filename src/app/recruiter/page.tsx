@@ -45,12 +45,18 @@ export default function RecruiterDashboard() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      const roleParam = params.get("role");
+      const roleParam = params.get("role") || params.get("userRole");
       if (roleParam === "onboarder") {
         setCurrentRole("onboarder");
+        if (activeRole === "audit") toggleActiveRole();
         logout(); // Force login screen
       } else if (roleParam === "recruiter") {
         setCurrentRole("recruiter");
+        if (activeRole === "audit") toggleActiveRole();
+        logout(); // Force login screen
+      } else if (roleParam === "auditor" || roleParam === "audit") {
+        setCurrentRole("recruiter");
+        if (activeRole === "recruiter") toggleActiveRole();
         logout(); // Force login screen
       }
     }
@@ -65,6 +71,7 @@ export default function RecruiterDashboard() {
 
   // Role perspective switcher: recruiter | onboarder
   const [currentRole, setCurrentRole] = useState<"recruiter" | "onboarder">("recruiter");
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
 
   // Left sidebar navigation view state
   const [currentView, setCurrentView] = useState<"dashboard" | "candidates" | "matrix" | "agencies">("candidates");
@@ -268,6 +275,38 @@ export default function RecruiterDashboard() {
   // Active candidate object helper
   const activeCandidate = candidates.find((c) => c.id === selectedCandidateId);
 
+  const getCandidateOnboardingStatus = (cand: any) => {
+    if (cand.stepStatus === "completed") {
+      return {
+        text: "Employee Created",
+        className: "bg-emerald-50 text-[#007A5E] border border-emerald-100 font-bold"
+      };
+    }
+    if (cand.stepStatus === "terminated") {
+      return {
+        text: "OB Terminated",
+        className: "bg-slate-50 text-slate-400 border border-slate-200"
+      };
+    }
+
+    const activeStep = cand.onboardingSteps?.find((s: any) => s.status !== "completed");
+    const stepNum = activeStep ? activeStep.number : cand.currentStep;
+    const stepName = activeStep ? activeStep.name : "Onboarding";
+    const ageDays = 3 + simulationOffsetDays;
+
+    if (cand.stepStatus === "stuck" || cand.slaStatus === "breached") {
+      return {
+        text: `Stuck at Step ${stepNum}: ${stepName} — ${ageDays} days`,
+        className: "bg-rose-50 text-rose-600 border border-rose-100 font-bold"
+      };
+    }
+
+    return {
+      text: `Step ${stepNum}: ${stepName} — ${ageDays} days`,
+      className: "bg-blue-50 text-blue-600 border border-[#DEEAF7] font-semibold"
+    };
+  };
+
   return (
     <main className="min-h-screen bg-[#F4F6FC] text-[#1E293B] flex flex-col font-sans antialiased">
       <DemoNavbar />
@@ -289,25 +328,109 @@ export default function RecruiterDashboard() {
 
           {/* Right Profile settings */}
           <div className="flex items-center gap-3">
-            
-            {/* Role Switcher Toggle */}
-            <div className="flex items-center gap-1 bg-[#F0F5FA] border border-[#DEEAF7] rounded-full p-1 shadow-3xs text-xs">
+            {/* Custom Role Dropdown */}
+            <div className="relative">
               <button 
-                onClick={toggleActiveRole}
-                className={`px-3 py-1 rounded-full font-bold uppercase transition-all text-[9.5px] ${
-                  activeRole === "recruiter" ? "bg-[#0052CC] text-white shadow-xs" : "text-[#0052CC] hover:bg-blue-50/50"
-                }`}
+                onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+                className="bg-white border border-slate-200 rounded-full px-3.5 py-1.5 flex items-center gap-2 text-[10px] font-extrabold tracking-wider text-slate-700 shadow-3xs cursor-pointer hover:bg-slate-50 transition-all select-none"
               >
-                Recruiter
+                {/* Glowing active indicator dot */}
+                <span className={`h-2 w-2 rounded-full shrink-0 animate-pulse ${
+                  activeRole === "audit" 
+                    ? "bg-[#0052CC] shadow-[0_0_6px_#0052CC]" 
+                    : currentRole === "onboarder" 
+                    ? "bg-[#007A5E] shadow-[0_0_6px_#007A5E]" 
+                    : "bg-[#7C3AED] shadow-[0_0_6px_#7C3AED]"
+                }`} />
+                <span>
+                  {activeRole === "audit" 
+                    ? "AUDITOR" 
+                    : currentRole === "onboarder" 
+                    ? "OB OWNER" 
+                    : "RECRUITER"
+                  }
+                </span>
+                <ChevronDown className="h-3.5 w-3.5 text-slate-400 shrink-0" />
               </button>
-              <button 
-                onClick={toggleActiveRole}
-                className={`px-3 py-1 rounded-full font-bold uppercase transition-all text-[9.5px] ${
-                  activeRole === "audit" ? "bg-[#0052CC] text-white shadow-xs" : "text-[#0052CC] hover:bg-blue-50/50"
-                }`}
-              >
-                Audit Role
-              </button>
+
+              {showRoleDropdown && (
+                <>
+                  {/* Invisible backdrop to close dropdown on outside click */}
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setShowRoleDropdown(false)} 
+                  />
+                  
+                  <div className="absolute right-0 mt-2 w-[260px] bg-white border border-slate-200 rounded-2xl shadow-xl py-3 px-2 z-50 animate-dropdown-slide text-left">
+                    <div className="px-3 py-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 mb-1.5">
+                      Change Perspective
+                    </div>
+                    
+                    {/* Recruiter option */}
+                    <button
+                      onClick={() => {
+                        setCurrentRole("recruiter");
+                        if (activeRole === "audit") toggleActiveRole();
+                        setShowRoleDropdown(false);
+                      }}
+                      className="w-full px-3 py-2 rounded-xl hover:bg-slate-50 flex items-center justify-between text-left transition-colors cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="h-2 w-2 rounded-full bg-[#7C3AED] group-hover:animate-pulse" />
+                        <div>
+                          <div className="font-extrabold text-[11.5px] text-slate-800">Recruiter</div>
+                          <div className="text-[9.5px] text-slate-400 font-semibold mt-0.5 leading-tight">Standard candidate coordinator view</div>
+                        </div>
+                      </div>
+                      {activeRole === "recruiter" && currentRole === "recruiter" && (
+                        <Check className="h-3.5 w-3.5 text-[#0052CC] shrink-0" />
+                      )}
+                    </button>
+
+                    {/* OB Owner option */}
+                    <button
+                      onClick={() => {
+                        setCurrentRole("onboarder");
+                        if (activeRole === "audit") toggleActiveRole();
+                        setShowRoleDropdown(false);
+                      }}
+                      className="w-full px-3 py-2 rounded-xl hover:bg-slate-50 flex items-center justify-between text-left transition-colors cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="h-2 w-2 rounded-full bg-[#007A5E] group-hover:animate-pulse" />
+                        <div>
+                          <div className="font-extrabold text-[11.5px] text-slate-800">OB Owner</div>
+                          <div className="text-[9.5px] text-slate-400 font-semibold mt-0.5 leading-tight">Extend/waive onboarding control view</div>
+                        </div>
+                      </div>
+                      {activeRole === "recruiter" && currentRole === "onboarder" && (
+                        <Check className="h-3.5 w-3.5 text-[#0052CC] shrink-0" />
+                      )}
+                    </button>
+
+                    {/* Auditor option */}
+                    <button
+                      onClick={() => {
+                        setCurrentRole("recruiter");
+                        if (activeRole === "recruiter") toggleActiveRole();
+                        setShowRoleDropdown(false);
+                      }}
+                      className="w-full px-3 py-2 rounded-xl hover:bg-slate-50 flex items-center justify-between text-left transition-colors cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="h-2 w-2 rounded-full bg-[#0052CC] group-hover:animate-pulse" />
+                        <div>
+                          <div className="font-extrabold text-[11.5px] text-slate-800">Auditor</div>
+                          <div className="text-[9.5px] text-slate-400 font-semibold mt-0.5 leading-tight">Audit download & export access view</div>
+                        </div>
+                      </div>
+                      {activeRole === "audit" && (
+                        <Check className="h-3.5 w-3.5 text-[#0052CC] shrink-0" />
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Notification system routing logs trigger - moved to side near profile */}
@@ -482,9 +605,14 @@ export default function RecruiterDashboard() {
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-base font-extrabold text-slate-800">{activeCandidate?.name}</span>
-                        <span className="px-2.5 py-0.5 bg-emerald-50 text-[#007A5E] border border-emerald-100 rounded-full text-[9.5px] font-bold uppercase tracking-wider">
-                          Active Onboarding
-                        </span>
+                        {(() => {
+                          const statusDisp = getCandidateOnboardingStatus(activeCandidate);
+                          return (
+                            <span className={`px-2.5 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider ${statusDisp.className}`}>
+                              {statusDisp.text}
+                            </span>
+                          );
+                        })()}
                       </div>
                       <span className="text-xs text-slate-400 font-semibold block mt-0.5">
                         Candidate #: {activeCandidate?.candidateNo} • {activeCandidate?.jobTitle}
@@ -744,6 +872,23 @@ export default function RecruiterDashboard() {
                             </span>
                           </div>
                         </div>
+
+                        {/* Dynamic Stuck Onboarding step banner */}
+                        {activeCandidate?.stepStatus !== "completed" && activeCandidate?.stepStatus !== "terminated" && (() => {
+                          const activeStep = activeCandidate.onboardingSteps?.find(s => s.status !== "completed");
+                          const stepNum = activeStep ? activeStep.number : activeCandidate.currentStep;
+                          const stepName = activeStep ? activeStep.name : "Onboarding Step";
+                          const ageDays = 3 + simulationOffsetDays;
+                          return (
+                            <div className="bg-rose-50 border border-rose-100 rounded-xl p-4 flex items-center gap-3 text-rose-800 text-xs font-bold my-2 shadow-2xs">
+                              <AlertCircle className="h-5 w-5 text-rose-600 shrink-0 animate-bounce" />
+                              <div>
+                                <span className="block text-rose-700 uppercase tracking-wider text-[9px] font-black">Action Required: Candidate is currently blocked</span>
+                                <span className="text-[13px] font-black block mt-0.5">Stuck at Step {stepNum}: {stepName} — {ageDays} days</span>
+                              </div>
+                            </div>
+                          );
+                        })()}
 
                         {/* Horizontal Timeline Track */}
                         <div className="grid grid-cols-1 md:grid-cols-7 gap-3 pt-2">
@@ -1557,15 +1702,12 @@ export default function RecruiterDashboard() {
                         <th className="p-4">Client</th>
                         <th className="p-4">MSP</th>
                         <th className="p-4">State</th>
-                        <th className="p-4">Start Date</th>
-                        <th className="p-4">SLA Status</th>
-                        <th className="p-4 text-right pr-6">Action</th>
+                        <th className="p-4 pr-6">Start Date</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 bg-white font-semibold text-slate-655">
                       {filteredCandidates.map((cand) => {
                         const isBreached = cand.slaStatus === "breached";
-                        const hasAnomaly = !!cand.anomalyAlert;
                         
                         return (
                           <React.Fragment key={cand.id}>
@@ -1584,41 +1726,20 @@ export default function RecruiterDashboard() {
                                   <div>
                                     <div className="flex items-center">
                                       <span className={`font-extrabold block hover:text-[#007A5E] ${isBreached ? "text-rose-700 font-black" : "text-slate-800"}`}>{cand.name}</span>
-                                      {anomalies.filter(a => a.candidateId === cand.id && (a.status === "open" || a.status === "in_review")).length > 0 && (() => {
-                                        const count = anomalies.filter(a => a.candidateId === cand.id && (a.status === "open" || a.status === "in_review")).length;
-                                        const isHard = anomalies.some(a => a.candidateId === cand.id && a.severity === "hard-block" && (a.status === "open" || a.status === "in_review"));
-                                        return (
-                                          <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ml-2 border ${
-                                            isHard ? "bg-rose-50 text-rose-600 border-rose-200 animate-pulse" : "bg-amber-50 text-amber-600 border-amber-200"
-                                          }`}>
-                                            ⚠️ {count} {isHard ? "Blocked" : "Flagged"}
-                                          </span>
-                                        );
-                                      })()}
                                     </div>
                                     <span className={`text-[10px] block ${isBreached ? "text-rose-600/70" : "text-slate-455"}`}>Candidate #: {cand.candidateNo} • {cand.jobTitle}</span>
                                   </div>
                                 </div>
                               </td>
                               <td className="p-4">
-                                <span className={`px-2.5 py-0.5 rounded-full text-[9.5px] font-bold uppercase ${
-                                  cand.stepStatus === "completed" 
-                                    ? "bg-emerald-50 text-emerald-600 border border-emerald-100" 
-                                    : cand.stepStatus === "stuck"
-                                    ? "bg-rose-50 text-rose-600 border border-rose-100"
-                                    : cand.stepStatus === "terminated"
-                                    ? "bg-rose-100 text-rose-700 border border-rose-205"
-                                    : "bg-blue-50 text-blue-600 border border-blue-100"
-                                }`}>
-                                  {cand.stepStatus === "completed" 
-                                    ? "Employee Created" 
-                                    : cand.stepStatus === "stuck"
-                                    ? "Stuck Onboarding"
-                                    : cand.stepStatus === "terminated"
-                                    ? "OB Terminated"
-                                    : "Active Onboarding"
-                                  }
-                                </span>
+                                {(() => {
+                                  const statusDisp = getCandidateOnboardingStatus(cand);
+                                  return (
+                                    <span className={`px-2.5 py-0.5 rounded-full text-[9.5px] ${statusDisp.className}`}>
+                                      {statusDisp.text}
+                                    </span>
+                                  );
+                                })()}
                               </td>
                               <td className="p-4">
                                 {cand.id === "candidate-debra" ? (
@@ -1636,51 +1757,8 @@ export default function RecruiterDashboard() {
                               <td className="p-4 text-slate-800">{cand.clientName}</td>
                               <td className="p-4 text-slate-400">{cand.mspName}</td>
                               <td className="p-4">{cand.stateCode}</td>
-                              <td className="p-4 text-slate-805">{cand.startDate}</td>
-                              <td className="p-4">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setExpandedCandidateId(expandedCandidateId === cand.id ? null : cand.id);
-                                  }}
-                                  className={`px-2.5 py-1 rounded-full text-[9.5px] font-bold uppercase tracking-wide flex items-center gap-1 transition-all ${
-                                    isBreached 
-                                      ? "bg-rose-100 hover:bg-rose-200 text-rose-600 border border-rose-200 animate-pulse" 
-                                      : "bg-emerald-50 hover:bg-emerald-100 text-[#007A5E] border border-emerald-100"
-                                  }`}
-                                >
-                                  {isBreached ? "⚠️ SLA Breached" : "SLA Active"}
-                                  <ChevronDown className={`h-3 w-3 shrink-0 transition-transform ${expandedCandidateId === cand.id ? "rotate-180" : ""}`} />
-                                </button>
-                              </td>
-                              <td className="p-4 text-right pr-6">
-                                <button className="p-1.5 hover:bg-slate-100 rounded transition-colors text-slate-400">
-                                  <Eye className="h-4.5 w-4.5" />
-                                </button>
-                              </td>
+                              <td className="p-4 text-slate-850 pr-6">{cand.startDate}</td>
                             </tr>
-                            {expandedCandidateId === cand.id && (
-                              <tr className="bg-rose-50/20 text-xs">
-                                <td colSpan={9} className="p-4 pl-12 border-t border-rose-100/30 text-rose-700">
-                                  <div className="space-y-2 text-left">
-                                    <div className="flex items-center gap-2 font-bold text-rose-650">
-                                      <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
-                                      <span>SLA Status Warning: {cand.slaBreachDetails || "General compliance delay detected."}</span>
-                                    </div>
-                                    {cand.onboardingSteps && cand.onboardingSteps.length > 0 && (
-                                      <div className="flex flex-wrap gap-2.5 font-bold text-slate-500 mt-1 pl-6">
-                                        <span>Missing compliance checks:</span>
-                                        {cand.onboardingSteps.filter(s => s.status !== "completed").map(s => (
-                                          <span key={s.number} className="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-[10px]">
-                                            {s.name} ({s.status === "stuck" ? "Stuck" : "Pending"})
-                                          </span>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                </td>
-                              </tr>
-                            )}
                           </React.Fragment>
                         );
                       })}
