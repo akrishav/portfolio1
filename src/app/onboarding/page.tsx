@@ -135,7 +135,7 @@ export default function OnboardingPage() {
 
         {/* Header matching Image 2 */}
         <header className="bg-white border-b border-slate-100 shadow-sm sticky top-0 z-40">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <img
                 src="/staffhc-logo.png"
@@ -303,7 +303,7 @@ export default function OnboardingPage() {
       <main className="min-h-screen bg-[#F4F6FC] text-[#1E293B] flex flex-col font-sans antialiased">
         <DemoNavbar />
         <header className="bg-white border-b border-slate-100 shadow-sm sticky top-0 z-40">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <img
                 src="/staffhc-logo.png"
@@ -364,7 +364,7 @@ export default function OnboardingPage() {
 
       {/* Corporate Dashboard Header */}
       <header className="bg-white border-b border-slate-100 shadow-sm z-30 shrink-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
               src="/staffhc-logo.png"
@@ -504,7 +504,7 @@ export default function OnboardingPage() {
 
           {/* Main dashboard content area split into sidebar, middle, and right columns */}
           {activeHeaderTab === "dashboard" ? (
-            <div className="grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8 items-start">
+            <div className="grow max-w-[1600px] w-full mx-auto px-6 py-8 flex flex-col lg:flex-row gap-8 items-start">
               
               {/* COLUMN 1: LEFT SIDEBAR (Always visible on large screens) */}
               <aside className="w-full lg:w-60 bg-white border border-slate-200 rounded-2xl p-6 lg:flex flex-col h-[560px] shadow-sm justify-between shrink-0 hidden">
@@ -1142,7 +1142,7 @@ export default function OnboardingPage() {
         </aside>
       </div>
       ) : (
-        <div className="grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8 items-start">
+        <div className="grow max-w-[1600px] w-full mx-auto px-6 py-8 flex flex-col lg:flex-row gap-8 items-start">
           
           {/* Stepper column */}
           <section className="flex-1 space-y-6 w-full text-left">
@@ -1469,7 +1469,7 @@ export default function OnboardingPage() {
 
       {/* Footer */}
       <footer className="bg-slate-55 border-t border-slate-200 shrink-0 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-455 font-medium">
+        <div className="max-w-[1600px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-455 font-medium">
           <div>
             © 2026 Staff HC INC. All rights reserved.
           </div>
