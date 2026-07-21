@@ -2122,20 +2122,66 @@ export default function RecruiterDashboard() {
                           </div>
                         </td>
                         <td className="p-4">
-                          <select
-                            value={config.escalationTarget}
-                            onChange={(e) => {
-                              const target = e.target.value as any;
-                              const next = [...slaSettings];
-                              next[index] = { ...config, escalationTarget: target };
-                              updateSlaConfig(next);
-                            }}
-                            className="px-2 py-1 border border-slate-200 rounded font-semibold text-slate-750"
-                          >
-                            <option value="recruiter">Recruiter</option>
-                            <option value="team lead">Team Lead</option>
-                            <option value="manager">Manager</option>
-                          </select>
+                          {(() => {
+                            const targets = Array.isArray(config.escalationTarget)
+                              ? config.escalationTarget
+                              : typeof config.escalationTarget === "string" && config.escalationTarget
+                              ? [
+                                  config.escalationTarget === "recruiter" ? "Recruiter" :
+                                  config.escalationTarget === "team lead" ? "Team Lead" :
+                                  config.escalationTarget === "manager" ? "OB Manager" : config.escalationTarget
+                                ]
+                              : ["Recruiter"];
+                              
+                            const options = [
+                              "Recruiter",
+                              "Team Lead",
+                              "Delivery Manager",
+                              "OB Owner (OB Rep)",
+                              "OB Manager"
+                            ];
+                            
+                            return (
+                              <div className="relative inline-block text-left group">
+                                <button className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-700 font-semibold text-[11px] hover:bg-slate-50 flex items-center justify-between gap-1.5 min-w-[135px] cursor-pointer shadow-3xs">
+                                  <span className="truncate max-w-[100px] text-left">
+                                    {targets.join(", ") || "Select Targets"}
+                                  </span>
+                                  <ChevronDown className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                                </button>
+                                
+                                <div className="absolute right-0 top-full mt-1 z-40 hidden group-hover:block bg-white border border-slate-200 rounded-xl shadow-xl p-2.5 space-y-1.5 min-w-[180px] text-left animate-dropdown-slide">
+                                  <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1 pb-1 border-b border-slate-100 mb-1">
+                                    Escalation Targets
+                                  </div>
+                                  {options.map((opt) => {
+                                    const checked = targets.includes(opt);
+                                    return (
+                                      <label key={opt} className="flex items-center gap-2 px-1.5 py-1 rounded-md hover:bg-slate-50 text-[11px] font-semibold text-slate-700 cursor-pointer select-none">
+                                        <input
+                                          type="checkbox"
+                                          checked={checked}
+                                          onChange={() => {
+                                            let nextTargets = [...targets];
+                                            if (checked) {
+                                              nextTargets = nextTargets.filter(t => t !== opt);
+                                            } else {
+                                              nextTargets.push(opt);
+                                            }
+                                            const next = [...slaSettings];
+                                            next[index] = { ...config, escalationTarget: nextTargets };
+                                            updateSlaConfig(next);
+                                          }}
+                                          className="rounded border-slate-350 text-[#0052CC] focus:ring-0 h-3.5 w-3.5"
+                                        />
+                                        <span>{opt}</span>
+                                      </label>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </td>
                       </tr>
                     ))}
@@ -2146,13 +2192,13 @@ export default function RecruiterDashboard() {
                 <button 
                   onClick={() => {
                     updateSlaConfig([
-                      { stepNumber: 1, stepName: "Application", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: "recruiter" },
-                      { stepNumber: 2, stepName: "Screening", durationValue: 2, durationUnit: "days", owner: "vendor", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "team lead" },
-                      { stepNumber: 3, stepName: "Credentialing", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
-                      { stepNumber: 4, stepName: "Interview", durationValue: 2, durationUnit: "days", owner: "recruiter", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: "team lead" },
-                      { stepNumber: 5, stepName: "Contract", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
-                      { stepNumber: 6, stepName: "Compliance", durationValue: 4, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
-                      { stepNumber: 7, stepName: "Ready", durationValue: 1, durationUnit: "days", owner: "onboarder", reminderLeadTime: 6, reminderLeadUnit: "hours", escalationTarget: "recruiter" }
+                      { stepNumber: 1, stepName: "Application", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Recruiter"] },
+                      { stepNumber: 2, stepName: "Screening", durationValue: 2, durationUnit: "days", owner: "vendor", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Team Lead"] },
+                      { stepNumber: 3, stepName: "Credentialing", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
+                      { stepNumber: 4, stepName: "Interview", durationValue: 2, durationUnit: "days", owner: "recruiter", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Team Lead"] },
+                      { stepNumber: 5, stepName: "Contract", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
+                      { stepNumber: 6, stepName: "Compliance", durationValue: 4, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
+                      { stepNumber: 7, stepName: "Ready", durationValue: 1, durationUnit: "days", owner: "onboarder", reminderLeadTime: 6, reminderLeadUnit: "hours", escalationTarget: ["Recruiter"] }
                     ]);
                     alert("Reset to default SLA configurations successfully.");
                   }}

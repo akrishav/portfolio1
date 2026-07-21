@@ -103,7 +103,7 @@ export interface SlaStepConfig {
   owner: "candidate" | "recruiter" | "onboarder" | "vendor";
   reminderLeadTime: number;
   reminderLeadUnit: "hours" | "days";
-  escalationTarget: "recruiter" | "team lead" | "manager";
+  escalationTarget: string[];
 }
 
 export interface SlaAuditLog {
@@ -529,13 +529,13 @@ const initialNotifications = (): NotificationLog[] => [
 ];
 
 const DEFAULT_SLA_CONFIGS: SlaStepConfig[] = [
-  { stepNumber: 1, stepName: "Application", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: "recruiter" },
-  { stepNumber: 2, stepName: "Screening", durationValue: 2, durationUnit: "days", owner: "vendor", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "team lead" },
-  { stepNumber: 3, stepName: "Credentialing", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
-  { stepNumber: 4, stepName: "Interview", durationValue: 2, durationUnit: "days", owner: "recruiter", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: "team lead" },
-  { stepNumber: 5, stepName: "Contract", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
-  { stepNumber: 6, stepName: "Compliance", durationValue: 4, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: "manager" },
-  { stepNumber: 7, stepName: "Ready", durationValue: 1, durationUnit: "days", owner: "onboarder", reminderLeadTime: 6, reminderLeadUnit: "hours", escalationTarget: "recruiter" }
+  { stepNumber: 1, stepName: "Application", durationValue: 1, durationUnit: "days", owner: "candidate", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Recruiter"] },
+  { stepNumber: 2, stepName: "Screening", durationValue: 2, durationUnit: "days", owner: "vendor", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Team Lead"] },
+  { stepNumber: 3, stepName: "Credentialing", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
+  { stepNumber: 4, stepName: "Interview", durationValue: 2, durationUnit: "days", owner: "recruiter", reminderLeadTime: 12, reminderLeadUnit: "hours", escalationTarget: ["Team Lead"] },
+  { stepNumber: 5, stepName: "Contract", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
+  { stepNumber: 6, stepName: "Compliance", durationValue: 4, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["OB Manager"] },
+  { stepNumber: 7, stepName: "Ready", durationValue: 1, durationUnit: "days", owner: "onboarder", reminderLeadTime: 6, reminderLeadUnit: "hours", escalationTarget: ["Recruiter"] }
 ];
 
 const DEFAULT_ANOMALIES: AnomalyRecord[] = [
@@ -674,7 +674,32 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const savedSimOffset = localStorage.getItem("staffhc_sim_offset");
 
     if (savedSlaConfig) {
-      setSlaSettings(JSON.parse(savedSlaConfig));
+      try {
+        const parsed = JSON.parse(savedSlaConfig);
+        const mapped = parsed.map((item: any) => {
+          let targets: string[] = [];
+          if (Array.isArray(item.escalationTarget)) {
+            targets = item.escalationTarget;
+          } else if (typeof item.escalationTarget === "string" && item.escalationTarget) {
+            const lower = item.escalationTarget.toLowerCase();
+            if (lower === "recruiter") targets = ["Recruiter"];
+            else if (lower === "team lead") targets = ["Team Lead"];
+            else if (lower === "manager" || lower === "ob manager") targets = ["OB Manager"];
+            else if (lower === "delivery manager") targets = ["Delivery Manager"];
+            else if (lower === "ob owner" || lower === "ob owner (ob rep)") targets = ["OB Owner (OB Rep)"];
+            else targets = [item.escalationTarget];
+          } else {
+            targets = ["Recruiter"];
+          }
+          return {
+            ...item,
+            escalationTarget: targets
+          };
+        });
+        setSlaSettings(mapped);
+      } catch (e) {
+        setSlaSettings(DEFAULT_SLA_CONFIGS);
+      }
     } else {
       setSlaSettings(DEFAULT_SLA_CONFIGS);
     }
