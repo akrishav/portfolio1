@@ -1,6 +1,6 @@
-# Walkthrough: Onboarding Role Selection & SLA Configuration Updates
+# Walkthrough: Onboarding Role Selection, SLA Configuration & Timeline Updates
 
-This walkthrough documents the role perspective picker dropdown in the recruiter dashboard header, the additional Compliance Auditor entry card on the hiring managers portal page, and the premium multi-select Escalation Targets configuration component.
+This walkthrough documents the role perspective picker dropdown in the recruiter dashboard header, the additional Compliance Auditor entry card on the hiring managers portal page, the premium multi-select Escalation Targets configuration component, and the alignment of the 13 onboarding steps timeline.
 
 ---
 
@@ -33,11 +33,19 @@ This walkthrough documents the role perspective picker dropdown in the recruiter
     1. `Recruiter`
     2. `Team Lead`
     3. `Delivery Manager`
-    4. `OB Owner (OB Rep)`
+    4. `OB Owner`
     5. `OB Manager`
 *   **Safe Backward Compatibility & State Mapping**:
     *   Updated the `SlaStepConfig` interface field `escalationTarget` to store arrays of strings (`string[]`).
     *   Configured the local storage parser in `OnboardingState.tsx` to automatically intercept any legacy single-string configuration options (e.g., `"recruiter"`, `"team lead"`, `"manager"`) and upgrade them to array formats dynamically, avoiding crashes.
+
+### 4. 13-Step Onboarding Timeline Format Across All Screens
+*   **Unified Steps Alignment**: Changed candidate onboarding step structures from the old 7 steps to the new 13 steps format across all mock data definitions and UI lists.
+*   **Horizontal Grid Wrap (Recruiter Dashboard)**: The recruiter details horizontal grid naturally wraps 7 items in the first row and the remaining 6 items in the second row, matching the screenshot perfectly.
+*   **Two-Row Timeline Layout (Candidate Portal)**: Re-designed the candidate portal timeline layout (`/onboarding`) to present steps in two clean rows connected by separate progress bar line indicators:
+    *   **Row 1**: Steps 1 - 7 (`Personal Details` through `I-9 Eligibility`).
+    *   **Row 2**: Steps 8 - 13 (`Acknowledgments` through `Previous Employers — Optional`).
+*   **Status Index Mappings**: Aligned document checklist and upload targets to point to Step 9 (`W-4 Withholding`, index 8) instead of the old hardcoded Step 3. Made warning banners display the active stuck step number dynamically.
 
 ---
 

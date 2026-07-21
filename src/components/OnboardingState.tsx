@@ -628,10 +628,10 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [anomalyAuditLogs, setAnomalyAuditLogs] = useState<AnomalyAuditLog[]>([]);
 
   useEffect(() => {
-    const savedCandidates = localStorage.getItem("staffhc_candidates_v4");
-    const savedMessages = localStorage.getItem("staffhc_messages_v4");
-    const savedNotifs = localStorage.getItem("staffhc_notifications_v4");
-    const savedUser = localStorage.getItem("staffhc_logged_user_v4");
+    const savedCandidates = localStorage.getItem("staffhc_candidates_v5");
+    const savedMessages = localStorage.getItem("staffhc_messages_v5");
+    const savedNotifs = localStorage.getItem("staffhc_notifications_v5");
+    const savedUser = localStorage.getItem("staffhc_logged_user_v5");
 
     if (savedCandidates) {
       try {
@@ -683,8 +683,8 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       }
     }
 
-    const savedSlaConfig = localStorage.getItem("staffhc_sla_config");
-    const savedSlaAudit = localStorage.getItem("staffhc_sla_audit");
+    const savedSlaConfig = localStorage.getItem("staffhc_sla_config_v2");
+    const savedSlaAudit = localStorage.getItem("staffhc_sla_audit_v2");
     const savedSimOffset = localStorage.getItem("staffhc_sim_offset");
 
     if (savedSlaConfig) {
@@ -730,9 +730,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setSimulationOffsetDays(0);
     }
 
-    const savedAnomalies = localStorage.getItem("staffhc_anomalies_v2");
-    const savedAnomalyAudit = localStorage.getItem("staffhc_anomaly_audit");
-    const savedActiveRole = localStorage.getItem("staffhc_active_role");
+    const savedAnomalies = localStorage.getItem("staffhc_anomalies_v3");
+    const savedAnomalyAudit = localStorage.getItem("staffhc_anomaly_audit_v2");
+    const savedActiveRole = localStorage.getItem("staffhc_active_role_v2");
 
     if (savedAnomalies) {
       setAnomalies(JSON.parse(savedAnomalies));
@@ -755,38 +755,40 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   useEffect(() => {
     if (candidates.length > 0) {
-      localStorage.setItem("staffhc_candidates_v4", JSON.stringify(candidates));
+      localStorage.setItem("staffhc_candidates_v5", JSON.stringify(candidates));
     }
   }, [candidates]);
 
   useEffect(() => {
     if (messages.length > 0) {
-      localStorage.setItem("staffhc_messages_v4", JSON.stringify(messages));
+      localStorage.setItem("staffhc_messages_v5", JSON.stringify(messages));
     }
   }, [messages]);
 
   useEffect(() => {
     if (notifications.length > 0) {
-      localStorage.setItem("staffhc_notifications_v4", JSON.stringify(notifications));
+      localStorage.setItem("staffhc_notifications_v5", JSON.stringify(notifications));
     }
   }, [notifications]);
 
   useEffect(() => {
     if (loggedInUser) {
-      localStorage.setItem("staffhc_logged_user_v4", JSON.stringify(loggedInUser));
+      localStorage.setItem("staffhc_logged_user_v5", JSON.stringify(loggedInUser));
     } else {
-      localStorage.removeItem("staffhc_logged_user_v4");
+      localStorage.removeItem("staffhc_logged_user_v5");
     }
   }, [loggedInUser]);
 
   useEffect(() => {
     if (slaSettings.length > 0) {
-      localStorage.setItem("staffhc_sla_config", JSON.stringify(slaSettings));
+      localStorage.setItem("staffhc_sla_config_v2", JSON.stringify(slaSettings));
     }
   }, [slaSettings]);
 
   useEffect(() => {
-    localStorage.setItem("staffhc_sla_audit", JSON.stringify(slaAuditLogs));
+    if (slaAuditLogs.length > 0) {
+      localStorage.setItem("staffhc_sla_audit_v2", JSON.stringify(slaAuditLogs));
+    }
   }, [slaAuditLogs]);
 
   useEffect(() => {
@@ -794,16 +796,20 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, [simulationOffsetDays]);
 
   useEffect(() => {
-    localStorage.setItem("staffhc_active_role", activeRole);
-  }, [activeRole]);
-
-  useEffect(() => {
-    localStorage.setItem("staffhc_anomalies_v2", JSON.stringify(anomalies));
+    if (anomalies.length > 0) {
+      localStorage.setItem("staffhc_anomalies_v3", JSON.stringify(anomalies));
+    }
   }, [anomalies]);
 
   useEffect(() => {
-    localStorage.setItem("staffhc_anomaly_audit", JSON.stringify(anomalyAuditLogs));
+    if (anomalyAuditLogs.length > 0) {
+      localStorage.setItem("staffhc_anomaly_audit_v2", JSON.stringify(anomalyAuditLogs));
+    }
   }, [anomalyAuditLogs]);
+
+  useEffect(() => {
+    localStorage.setItem("staffhc_active_role_v2", activeRole);
+  }, [activeRole]);
 
   const login = (email: string, role: "candidate" | "recruiter") => {
     const cleanEmail = email.toLowerCase().trim();
@@ -1231,12 +1237,12 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
                 return {
                   ...c,
                   slaStatus: "breached" as const,
-                  slaBreachDetails: "Step 3 (Credentialing) exceeded 3-day SLA target."
+                  slaBreachDetails: "Step 9 (W-4 Withholding) exceeded 3-day SLA target."
                 };
               }
               return c;
             });
-            localStorage.setItem("staffhc_candidates_v4", JSON.stringify(nextC));
+            localStorage.setItem("staffhc_candidates_v5", JSON.stringify(nextC));
             return nextC;
           });
         }
@@ -1297,7 +1303,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         }
         return cand;
       });
-      localStorage.setItem("staffhc_candidates_v4", JSON.stringify(next));
+      localStorage.setItem("staffhc_candidates_v5", JSON.stringify(next));
       return next;
     });
 
@@ -1421,16 +1427,16 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const resetDemoState = () => {
-    localStorage.removeItem("staffhc_candidates_v4");
-    localStorage.removeItem("staffhc_messages_v4");
-    localStorage.removeItem("staffhc_notifications_v4");
-    localStorage.removeItem("staffhc_logged_user_v4");
-    localStorage.removeItem("staffhc_sla_config");
-    localStorage.removeItem("staffhc_sla_audit");
+    localStorage.removeItem("staffhc_candidates_v5");
+    localStorage.removeItem("staffhc_messages_v5");
+    localStorage.removeItem("staffhc_notifications_v5");
+    localStorage.removeItem("staffhc_logged_user_v5");
+    localStorage.removeItem("staffhc_sla_config_v2");
+    localStorage.removeItem("staffhc_sla_audit_v2");
     localStorage.removeItem("staffhc_sim_offset");
-    localStorage.removeItem("staffhc_anomalies_v2");
-    localStorage.removeItem("staffhc_anomaly_audit");
-    localStorage.removeItem("staffhc_active_role");
+    localStorage.removeItem("staffhc_anomalies_v3");
+    localStorage.removeItem("staffhc_anomaly_audit_v2");
+    localStorage.removeItem("staffhc_active_role_v2");
     setCandidates(initialCandidates());
     setMessages(initialMessages());
     setNotifications(initialNotifications());
