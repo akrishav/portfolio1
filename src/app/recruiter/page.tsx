@@ -1503,6 +1503,14 @@ export default function RecruiterDashboard() {
                                         </div>
                                         <p className="font-bold text-[10.5px]">{log.description}</p>
                                         <p className="text-[9.5px] text-slate-450 font-normal">Operator: <span className="font-bold">{log.operator}</span></p>
+                                        {log.previousState && log.newState && (
+                                          <div className="flex items-center gap-1.5 text-[9px] mt-1 font-bold text-slate-450 uppercase">
+                                            <span>State:</span>
+                                            <span className="px-1 py-0.5 bg-slate-100/80 border border-slate-200 rounded font-bold text-[8.5px]">{log.previousState}</span>
+                                            <span>➔</span>
+                                            <span className="px-1 py-0.5 bg-blue-50 border border-blue-100 text-[#0052CC] rounded font-bold text-[8.5px]">{log.newState}</span>
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
                                   );
@@ -1535,6 +1543,14 @@ export default function RecruiterDashboard() {
                                         </div>
                                         <p className="font-bold text-[10.5px]">{log.details}</p>
                                         <p className="text-[9.5px] text-slate-450 font-normal">Operator: <span className="font-bold">{log.operator}</span></p>
+                                        {log.previousState && log.newState && (
+                                          <div className="flex items-center gap-1.5 text-[9px] mt-1 font-bold text-slate-450 uppercase">
+                                            <span>State:</span>
+                                            <span className="px-1 py-0.5 bg-slate-100/80 border border-slate-200 rounded font-bold text-[8.5px]">{log.previousState}</span>
+                                            <span>➔</span>
+                                            <span className="px-1 py-0.5 bg-blue-50 border border-blue-100 text-[#0052CC] rounded font-bold text-[8.5px]">{log.newState}</span>
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
                                   );

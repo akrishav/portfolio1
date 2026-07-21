@@ -114,6 +114,8 @@ export interface SlaAuditLog {
   description: string;
   timestamp: string;
   operator: string;
+  previousState?: string;
+  newState?: string;
 }
 
 export interface FieldComparison {
@@ -145,6 +147,8 @@ export interface AnomalyAuditLog {
   details: string;
   timestamp: string;
   operator: string;
+  previousState?: string;
+  newState?: string;
 }
 
 interface OnboardingContextType {
@@ -1213,6 +1217,23 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             timestamp: `Today 09:12 AM`,
             status: "delivered"
           });
+
+          // Add SLA audit log for warning margin
+          setSlaAuditLogs(prevLogs => {
+            const existsLog = prevLogs.some(l => l.id === `audit-at-risk-${nextOffset}`);
+            if (existsLog) return prevLogs;
+            return [...prevLogs, {
+              id: `audit-at-risk-${nextOffset}`,
+              candidateId: "candidate-mani",
+              stepNumber: 9,
+              eventType: "at_risk",
+              description: "Step 9 (W-4 Withholding) reached 48-hour warning margin limit.",
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " + new Date().toLocaleDateString(),
+              operator: "System",
+              previousState: "active",
+              newState: "warning"
+            }];
+          });
         }
       }
       if (nextOffset >= 2) {
@@ -1228,6 +1249,23 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             message: `⚠️ System escalated SLA breach for Mani (Step 3: Credentialing). Target exceeded. Notification routed to manager.`,
             timestamp: `Today 10:30 AM`,
             status: "delivered"
+          });
+
+          // Add SLA audit log for SLA breach
+          setSlaAuditLogs(prevLogs => {
+            const existsLog = prevLogs.some(l => l.id === `audit-breach-${nextOffset}`);
+            if (existsLog) return prevLogs;
+            return [...prevLogs, {
+              id: `audit-breach-${nextOffset}`,
+              candidateId: "candidate-mani",
+              stepNumber: 9,
+              eventType: "breach",
+              description: "SLA breached: Step 9 (W-4 Withholding) exceeded duration limit.",
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " + new Date().toLocaleDateString(),
+              operator: "System",
+              previousState: "warning",
+              newState: "breached"
+            }];
           });
 
           // Update candidate Mani SLA status to breached
@@ -1307,6 +1345,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return next;
     });
 
+    const cand = candidates.find(c => c.id === candidateId);
+    const prevSlaStatus = cand ? cand.slaStatus : "active";
+
     const newLog: SlaAuditLog = {
       id: `audit-${Date.now()}`,
       candidateId,
@@ -1314,7 +1355,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       eventType: "waiver",
       description: `SLA waived for Step ${stepNumber}. Reason: "${reason}"`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " + new Date().toLocaleDateString(),
-      operator
+      operator,
+      previousState: prevSlaStatus,
+      newState: "active"
     };
     setSlaAuditLogs(prev => [...prev, newLog]);
   };
@@ -1344,7 +1387,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         action: actionText,
         details: `Status changed to ${nextStatus}. Reason: "${reason || 'N/A'}"`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " + new Date().toLocaleDateString(),
-        operator: activeRole === "audit" ? "Alex (Compliance Audit)" : "Alex (Recruiter)"
+        operator: activeRole === "audit" ? "Alex (Compliance Audit)" : "Alex (Recruiter)",
+        previousState: targetAnomaly.status,
+        newState: nextStatus
       };
       setAnomalyAuditLogs(prev => [...prev, newLog]);
     }
@@ -1419,7 +1464,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       action: "Client Transfer Successful",
       details: "Candidate onboarding file successfully uploaded system-to-system to CDK Global MSP portal.",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " + new Date().toLocaleDateString(),
-      operator: "Alex"
+      operator: "Alex",
+      previousState: "pending_export",
+      newState: "exported"
     };
     setAnomalyAuditLogs(prev => [...prev, newLog]);
 
