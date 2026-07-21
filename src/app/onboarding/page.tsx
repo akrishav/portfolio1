@@ -9,7 +9,7 @@ import {
   Lock, Mail, KeyRound, CheckCircle2, AlertTriangle, Send, 
   UploadCloud, FileText, Check, ArrowRight, User, Clock, 
   Bell, File, CheckCircle, ShieldAlert, AlertCircle, Layout, 
-  Settings, HelpCircle, LogOut, ChevronRight, MessageSquare, Inbox, DollarSign
+  Settings, HelpCircle, LogOut, ChevronRight, MessageSquare, Inbox, DollarSign, ChevronDown, X
 } from "lucide-react";
 
 interface SubStep {
@@ -108,6 +108,8 @@ export default function OnboardingPage() {
   // Chat/Notification state
   const [chatMessage, setChatMessage] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [unreadChatCount, setUnreadChatCount] = useState(1);
 
   // Document uploading modal state
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -389,44 +391,46 @@ export default function OnboardingPage() {
     switch (subStep.id) {
       case "personal_details":
         return (
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Personal Details</h4>
-            <p className="text-[11px] text-slate-400 font-medium">Please verify your legal name and contact details.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-5">
+            <div className="space-y-1 mb-5">
+              <h4 className="text-base font-semibold text-slate-800">Personal details</h4>
+              <p className="text-xs text-slate-455">Please verify your legal name and contact details.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-450 uppercase">Full Legal Name</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Full legal name</label>
                 <input 
                   type="text" 
                   value={personalDetails.fullName}
                   onChange={e => setPersonalDetails(p => ({ ...p, fullName: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Email Address</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Email address</label>
                 <input 
                   type="email" 
                   value={personalDetails.email}
                   onChange={e => setPersonalDetails(p => ({ ...p, email: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Phone Number</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Phone number</label>
                 <input 
                   type="text" 
                   value={personalDetails.phone}
                   onChange={e => setPersonalDetails(p => ({ ...p, phone: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Social Security Number</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Social security number</label>
                 <input 
                   type="text" 
                   value={personalDetails.ssn}
                   onChange={e => setPersonalDetails(p => ({ ...p, ssn: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
             </div>
@@ -435,45 +439,47 @@ export default function OnboardingPage() {
 
       case "addresses":
         return (
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Permanent Address</h4>
-            <p className="text-[11px] text-slate-400 font-medium">Please provide your primary residence address details.</p>
-            <div className="space-y-3">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Street Address</label>
+          <div className="space-y-5">
+            <div className="space-y-1 mb-5">
+              <h4 className="text-base font-semibold text-slate-800">Permanent address</h4>
+              <p className="text-xs text-slate-455">Please provide your primary residence address details.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+              <div className="space-y-1.5 col-span-full">
+                <label className="text-[13px] font-medium text-slate-700 block">Street address</label>
                 <input 
                   type="text" 
                   value={addressDetails.address1}
                   onChange={e => setAddressDetails(p => ({ ...p, address1: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-6 col-span-full">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-455 uppercase">City</label>
+                  <label className="text-[13px] font-medium text-slate-700 block">City</label>
                   <input 
                     type="text" 
                     value={addressDetails.city}
                     onChange={e => setAddressDetails(p => ({ ...p, city: e.target.value }))}
-                    className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                    className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-455 uppercase">State</label>
+                  <label className="text-[13px] font-medium text-slate-700 block">State</label>
                   <input 
                     type="text" 
                     value={addressDetails.state}
                     onChange={e => setAddressDetails(p => ({ ...p, state: e.target.value }))}
-                    className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                    className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-455 uppercase">ZIP Code</label>
+                  <label className="text-[13px] font-medium text-slate-700 block">Zip code</label>
                   <input 
                     type="text" 
                     value={addressDetails.zip}
                     onChange={e => setAddressDetails(p => ({ ...p, zip: e.target.value }))}
-                    className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                    className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                   />
                 </div>
               </div>
@@ -483,35 +489,37 @@ export default function OnboardingPage() {
 
       case "emergency_contact":
         return (
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Emergency Contact</h4>
-            <p className="text-[11px] text-slate-400 font-medium">Provide a contact in case of an medical or work emergency.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-5">
+            <div className="space-y-1 mb-5">
+              <h4 className="text-base font-semibold text-slate-800">Emergency contact</h4>
+              <p className="text-xs text-slate-455">Provide a contact in case of a medical or work emergency.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Contact Name</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Contact name</label>
                 <input 
                   type="text" 
                   value={emergencyDetails.contactName}
                   onChange={e => setEmergencyDetails(p => ({ ...p, contactName: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Relationship</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Relationship</label>
                 <input 
                   type="text" 
                   value={emergencyDetails.relationship}
                   onChange={e => setEmergencyDetails(p => ({ ...p, relationship: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Phone Number</label>
+              <div className="space-y-1.5 col-span-full">
+                <label className="text-[13px] font-medium text-slate-700 block">Phone number</label>
                 <input 
                   type="text" 
                   value={emergencyDetails.phone}
                   onChange={e => setEmergencyDetails(p => ({ ...p, phone: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
             </div>
@@ -520,16 +528,18 @@ export default function OnboardingPage() {
 
       case "equal_employment":
         return (
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Equal Employment Disclosures</h4>
-            <p className="text-[11px] text-slate-400 font-medium">Voluntary demographics statistics data requested under Federal regulations.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-5">
+            <div className="space-y-1 mb-5">
+              <h4 className="text-base font-semibold text-slate-800">Equal employment disclosures</h4>
+              <p className="text-xs text-slate-455">Voluntary demographics statistics data requested under Federal regulations.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Gender Selection</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Gender selection</label>
                 <select 
                   value={employmentDetails.gender}
                   onChange={e => setEmploymentDetails(p => ({ ...p, gender: e.target.value }))}
-                  className="w-full px-3 py-2 text-xs border border-slate-205 rounded-lg focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3 h-11 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 >
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -537,11 +547,11 @@ export default function OnboardingPage() {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Race / Ethnicity</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Race / ethnicity</label>
                 <select 
                   value={employmentDetails.ethnicity}
                   onChange={e => setEmploymentDetails(p => ({ ...p, ethnicity: e.target.value }))}
-                  className="w-full px-3 py-2 text-xs border border-slate-205 rounded-lg focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3 h-11 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 >
                   <option value="Asian">Asian</option>
                   <option value="White">White / Caucasian</option>
@@ -551,11 +561,11 @@ export default function OnboardingPage() {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Veteran Status</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Veteran status</label>
                 <select 
                   value={employmentDetails.veteranStatus}
                   onChange={e => setEmploymentDetails(p => ({ ...p, veteranStatus: e.target.value }))}
-                  className="w-full px-3 py-2 text-xs border border-slate-205 rounded-lg focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3 h-11 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 >
                   <option value="No">No, I am not a veteran</option>
                   <option value="Yes">Yes, protected veteran</option>
@@ -568,35 +578,37 @@ export default function OnboardingPage() {
 
       case "client_onboarding":
         return (
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Client Onboarding Preference</h4>
-            <p className="text-[11px] text-slate-400 font-medium">Verify your clinical specialty details for CDK Global assignment matching.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-5">
+            <div className="space-y-1 mb-5">
+              <h4 className="text-base font-semibold text-slate-800">Client onboarding preference</h4>
+              <p className="text-xs text-slate-455">Verify your clinical specialty details for CDK Global assignment matching.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Clinical Specialty</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Clinical specialty</label>
                 <input 
                   type="text" 
                   value={employmentDetails.specialty}
                   onChange={e => setEmploymentDetails(p => ({ ...p, specialty: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Shift Preference</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Shift preference</label>
                 <input 
                   type="text" 
                   value={employmentDetails.shifts}
                   onChange={e => setEmploymentDetails(p => ({ ...p, shifts: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Placement Location</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Placement location</label>
                 <input 
                   type="text" 
                   value={employmentDetails.locations}
                   onChange={e => setEmploymentDetails(p => ({ ...p, locations: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
             </div>
@@ -605,16 +617,18 @@ export default function OnboardingPage() {
 
       case "i9_eligibility":
         return (
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Form I-9 Eligibility Details</h4>
-            <p className="text-[11px] text-slate-400 font-medium">Submit verification document details matching your I-9 requirements.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-5">
+            <div className="space-y-1 mb-5">
+              <h4 className="text-base font-semibold text-slate-800">Form I-9 eligibility details</h4>
+              <p className="text-xs text-slate-455">Submit verification document details matching your I-9 requirements.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Work Authorization Status</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Work authorization status</label>
                 <select 
                   value={employmentDetails.citizenStatus}
                   onChange={e => setEmploymentDetails(p => ({ ...p, citizenStatus: e.target.value }))}
-                  className="w-full px-3 py-2 text-xs border border-slate-205 rounded-lg focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3 h-11 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 >
                   <option value="US Citizen">Citizen of the United States</option>
                   <option value="Noncitizen National">Noncitizen National of the United States</option>
@@ -622,21 +636,21 @@ export default function OnboardingPage() {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">List A Document Number</label>
+                <label className="text-[13px] font-medium text-slate-700 block">List A document number</label>
                 <input 
                   type="text" 
                   value={employmentDetails.i9DocNum}
                   onChange={e => setEmploymentDetails(p => ({ ...p, i9DocNum: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Expiration Date</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Expiration date</label>
                 <input 
                   type="date" 
                   value={employmentDetails.i9Expiry}
                   onChange={e => setEmploymentDetails(p => ({ ...p, i9Expiry: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
             </div>
@@ -645,38 +659,40 @@ export default function OnboardingPage() {
 
       case "education_details":
         return (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Education Details</h4>
-              <span className="text-[9px] font-black bg-blue-50 text-[#0052CC] border border-[#DEEAF7] px-2 py-0.5 rounded uppercase">Optional</span>
+          <div className="space-y-5">
+            <div className="flex items-center justify-between mb-5">
+              <div className="space-y-1">
+                <h4 className="text-base font-semibold text-slate-800">Education details</h4>
+                <p className="text-xs text-slate-455">Add educational degrees or certifications to your candidate history (non-blocking).</p>
+              </div>
+              <span className="text-[9.5px] font-bold bg-[#EBF3FC] border border-[#DEEAF7] text-[#0052CC] px-2 py-0.5 rounded uppercase select-none shrink-0">Optional</span>
             </div>
-            <p className="text-[11px] text-slate-400 font-medium">Add educational degrees or certifications to your candidate history (non-blocking).</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Degree / Certification</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Degree / certification</label>
                 <input 
                   type="text" 
                   value={employmentDetails.degree}
                   onChange={e => setEmploymentDetails(p => ({ ...p, degree: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Institution / School</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Institution / school</label>
                 <input 
                   type="text" 
                   value={employmentDetails.institution}
                   onChange={e => setEmploymentDetails(p => ({ ...p, institution: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Graduation Year</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Graduation year</label>
                 <input 
                   type="text" 
                   value={employmentDetails.gradYear}
                   onChange={e => setEmploymentDetails(p => ({ ...p, gradYear: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
             </div>
@@ -685,38 +701,40 @@ export default function OnboardingPage() {
 
       case "previous_employers":
         return (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Previous Employers</h4>
-              <span className="text-[9px] font-black bg-blue-50 text-[#0052CC] border border-[#DEEAF7] px-2 py-0.5 rounded uppercase">Optional</span>
+          <div className="space-y-5">
+            <div className="flex items-center justify-between mb-5">
+              <div className="space-y-1">
+                <h4 className="text-base font-semibold text-slate-800">Previous employers</h4>
+                <p className="text-xs text-slate-455">List prior employment assignments or hospital networks (non-blocking).</p>
+              </div>
+              <span className="text-[9.5px] font-bold bg-[#EBF3FC] border border-[#DEEAF7] text-[#0052CC] px-2 py-0.5 rounded uppercase select-none shrink-0">Optional</span>
             </div>
-            <p className="text-[11px] text-slate-400 font-medium">List prior employment assignments or hospital networks (non-blocking).</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Last Employer Name</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Last employer name</label>
                 <input 
                   type="text" 
                   value={employmentDetails.lastEmployer}
                   onChange={e => setEmploymentDetails(p => ({ ...p, lastEmployer: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Role Title</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Role title</label>
                 <input 
                   type="text" 
                   value={employmentDetails.lastRole}
                   onChange={e => setEmploymentDetails(p => ({ ...p, lastRole: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Years Worked</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Years worked</label>
                 <input 
                   type="text" 
                   value={employmentDetails.yearsWorked}
                   onChange={e => setEmploymentDetails(p => ({ ...p, yearsWorked: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
             </div>
@@ -725,16 +743,18 @@ export default function OnboardingPage() {
 
       case "w4_withholding":
         return (
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Federal IRS W-4 Withholding</h4>
-            <p className="text-[11px] text-slate-400 font-medium">Verify your IRS federal tax withholding allowances preference.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-5">
+            <div className="space-y-1 mb-5">
+              <h4 className="text-base font-semibold text-slate-800">Federal IRS W-4 withholding</h4>
+              <p className="text-xs text-slate-455">Verify your IRS federal tax withholding allowances preference.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Filing Status</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Filing status</label>
                 <select 
                   value={payrollDetails.filingStatus}
                   onChange={e => setPayrollDetails(p => ({ ...p, filingStatus: e.target.value }))}
-                  className="w-full px-3 py-2 text-xs border border-slate-205 rounded-lg focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3 h-11 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 >
                   <option value="Single">Single / Married Filing Separately</option>
                   <option value="Married">Married Filing Jointly</option>
@@ -742,21 +762,21 @@ export default function OnboardingPage() {
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">W-4 Claim Dependents</label>
+                <label className="text-[13px] font-medium text-slate-700 block">W-4 claim dependents</label>
                 <input 
                   type="text" 
                   value={payrollDetails.allowances}
                   onChange={e => setPayrollDetails(p => ({ ...p, allowances: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Extra Withholding Amount ($)</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Extra withholding amount ($)</label>
                 <input 
                   type="text" 
                   value={payrollDetails.extraWithholding}
                   onChange={e => setPayrollDetails(p => ({ ...p, extraWithholding: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
             </div>
@@ -765,16 +785,18 @@ export default function OnboardingPage() {
 
       case "state_withholding":
         return (
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">State Tax Withholding Form</h4>
-            <p className="text-[11px] text-slate-400 font-medium">Verify your state-level income tax filing status details.</p>
-            <div className="space-y-3">
-              <div className="space-y-1.5 max-w-sm">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">State Tax Filing Status</label>
+          <div className="space-y-5">
+            <div className="space-y-1 mb-5">
+              <h4 className="text-base font-semibold text-slate-800">State tax withholding form</h4>
+              <p className="text-xs text-slate-455">Verify your state-level income tax filing status details.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-1.5">
+                <label className="text-[13px] font-medium text-slate-700 block">State tax filing status</label>
                 <select 
                   value={payrollDetails.stateFilingStatus}
                   onChange={e => setPayrollDetails(p => ({ ...p, stateFilingStatus: e.target.value }))}
-                  className="w-full px-3 py-2 text-xs border border-slate-205 rounded-lg focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3 h-11 border border-slate-205 rounded-xl focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 >
                   <option value="Single">Single / Separately</option>
                   <option value="Jointly">Married Filing Jointly</option>
@@ -787,35 +809,37 @@ export default function OnboardingPage() {
 
       case "method_of_payment":
         return (
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Method of Payment (Direct Deposit)</h4>
-            <p className="text-[11px] text-slate-400 font-medium">Verify bank account details for direct deposit placement disbursements.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-5">
+            <div className="space-y-1 mb-5">
+              <h4 className="text-base font-semibold text-slate-800">Method of payment (direct deposit)</h4>
+              <p className="text-xs text-slate-455">Verify bank account details for direct deposit placement disbursements.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Bank Name</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Bank name</label>
                 <input 
                   type="text" 
                   value={payrollDetails.bankName}
                   onChange={e => setPayrollDetails(p => ({ ...p, bankName: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Routing Transit Number</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Routing transit number</label>
                 <input 
                   type="text" 
                   value={payrollDetails.routingNumber}
                   onChange={e => setPayrollDetails(p => ({ ...p, routingNumber: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase">Account Number</label>
+                <label className="text-[13px] font-medium text-slate-700 block">Account number</label>
                 <input 
                   type="text" 
                   value={payrollDetails.accountNumber}
                   onChange={e => setPayrollDetails(p => ({ ...p, accountNumber: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  className="w-full px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 text-xs font-semibold text-slate-805"
                 />
               </div>
             </div>
@@ -824,11 +848,13 @@ export default function OnboardingPage() {
 
       case "benefits_election":
         return (
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Benefits Election Portal</h4>
-            <p className="text-[11px] text-slate-400 font-medium">Select your healthcare coverage and retirement plans, or submit a waiver.</p>
+          <div className="space-y-5">
+            <div className="space-y-1 mb-5">
+              <h4 className="text-base font-semibold text-slate-800">Benefits election</h4>
+              <p className="text-xs text-slate-455">Select your healthcare coverage and retirement plans, or submit a waiver.</p>
+            </div>
             <div className="space-y-3.5">
-              <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
+              <label className="flex items-center gap-3 p-3.5 bg-slate-50 border border-slate-105 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
                 <input 
                   type="checkbox" 
                   checked={benefitsDetails.medicalSelected}
@@ -837,11 +863,11 @@ export default function OnboardingPage() {
                 />
                 <div className="text-left">
                   <span className="block text-xs font-bold text-slate-800">Standard Medical PPO Plan</span>
-                  <span className="block text-[10px] text-slate-450 mt-0.5">Comprehensive coverage includes inpatient, outpatient, and prescriptions.</span>
+                  <span className="block text-[10px] text-slate-450 mt-0.5 font-semibold">Comprehensive coverage includes inpatient, outpatient, and prescriptions.</span>
                 </div>
               </label>
 
-              <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
+              <label className="flex items-center gap-3 p-3.5 bg-slate-50 border border-slate-105 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
                 <input 
                   type="checkbox" 
                   checked={benefitsDetails.dentalSelected}
@@ -850,11 +876,11 @@ export default function OnboardingPage() {
                 />
                 <div className="text-left">
                   <span className="block text-xs font-bold text-slate-800">Premier Dental Coverage</span>
-                  <span className="block text-[10px] text-slate-455 mt-0.5">Includes preventative diagnostic cleanings and basic/major restorative work.</span>
+                  <span className="block text-[10px] text-slate-455 mt-0.5 font-semibold">Includes preventative diagnostic cleanings and basic/major restorative work.</span>
                 </div>
               </label>
 
-              <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
+              <label className="flex items-center gap-3 p-3.5 bg-slate-50 border border-slate-105 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
                 <input 
                   type="checkbox" 
                   checked={benefitsDetails.visionSelected}
@@ -863,11 +889,11 @@ export default function OnboardingPage() {
                 />
                 <div className="text-left">
                   <span className="block text-xs font-bold text-slate-800">Basic Vision Care Plan</span>
-                  <span className="block text-[10px] text-slate-455 mt-0.5">Covers eye exams, corrective lenses, and allowance towards frames.</span>
+                  <span className="block text-[10px] text-slate-455 mt-0.5 font-semibold">Covers eye exams, corrective lenses, and allowance towards frames.</span>
                 </div>
               </label>
 
-              <label className="flex items-center gap-3 p-3 bg-rose-50/30 border border-rose-100 rounded-xl cursor-pointer hover:bg-rose-50/50 transition-colors">
+              <label className="flex items-center gap-3 p-3.5 bg-rose-50/30 border border-rose-100 rounded-xl cursor-pointer hover:bg-rose-50/50 transition-colors">
                 <input 
                   type="checkbox" 
                   checked={benefitsDetails.benefitsWaived}
@@ -882,7 +908,7 @@ export default function OnboardingPage() {
                 />
                 <div className="text-left">
                   <span className="block text-xs font-bold text-rose-800">Waive All Corporate Health Benefits</span>
-                  <span className="block text-[10px] text-rose-600/70 mt-0.5">Declining employer-sponsored health benefits. Proof of other coverage may be required.</span>
+                  <span className="block text-[10px] text-rose-600/70 mt-0.5 font-semibold">Declining employer-sponsored health benefits. Proof of other coverage may be required.</span>
                 </div>
               </label>
             </div>
@@ -891,35 +917,37 @@ export default function OnboardingPage() {
 
       case "agreements_signatures":
         return (
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Agreements & Signatures Checklist</h4>
-            <p className="text-[11px] text-slate-400 font-medium">Review and sign standard agreements required for your onboarding.</p>
+          <div className="space-y-5">
+            <div className="space-y-1 mb-5">
+              <h4 className="text-base font-semibold text-slate-800">Agreements & signatures</h4>
+              <p className="text-xs text-slate-455">Review and sign standard agreements required for your onboarding.</p>
+            </div>
             <div className="space-y-3">
               <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
-                <div>
+                <div className="text-left">
                   <span className="text-xs font-bold text-slate-800 block">1. Employee Handbook Acknowledgment</span>
-                  <span className="text-[10px] text-slate-400 block mt-0.5">Acknowledged on file • Auto-Signed</span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5 font-medium">Acknowledged on file • Auto-Signed</span>
                 </div>
-                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
               </div>
 
               <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
-                <div>
+                <div className="text-left">
                   <span className="text-xs font-bold text-slate-800 block">2. 401(k) Voluntary Enrollment Form</span>
-                  <span className="text-[10px] text-slate-400 block mt-0.5">Acknowledged on file • Auto-Signed</span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5 font-medium">Acknowledged on file • Auto-Signed</span>
                 </div>
-                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
               </div>
 
               <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
-                <div>
+                <div className="text-left">
                   <span className="text-xs font-bold text-slate-800 block">3. Employee Offer Letter - Hourly(Weekly)</span>
-                  <span className="text-[10px] text-slate-400 block mt-0.5">
+                  <span className="text-[10px] text-slate-400 block mt-0.5 font-medium">
                     {documentsDetails.signedOfferLetter ? "Signed Successfully" : "Action Required • Signature Pending"}
                   </span>
                 </div>
                 {documentsDetails.signedOfferLetter ? (
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                  <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
                 ) : (
                   <button 
                     onClick={() => {
@@ -929,7 +957,7 @@ export default function OnboardingPage() {
                         alert("Employee Offer Letter signed successfully.");
                       }
                     }}
-                    className="px-3 py-1 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold transition-all shadow-xs cursor-pointer"
+                    className="px-3 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg text-[10px] font-bold transition-all shadow-xs cursor-pointer shrink-0"
                   >
                     Sign Contract
                   </button>
@@ -937,29 +965,29 @@ export default function OnboardingPage() {
               </div>
 
               <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
-                <div>
+                <div className="text-left">
                   <span className="text-xs font-bold text-slate-800 block">4. Drug Check Policy & Consent Form</span>
-                  <span className="text-[10px] text-slate-400 block mt-0.5">Acknowledged on file • Auto-Signed</span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5 font-medium">Acknowledged on file • Auto-Signed</span>
                 </div>
-                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
               </div>
 
               <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
-                <div>
+                <div className="text-left">
                   <span className="text-xs font-bold text-slate-800 block">5. Payroll Procedures & Acknowledgment</span>
-                  <span className="text-[10px] text-slate-400 block mt-0.5">Acknowledged on file • Auto-Signed</span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5 font-medium">Acknowledged on file • Auto-Signed</span>
                 </div>
-                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
               </div>
 
               {documentsDetails.signedOfferLetter && (
                 <div className="pt-2 text-left space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-550 uppercase">Legal Signature Representation</label>
+                  <label className="text-[13px] font-medium text-slate-700 block">Legal signature representation</label>
                   <input 
                     type="text" 
                     value={documentsDetails.signature}
                     onChange={e => setDocumentsDetails(p => ({ ...p, signature: e.target.value }))}
-                    className="w-full max-w-sm px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-serif italic font-semibold text-slate-700"
+                    className="w-full max-w-sm px-3.5 h-11 border border-slate-205 rounded-xl focus:border-[#0052CC] focus:outline-none bg-slate-50 font-serif italic font-semibold text-slate-705"
                     placeholder="Typed Legal Name Signature"
                   />
                 </div>
@@ -970,15 +998,17 @@ export default function OnboardingPage() {
 
       case "required_uploads":
         return (
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Required Document Uploads</h4>
-            <p className="text-[11px] text-slate-400 font-medium">Upload physical files representing credential licenses or healthcare screenings.</p>
+          <div className="space-y-5">
+            <div className="space-y-1 mb-5">
+              <h4 className="text-base font-semibold text-slate-800">Required document uploads</h4>
+              <p className="text-xs text-slate-455">Upload physical files representing credential licenses or healthcare screenings.</p>
+            </div>
             <div className="space-y-4">
               {/* Professional License upload slot */}
               <div className="border border-slate-200 bg-slate-50/50 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left">
                 <div>
                   <h5 className="text-xs font-bold text-slate-800">Professional Nursing License</h5>
-                  <p className="text-[10px] text-slate-400 font-medium mt-0.5">State registered nursing license registry proof (PDF/JPEG).</p>
+                  <p className="text-[10px] text-slate-400 font-medium mt-0.5 font-semibold">State registered nursing license registry proof (PDF/JPEG).</p>
                   
                   {candidate?.onboardingSteps[13]?.status === "completed" ? (
                     <div className="mt-2 text-emerald-600 text-[10px] font-bold flex items-center gap-1">
@@ -1004,7 +1034,7 @@ export default function OnboardingPage() {
                   ) : (
                     <button 
                       onClick={() => triggerUploadFile(14, "Nursing_License_Mani.pdf")}
-                      className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all cursor-pointer"
+                      className="h-10 px-4 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
                     >
                       Upload File
                     </button>
@@ -1016,12 +1046,12 @@ export default function OnboardingPage() {
               <div className="border border-slate-200 bg-slate-50/50 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left">
                 <div>
                   <h5 className="text-xs font-bold text-slate-800">Immunization Records</h5>
-                  <p className="text-[10px] text-slate-400 font-medium mt-0.5">Tuberculosis screening and Hepatitis B series records.</p>
+                  <p className="text-[10px] text-slate-400 font-medium mt-0.5 font-semibold">Tuberculosis screening and Hepatitis B series records.</p>
                 </div>
                 <div>
                   <button 
                     onClick={() => triggerUploadFile(14, "Immunization_Records_Mani.pdf")}
-                    className="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-200 text-xs font-bold transition-all cursor-pointer"
+                    className="h-10 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl border border-slate-200 text-xs font-bold transition-all cursor-pointer"
                   >
                     Upload File
                   </button>
@@ -1034,8 +1064,10 @@ export default function OnboardingPage() {
       case "review_submit":
         return (
           <div className="space-y-5 text-left">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Review & Submit Onboarding</h4>
-            <p className="text-[11px] text-slate-400 font-medium">Verify your entered profile parameters before locking and exporting to CDK Global.</p>
+            <div className="space-y-1 mb-5">
+              <h4 className="text-base font-semibold text-slate-800">Review & submit onboarding</h4>
+              <p className="text-xs text-slate-455">Verify your entered profile parameters before locking and exporting.</p>
+            </div>
             
             <div className="space-y-4 max-h-[380px] overflow-y-auto pr-2 no-scrollbar text-xs">
               {/* Personal Details Group */}
@@ -1046,13 +1078,13 @@ export default function OnboardingPage() {
                 >
                   Edit
                 </button>
-                <h5 className="font-extrabold text-slate-700 uppercase tracking-wider text-[10px]">Personal Information</h5>
+                <h5 className="font-bold text-slate-800 text-xs">Personal information</h5>
                 <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600">
-                  <div><strong>Legal Name:</strong> {personalDetails.fullName}</div>
-                  <div><strong>Email:</strong> {personalDetails.email}</div>
-                  <div><strong>Phone:</strong> {personalDetails.phone}</div>
-                  <div><strong>Address:</strong> {addressDetails.address1}, {addressDetails.city}, {addressDetails.state} {addressDetails.zip}</div>
-                  <div><strong>Emergency Contact:</strong> {emergencyDetails.contactName} ({emergencyDetails.relationship}) — {emergencyDetails.phone}</div>
+                  <div><strong>Legal name:</strong> {personalDetails.fullName}</div>
+                  <div><strong>Email address:</strong> {personalDetails.email}</div>
+                  <div><strong>Phone number:</strong> {personalDetails.phone}</div>
+                  <div><strong>Street address:</strong> {addressDetails.address1}, {addressDetails.city}, {addressDetails.state} {addressDetails.zip}</div>
+                  <div><strong>Emergency contact:</strong> {emergencyDetails.contactName} ({emergencyDetails.relationship}) — {emergencyDetails.phone}</div>
                 </div>
               </div>
 
@@ -1064,14 +1096,14 @@ export default function OnboardingPage() {
                 >
                   Edit
                 </button>
-                <h5 className="font-extrabold text-slate-700 uppercase tracking-wider text-[10px]">Employment Parameters</h5>
+                <h5 className="font-bold text-slate-800 text-xs">Employment parameters</h5>
                 <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600">
-                  <div><strong>Clinical Specialty:</strong> {employmentDetails.specialty}</div>
-                  <div><strong>Shift Preference:</strong> {employmentDetails.shifts}</div>
-                  <div><strong>Placement:</strong> {employmentDetails.locations}</div>
-                  <div><strong>I-9 Document:</strong> {employmentDetails.citizenStatus} ({employmentDetails.i9DocNum})</div>
-                  <div><strong>Degree (Optional):</strong> {employmentDetails.degree || "Not Provided"}</div>
-                  <div><strong>Last Employer (Optional):</strong> {employmentDetails.lastEmployer || "Not Provided"}</div>
+                  <div><strong>Clinical specialty:</strong> {employmentDetails.specialty}</div>
+                  <div><strong>Shift preference:</strong> {employmentDetails.shifts}</div>
+                  <div><strong>Placement location:</strong> {employmentDetails.locations}</div>
+                  <div><strong>I-9 document:</strong> {employmentDetails.citizenStatus} ({employmentDetails.i9DocNum})</div>
+                  <div><strong>Degree (optional):</strong> {employmentDetails.degree || "Not Provided"}</div>
+                  <div><strong>Last employer (optional):</strong> {employmentDetails.lastEmployer || "Not Provided"}</div>
                 </div>
               </div>
 
@@ -1083,12 +1115,12 @@ export default function OnboardingPage() {
                 >
                   Edit
                 </button>
-                <h5 className="font-extrabold text-slate-700 uppercase tracking-wider text-[10px]">Payroll & Taxes</h5>
+                <h5 className="font-bold text-slate-800 text-xs">Payroll & taxes</h5>
                 <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600">
-                  <div><strong>Filing Status:</strong> {payrollDetails.filingStatus}</div>
-                  <div><strong>W-4 Dependents:</strong> {payrollDetails.allowances}</div>
-                  <div><strong>Method of Payment:</strong> {payrollDetails.paymentMethod}</div>
-                  <div><strong>Direct Deposit Account:</strong> {payrollDetails.bankName} (Acct: {payrollDetails.accountNumber})</div>
+                  <div><strong>Filing status:</strong> {payrollDetails.filingStatus}</div>
+                  <div><strong>W-4 dependents:</strong> {payrollDetails.allowances}</div>
+                  <div><strong>Method of payment:</strong> {payrollDetails.paymentMethod}</div>
+                  <div><strong>Direct deposit bank:</strong> {payrollDetails.bankName} (Acct: {payrollDetails.accountNumber})</div>
                 </div>
               </div>
 
@@ -1100,12 +1132,12 @@ export default function OnboardingPage() {
                 >
                   Edit
                 </button>
-                <h5 className="font-extrabold text-slate-700 uppercase tracking-wider text-[10px]">Benefits Selections</h5>
+                <h5 className="font-bold text-slate-800 text-xs">Benefits selections</h5>
                 <div className="text-[11px] text-slate-600">
                   {benefitsDetails.benefitsWaived ? (
-                    <span className="text-rose-600 font-bold uppercase">All benefits declined/waived</span>
+                    <span className="text-rose-605 font-bold uppercase">All benefits declined/waived</span>
                   ) : (
-                    <span>Enrolled plans: {benefitsDetails.medicalSelected && "Medical PPO, "} {benefitsDetails.dentalSelected && "Dental, "} {benefitsDetails.visionSelected && "Vision"}</span>
+                    <span className="font-semibold">Enrolled plans: {benefitsDetails.medicalSelected && "Medical PPO, "} {benefitsDetails.dentalSelected && "Dental, "} {benefitsDetails.visionSelected && "Vision"}</span>
                   )}
                 </div>
               </div>
@@ -1118,10 +1150,10 @@ export default function OnboardingPage() {
                 >
                   Edit
                 </button>
-                <h5 className="font-extrabold text-slate-700 uppercase tracking-wider text-[10px]">Signatures & Agreements</h5>
+                <h5 className="font-bold text-slate-800 text-xs">Signatures & agreements</h5>
                 <div className="text-[11px] text-slate-600 space-y-1">
                   <div><strong>Signature:</strong> <span className="font-serif italic font-bold">{documentsDetails.signature || "Not Signed"}</span></div>
-                  <div><strong>Offer Letter Status:</strong> {documentsDetails.signedOfferLetter ? "Signed successfully" : "Pending signature"}</div>
+                  <div><strong>Offer letter status:</strong> {documentsDetails.signedOfferLetter ? "Signed successfully" : "Pending signature"}</div>
                 </div>
               </div>
             </div>
@@ -1130,11 +1162,11 @@ export default function OnboardingPage() {
             <div className="pt-4 border-t border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
               <div>
                 {getRemainingRequiredSteps() > 0 ? (
-                  <span className="text-[10px] font-black uppercase bg-rose-50 text-rose-600 border border-rose-100 rounded px-2.5 py-1 flex items-center gap-1 select-none">
+                  <span className="text-[10px] font-bold uppercase bg-rose-50 text-rose-600 border border-rose-100 rounded px-2.5 py-1.5 flex items-center gap-1.5 select-none">
                     <Lock className="h-3 w-3" /> {getRemainingRequiredSteps()} required sections remaining
                   </span>
                 ) : (
-                  <span className="text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100 rounded px-2.5 py-1 flex items-center gap-1 select-none">
+                  <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-600 border border-emerald-100 rounded px-2.5 py-1.5 flex items-center gap-1.5 select-none">
                     <Check className="h-3 w-3 stroke-[3px]" /> Checklist complete! Ready to submit.
                   </span>
                 )}
@@ -1142,7 +1174,7 @@ export default function OnboardingPage() {
               <button
                 disabled={getRemainingRequiredSteps() > 0}
                 onClick={() => setShowSubmitSuccessModal(true)}
-                className="px-6 py-3 bg-[#007A5E] hover:bg-[#005E48] disabled:bg-slate-300 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 disabled:scale-100 disabled:shadow-none cursor-pointer"
+                className="px-6 h-11 bg-[#0052CC] hover:bg-[#0042A3] disabled:bg-slate-300 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-95 disabled:scale-100 disabled:shadow-none cursor-pointer"
               >
                 Submit Onboarding
               </button>
@@ -1756,143 +1788,130 @@ export default function OnboardingPage() {
               </div>
             )}
           </section>
-
-          {/* COLUMN 3: RECRUITER CONTACT ASIDE */}
-          <aside className="w-full lg:w-80 space-y-6 shrink-0 hidden lg:block">
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col h-[400px] justify-between">
-              <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
-                <div className="relative">
-                  <div className="h-10 w-10 rounded-full overflow-hidden border border-slate-100">
-                    <img 
-                      src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
-                      alt="Recruiter Alex" 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <span className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 rounded-full border-2 border-white"></span>
-                </div>
-                <div className="text-left">
-                  <h4 className="text-xs font-bold text-slate-800">Alex (Recruiter)</h4>
-                  <span className="text-[10px] text-slate-455 font-bold block">Online • Onboarding Coordinator</span>
-                </div>
-              </div>
-
-              <div className="grow overflow-y-auto py-3 space-y-3 no-scrollbar text-xs flex flex-col">
-                {candidateMessages.slice(-4).map((msg) => {
-                  const isRecruiter = msg.sender === "recruiter";
-                  const isSystem = msg.sender === "system";
-                  if (isSystem) return null;
-                  return (
-                    <div 
-                      key={msg.id} 
-                      className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-left text-[11px] ${
-                        isRecruiter 
-                          ? "bg-slate-100 text-slate-700 self-start rounded-tl-none font-medium leading-normal" 
-                          : "bg-[#0052CC] text-white self-end rounded-tr-none font-medium leading-normal shadow-2xs"
-                      }`}
-                    >
-                      <p>{msg.text}</p>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <form onSubmit={handleSendMessage} className="relative mt-2 border-t border-slate-100 pt-3">
-                <input 
-                  type="text" 
-                  value={chatMessage}
-                  onChange={e => setChatMessage(e.target.value)}
-                  placeholder="Quick message to recruiter..."
-                  className="w-full pl-3 pr-10 py-2 border border-slate-205 rounded-xl bg-slate-50 text-[11px] focus:outline-none placeholder-slate-400 font-semibold"
-                />
-                <button 
-                  type="submit" 
-                  className="absolute right-2.5 top-[21px] text-[#0052CC] hover:text-[#0042A3] transition-colors cursor-pointer"
-                >
-                  <Send className="h-4.5 w-4.5" />
-                </button>
-              </form>
-            </div>
-          </aside>
         </div>
       ) : (
         /* ONBOARD WORKSPACE TAB VIEW */
-        <div className="grow max-w-[1600px] w-full mx-auto px-6 py-8 flex flex-col lg:flex-row gap-8 items-start">
+        <div className="grow max-w-[1600px] w-full mx-auto px-6 py-8 flex flex-col items-center">
           
-          <section className="flex-1 space-y-6 w-full text-left">
+          <section className="space-y-6 w-full text-left max-w-[880px]">
             <div className="flex flex-col gap-1">
-              <h1 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
-                Candidate Work Area
+              <h1 className="text-[28px] font-bold text-[#0F172A] tracking-tight leading-tight">
+                Complete your onboarding
               </h1>
-              <p className="text-xs text-slate-400 font-medium">
-                Verify and complete each of the 6 core compliance groups below to authorize assignment export.
+              <p className="text-sm text-slate-455 font-medium mt-1">
+                Finish the sections below to wrap up your onboarding — about 15 minutes.
               </p>
             </div>
 
-            {/* 6-Group Top-level Stepper */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-              <div className="flex justify-between items-center gap-2 overflow-x-auto pb-1.5 no-scrollbar">
-                {ONBOARDING_GROUPS.map((group, idx) => {
-                  const isCompleted = isGroupCompleted(idx);
-                  const isActive = activeGroupIndex === idx;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => handleGroupClick(idx)}
-                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all text-xs font-bold shrink-0 cursor-pointer ${
-                        isActive
-                          ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10 scale-[1.01]"
-                          : isCompleted
-                          ? "bg-emerald-50 border-emerald-100 text-[#007A5E] hover:bg-emerald-100/30"
-                          : "bg-slate-50 border-slate-200 text-slate-455 hover:bg-slate-100/50"
-                      }`}
-                    >
-                      <span className={`h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-black ${
-                        isActive
-                          ? "bg-white text-[#0052CC]"
-                          : isCompleted
-                          ? "bg-[#007A5E] text-white"
-                          : "bg-slate-200 text-slate-600"
-                      }`}>
-                        {idx + 1}
-                      </span>
-                      <span>{group.name}</span>
-                    </button>
-                  );
-                })}
+            <div className="flex flex-col gap-1.5 text-left">
+              <span className="text-[11px] font-bold text-slate-455">
+                Section {activeGroupIndex + 1} of 6 · {ONBOARDING_GROUPS[activeGroupIndex].name}
+              </span>
+            </div>
+
+            {/* Connected 6-Group Stepper */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <div className="h-2" />
+              
+              <div className="overflow-x-auto no-scrollbar pb-2">
+                <div className="relative flex justify-between items-start w-full min-w-[700px] px-4">
+                  {ONBOARDING_GROUPS.map((group, idx) => {
+                    const isCompleted = isGroupCompleted(idx);
+                    const isActive = activeGroupIndex === idx;
+                    
+                    return (
+                      <div key={idx} className="flex-1 flex flex-col items-center relative z-10">
+                        {/* Connection Line */}
+                        {idx < ONBOARDING_GROUPS.length - 1 && (
+                          <div 
+                            className={`absolute top-5 left-[calc(50%+20px)] right-[calc(-50%+20px)] h-0.5 z-0 transition-colors duration-200 ${
+                              isCompleted ? "bg-[#0052CC]" : "bg-slate-200"
+                            }`} 
+                          />
+                        )}
+                        
+                        <button
+                          onClick={() => handleGroupClick(idx)}
+                          className="flex flex-col items-center focus:outline-none cursor-pointer group"
+                        >
+                          <div 
+                            className={`h-10 w-10 rounded-full flex items-center justify-center text-xs font-black transition-all duration-200 border-2 ${
+                              isActive 
+                                ? "border-2 border-[#0052CC] bg-white text-[#0052CC] shadow-sm scale-105" 
+                                : isCompleted
+                                ? "border-[#0052CC] bg-[#0052CC] text-white"
+                                : "border-slate-200 bg-slate-100 text-slate-400"
+                            }`}
+                          >
+                            {isCompleted ? (
+                              <Check className="h-5 w-5 stroke-[3px]" />
+                            ) : (
+                              <span>{idx + 1}</span>
+                            )}
+                          </div>
+                          
+                          <span 
+                            className={`mt-2.5 text-[11px] leading-none whitespace-nowrap transition-all ${
+                              isActive 
+                                ? "font-bold text-[#0052CC]"
+                                : isCompleted
+                                ? "font-semibold text-slate-800"
+                                : "font-medium text-slate-400"
+                            }`}
+                          >
+                            {group.name}
+                          </span>
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
             {/* Sub-form container card */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
-              {/* Horizontal pills for active group sub-steps */}
-              <div className="flex flex-wrap gap-2 border-b border-slate-100 pb-4">
-                {ONBOARDING_GROUPS[activeGroupIndex].subSteps.map((sub, idx) => {
-                  const stepState = candidate.onboardingSteps.find(st => st.number === sub.stepNumber);
-                  const isCompleted = stepState?.status === "completed";
-                  const isActive = activeSubStepIndex === idx;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveSubStepIndex(idx)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition-all uppercase tracking-wider cursor-pointer flex items-center gap-1.5 ${
-                        isActive
-                          ? "bg-[#EBF3FC] text-[#0052CC] border border-[#DEEAF7] font-black"
-                          : isCompleted
-                          ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
-                          : "bg-slate-50 text-slate-400 border border-slate-200"
-                      }`}
-                    >
-                      {isCompleted && <Check className="h-3 w-3 text-emerald-600 stroke-[3px]" />}
-                      <span>{sub.name}</span>
-                      {sub.isOptional && (
-                        <span className="text-[8px] font-black bg-[#0052CC] text-white px-1.5 py-0.5 rounded ml-0.5 select-none">
-                          OPTIONAL
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-6">
+              {/* Segmented Sub-step Navigation Row */}
+              <div className="space-y-3">
+                <div className="bg-slate-100/80 p-1.5 rounded-2xl flex flex-wrap items-center gap-1.5 w-fit max-w-full">
+                  {ONBOARDING_GROUPS[activeGroupIndex].subSteps.map((sub, idx) => {
+                    const stepState = candidate.onboardingSteps.find(st => st.number === sub.stepNumber);
+                    const isCompleted = stepState?.status === "completed";
+                    const isActive = activeSubStepIndex === idx;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveSubStepIndex(idx)}
+                        className={`px-4 py-2 rounded-xl text-xs transition-all cursor-pointer flex items-center gap-2 font-semibold ${
+                          isActive
+                            ? "bg-white border border-[#0052CC] text-[#0052CC] shadow-xs"
+                            : isCompleted
+                            ? "hover:bg-slate-200/50 text-slate-700"
+                            : "hover:bg-slate-200/30 text-slate-400 font-medium"
+                        }`}
+                      >
+                        {isActive ? (
+                          <span className="h-4.5 w-4.5 rounded-full bg-[#0052CC] text-white flex items-center justify-center text-[10px] font-black">
+                            {idx + 1}
+                          </span>
+                        ) : isCompleted ? (
+                          <Check className="h-3.5 w-3.5 text-[#0052CC] stroke-[3px]" />
+                        ) : null}
+                        <span>{sub.name}</span>
+                        {sub.isOptional && (
+                          <span className="text-[8.5px] font-bold bg-[#EBF3FC] border border-[#DEEAF7] text-[#0052CC] px-1.5 py-0.5 rounded select-none uppercase">
+                            Optional
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                {/* Progress Hint */}
+                <p className="text-[11px] text-slate-400 font-medium px-1">
+                  Step {activeSubStepIndex + 1} of {ONBOARDING_GROUPS[activeGroupIndex].subSteps.length} in this section.
+                </p>
               </div>
 
               {/* Dynamic subform area */}
@@ -1901,11 +1920,11 @@ export default function OnboardingPage() {
               </div>
 
               {/* Stepper Navigation */}
-              <div className="flex justify-between items-center border-t border-slate-100 pt-5">
+              <div className="flex justify-between items-center border-t border-slate-100 pt-6 mt-8">
                 <button
                   onClick={handlePrevStep}
                   disabled={activeGroupIndex === 0 && activeSubStepIndex === 0}
-                  className="px-4 py-2 border border-slate-200 hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-transparent text-slate-600 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                  className="px-4 py-2.5 border border-slate-200 hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-transparent text-slate-600 rounded-lg text-xs font-bold transition-all cursor-pointer"
                 >
                   Back
                 </button>
@@ -1922,18 +1941,23 @@ export default function OnboardingPage() {
             </div>
 
             {/* Collapsed view full checklist accordion */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+            {/* Slim Accordion Checklist */}
+            <div className="bg-white border border-slate-200 rounded-xl shadow-xs">
               <button 
                 onClick={() => setShowFullChecklist(!showFullChecklist)}
-                className="w-full flex justify-between items-center font-bold text-slate-800 text-sm focus:outline-none cursor-pointer"
+                className="w-full flex justify-between items-center px-5 py-3.5 font-semibold text-slate-700 text-xs hover:bg-slate-50/50 transition-colors focus:outline-none cursor-pointer"
               >
                 <span>View full checklist</span>
-                <span className="text-xs text-[#0052CC] hover:underline font-extrabold uppercase tracking-wide">
-                  {showFullChecklist ? "Collapse Checklist" : "Expand Checklist"}
-                </span>
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <span className="text-[10px] uppercase font-bold tracking-wider">
+                    {showFullChecklist ? "Hide" : "Show"}
+                  </span>
+                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showFullChecklist ? "rotate-180" : ""}`} />
+                </div>
               </button>
+              
               {showFullChecklist && (
-                <div className="mt-5 divide-y divide-slate-100 text-xs font-semibold text-slate-655 space-y-4">
+                <div className="px-5 pb-5 border-t border-slate-100 divide-y divide-slate-100 text-xs font-semibold text-slate-655 space-y-4 pt-4">
                   {ONBOARDING_GROUPS.map((group, gIdx) => (
                     <div key={gIdx} className="pt-4 first:pt-0">
                       <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2.5">{group.name}</h4>
@@ -1968,64 +1992,6 @@ export default function OnboardingPage() {
             </div>
 
           </section>
-
-          {/* COLUMN 2: RECRUITER CONTACT CHAT */}
-          <aside className="w-full lg:w-80 space-y-6 shrink-0">
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col h-[480px] justify-between">
-              <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
-                <div className="relative">
-                  <div className="h-10 w-10 rounded-full overflow-hidden border border-slate-100">
-                    <img 
-                      src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
-                      alt="Recruiter Alex" 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <span className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 rounded-full border-2 border-white"></span>
-                </div>
-                <div className="text-left">
-                  <h4 className="text-xs font-bold text-slate-800">Alex (Recruiter)</h4>
-                  <span className="text-[10px] text-slate-455 font-bold block">Online • Onboarding Coordinator</span>
-                </div>
-              </div>
-
-              <div className="grow overflow-y-auto py-3 space-y-3 no-scrollbar text-xs flex flex-col">
-                {candidateMessages.slice(-6).map((msg) => {
-                  const isRecruiter = msg.sender === "recruiter";
-                  const isSystem = msg.sender === "system";
-                  if (isSystem) return null;
-                  return (
-                    <div 
-                      key={msg.id} 
-                      className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-left text-[11px] ${
-                        isRecruiter 
-                          ? "bg-slate-100 text-slate-700 self-start rounded-tl-none font-medium leading-normal" 
-                          : "bg-[#0052CC] text-white self-end rounded-tr-none font-medium leading-normal shadow-2xs"
-                      }`}
-                    >
-                      <p>{msg.text}</p>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <form onSubmit={handleSendMessage} className="relative mt-2 border-t border-slate-100 pt-3">
-                <input 
-                  type="text" 
-                  value={chatMessage}
-                  onChange={e => setChatMessage(e.target.value)}
-                  placeholder="Ask a question..."
-                  className="w-full pl-3 pr-10 py-2.5 border border-slate-205 rounded-xl bg-slate-50 text-[11px] focus:outline-none placeholder-slate-400 font-semibold"
-                />
-                <button 
-                  type="submit" 
-                  className="absolute right-2.5 top-[23px] text-[#0052CC] hover:text-[#0042A3] transition-colors cursor-pointer"
-                >
-                  <Send className="h-4.5 w-4.5" />
-                </button>
-              </form>
-            </div>
-          </aside>
         </div>
       )}
 
@@ -2093,6 +2059,104 @@ export default function OnboardingPage() {
           </div>
         </div>
       )}
+
+      {/* Floating Recruiter Chat Bubble & Overlay */}
+      <div className="fixed bottom-6 right-24 z-40 flex flex-col items-end">
+        {/* Floating Chat Bubble Button */}
+        <button
+          onClick={() => {
+            setChatOpen(!chatOpen);
+            setUnreadChatCount(0); // Mark read
+          }}
+          className="h-12 w-12 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 border border-indigo-400/20 relative cursor-pointer"
+          title="Chat with Recruiter"
+        >
+          <MessageSquare className="h-5.5 w-5.5" />
+          {unreadChatCount > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[9px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white animate-bounce">
+              {unreadChatCount}
+            </span>
+          )}
+        </button>
+
+        {/* Floating Chat Overlay Window */}
+        {chatOpen && (
+          <div className="fixed bottom-24 right-24 w-[380px] h-[480px] bg-white border border-slate-200 rounded-2xl shadow-2xl flex flex-col justify-between overflow-hidden animate-fade-in z-50">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <div className="h-9 w-9 rounded-full overflow-hidden border border-slate-100">
+                    <img 
+                      src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
+                      alt="Recruiter Alex" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span className="absolute bottom-0 right-0 h-2 w-2 bg-emerald-500 rounded-full border border-white"></span>
+                </div>
+                <div className="text-left">
+                  <h4 className="text-xs font-bold text-slate-800">Alex (Recruiter)</h4>
+                  <span className="text-[10px] text-slate-400 font-bold block">Online • Onboarding Coordinator</span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setChatOpen(false)}
+                className="text-slate-400 hover:text-slate-655 p-1 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="h-4.5 w-4.5" />
+              </button>
+            </div>
+
+            {/* Conversation Messages */}
+            <div className="grow overflow-y-auto p-4 space-y-3.5 no-scrollbar text-xs flex flex-col bg-slate-50/30">
+              {candidateMessages.map((msg) => {
+                const isRecruiter = msg.sender === "recruiter";
+                const isSystem = msg.sender === "system";
+                if (isSystem) {
+                  return (
+                    <div key={msg.id} className="mx-auto bg-slate-105 text-slate-500 rounded-lg px-2.5 py-1 text-[10px] font-semibold w-fit border border-slate-150 my-1">
+                      {msg.text}
+                    </div>
+                  );
+                }
+                return (
+                  <div 
+                    key={msg.id} 
+                    className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-left text-[11px] leading-normal font-medium ${
+                      isRecruiter 
+                        ? "bg-slate-100 text-slate-705 self-start rounded-tl-none" 
+                        : "bg-[#0052CC] text-white self-end rounded-tr-none shadow-2xs"
+                    }`}
+                  >
+                    <p>{msg.text}</p>
+                    <span className={`block text-[8.5px] mt-1 text-right font-semibold ${isRecruiter ? "text-slate-400" : "text-white/70"}`}>
+                      {msg.timestamp}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Message Input Footer */}
+            <form onSubmit={handleSendMessage} className="p-3 border-t border-slate-100 flex gap-2 bg-white">
+              <input 
+                type="text" 
+                value={chatMessage}
+                onChange={e => setChatMessage(e.target.value)}
+                placeholder="Ask a question..."
+                className="grow px-3.5 py-2.5 text-xs border border-slate-205 rounded-xl bg-slate-50 focus:border-[#0052CC] focus:outline-none placeholder-slate-400 font-semibold"
+              />
+              <button 
+                type="submit"
+                className="px-4 py-2.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer"
+              >
+                Send
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
 
       {/* Footer */}
       <footer className="bg-slate-55 border-t border-slate-200 shrink-0 py-8">
