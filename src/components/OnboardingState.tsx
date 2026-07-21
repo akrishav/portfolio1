@@ -168,6 +168,7 @@ interface OnboardingContextType {
   setSelectedCandidateId: (id: string | null) => void;
   sendCandidateMessage: (candidateId: string, text: string, sender: "candidate" | "recruiter") => void;
   uploadDocument: (candidateId: string, stepNumber: number, fileName: string, fileSize: string) => void;
+  updateCandidateStepStatus: (candidateId: string, stepNumber: number, status: "completed" | "in_progress" | "stuck" | "pending") => void;
   resolveStep: (candidateId: string, stepNumber: number) => void;
   resolveERPDocument: (candidateId: string, docName: string) => void;
   resolveERPPlacement: (candidateId: string, placementName: string) => void;
@@ -204,7 +205,8 @@ const defaultSteps = (): OnboardingStep[] => [
   { number: 10, name: "State Withholding", description: "Complete state tax withholding form", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 11:00 AM" },
   { number: 11, name: "Method of Payment", description: "Select direct deposit or check payment", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 01:00 PM" },
   { number: 12, name: "Education Details — Optional", description: "Education history details", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 02:00 PM" },
-  { number: 13, name: "Previous Employers — Optional", description: "List prior employment history", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 04:00 PM" }
+  { number: 13, name: "Previous Employers — Optional", description: "List prior employment history", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 04:00 PM" },
+  { number: 14, name: "Required Uploads", description: "Upload required licensing and certification files", status: "pending", uploadedFiles: [], startedAt: "2026-07-09 05:00 PM" }
 ];
 
 const initialCandidates = (): Candidate[] => [
@@ -553,7 +555,8 @@ const DEFAULT_SLA_CONFIGS: SlaStepConfig[] = [
   { stepNumber: 10, stepName: "State Withholding", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Team Lead"] },
   { stepNumber: 11, stepName: "Method of Payment", durationValue: 2, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Team Lead"] },
   { stepNumber: 12, stepName: "Education Details — Optional", durationValue: 5, durationUnit: "days", owner: "candidate", reminderLeadTime: 2, reminderLeadUnit: "days", escalationTarget: ["Recruiter"] },
-  { stepNumber: 13, stepName: "Previous Employers — Optional", durationValue: 5, durationUnit: "days", owner: "candidate", reminderLeadTime: 2, reminderLeadUnit: "days", escalationTarget: ["Recruiter"] }
+  { stepNumber: 13, stepName: "Previous Employers — Optional", durationValue: 5, durationUnit: "days", owner: "candidate", reminderLeadTime: 2, reminderLeadUnit: "days", escalationTarget: ["Recruiter"] },
+  { stepNumber: 14, stepName: "Required Uploads", durationValue: 3, durationUnit: "days", owner: "candidate", reminderLeadTime: 1, reminderLeadUnit: "days", escalationTarget: ["Recruiter"] }
 ];
 
 const DEFAULT_ANOMALIES: AnomalyRecord[] = [
@@ -642,6 +645,16 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         let parsed = JSON.parse(savedCandidates);
         if (Array.isArray(parsed)) {
           parsed = parsed.map(c => {
+            if (c.onboardingSteps && c.onboardingSteps.length === 13) {
+              c.onboardingSteps.push({
+                number: 14,
+                name: "Required Uploads",
+                description: "Upload required licensing and certification files",
+                status: "pending",
+                uploadedFiles: [],
+                startedAt: "2026-07-09 05:00 PM"
+              });
+            }
             if (c.id === "candidate-mani") {
               return {
                 ...c,
@@ -1007,6 +1020,47 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     };
 
     setNotifications(prev => [...prev, newNotif]);
+  };
+
+  const updateCandidateStepStatus = (candidateId: string, stepNumber: number, status: "completed" | "in_progress" | "stuck" | "pending") => {
+    setCandidates(prev => {
+      const next = prev.map(c => {
+        if (c.id !== candidateId) return c;
+
+        const updatedSteps = c.onboardingSteps.map(step => {
+          if (step.number === stepNumber) {
+            return {
+              ...step,
+              status,
+              actionRequiredText: undefined
+            };
+          }
+          if (status === "completed" && step.number === stepNumber + 1 && step.status === "pending") {
+            return {
+              ...step,
+              status: "in_progress" as const
+            };
+          }
+          return step;
+        });
+
+        const nextIncomplete = updatedSteps.find(s => s.status !== "completed");
+        const nextStepNum = nextIncomplete ? nextIncomplete.number : 14;
+        const nextStatus = nextIncomplete ? nextIncomplete.status : ("completed" as const);
+
+        return {
+          ...c,
+          onboardingSteps: updatedSteps,
+          currentStep: nextStepNum,
+          stepStatus: nextStatus === "completed" ? "completed" : nextStatus === "stuck" ? "stuck" : "in_progress",
+          stuckReason: nextStatus === "stuck" ? c.stuckReason : undefined,
+          stuckExplanation: nextStatus === "stuck" ? c.stuckExplanation : undefined,
+          daysStuck: nextStatus === "stuck" ? c.daysStuck : undefined
+        };
+      });
+      localStorage.setItem("staffhc_candidates_v5", JSON.stringify(next));
+      return next;
+    });
   };
 
   const resolveStep = (candidateId: string, stepNumber: number) => {
@@ -1531,6 +1585,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setSelectedCandidateId,
         sendCandidateMessage,
         uploadDocument,
+        updateCandidateStepStatus,
         resolveStep,
         resolveERPDocument,
         resolveERPPlacement,

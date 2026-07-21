@@ -12,6 +12,66 @@ import {
   Settings, HelpCircle, LogOut, ChevronRight, MessageSquare, Inbox, DollarSign
 } from "lucide-react";
 
+interface SubStep {
+  id: string;
+  name: string;
+  stepNumber: number;
+  isOptional?: boolean;
+}
+
+interface Group {
+  name: string;
+  subSteps: SubStep[];
+}
+
+const ONBOARDING_GROUPS: Group[] = [
+  {
+    name: "Personal Information",
+    subSteps: [
+      { id: "personal_details", name: "Personal Details", stepNumber: 1 },
+      { id: "addresses", name: "Addresses", stepNumber: 2 },
+      { id: "emergency_contact", name: "Emergency Contact", stepNumber: 4 }
+    ]
+  },
+  {
+    name: "Employment",
+    subSteps: [
+      { id: "equal_employment", name: "Equal Employment", stepNumber: 3 },
+      { id: "client_onboarding", name: "Client Onboarding Form", stepNumber: 5 },
+      { id: "i9_eligibility", name: "I-9 Eligibility", stepNumber: 7 },
+      { id: "education_details", name: "Education Details", stepNumber: 12, isOptional: true },
+      { id: "previous_employers", name: "Previous Employers", stepNumber: 13, isOptional: true }
+    ]
+  },
+  {
+    name: "Payroll",
+    subSteps: [
+      { id: "w4_withholding", name: "W-4 Withholding", stepNumber: 9 },
+      { id: "state_withholding", name: "State Withholding", stepNumber: 10 },
+      { id: "method_of_payment", name: "Method of Payment", stepNumber: 11 }
+    ]
+  },
+  {
+    name: "Benefits",
+    subSteps: [
+      { id: "benefits_election", name: "Benefits Election", stepNumber: 6 }
+    ]
+  },
+  {
+    name: "Documents",
+    subSteps: [
+      { id: "agreements_signatures", name: "Agreements & Signatures", stepNumber: 8 },
+      { id: "required_uploads", name: "Required Uploads", stepNumber: 14 }
+    ]
+  },
+  {
+    name: "Review",
+    subSteps: [
+      { id: "review_submit", name: "Review & Submit", stepNumber: 15 }
+    ]
+  }
+];
+
 export default function OnboardingPage() {
   const { 
     candidates, 
@@ -21,7 +81,8 @@ export default function OnboardingPage() {
     login, 
     logout, 
     sendCandidateMessage, 
-    uploadDocument 
+    uploadDocument,
+    updateCandidateStepStatus
   } = useOnboarding();
 
   // Login Form States
@@ -29,7 +90,6 @@ export default function OnboardingPage() {
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState("");
   const [loginError, setLoginError] = useState("");
-
 
   // Menu active state: overview | documents | messages | emails | settings
   const [activeMenu, setActiveMenu] = useState<"overview" | "documents" | "messages" | "emails" | "settings">("overview");
@@ -40,6 +100,84 @@ export default function OnboardingPage() {
   // Mobile / Tablet Tab switching state (Active panel when not on full 3-column desktop)
   const [mobileActiveTab, setMobileActiveTab] = useState<"overview" | "documents" | "chat">("overview");
 
+  // Stepper state
+  const [activeGroupIndex, setActiveGroupIndex] = useState(0);
+  const [activeSubStepIndex, setActiveSubStepIndex] = useState(0);
+  const [showFullChecklist, setShowFullChecklist] = useState(false);
+
+  // Chat/Notification state
+  const [chatMessage, setChatMessage] = useState("");
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  // Document uploading modal state
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadTargetStep, setUploadTargetStep] = useState<number>(14);
+  const [uploadFileName, setUploadFileName] = useState("Nursing_License_Mani.pdf");
+  const [uploading, setUploading] = useState(false);
+
+  // Success submitting onboarding modal state
+  const [showSubmitSuccessModal, setShowSubmitSuccessModal] = useState(false);
+
+  // Interactive Form Field States
+  const [personalDetails, setPersonalDetails] = useState({
+    fullName: "Mani Ganesan",
+    email: "mani@staffhc.com",
+    phone: "(512) 555-0199",
+    ssn: "XXX-XX-1234"
+  });
+  const [addressDetails, setAddressDetails] = useState({
+    address1: "1042 Maple Ave",
+    city: "Austin",
+    state: "TX",
+    zip: "78701"
+  });
+  const [emergencyDetails, setEmergencyDetails] = useState({
+    contactName: "Priya Ganesan",
+    relationship: "Spouse",
+    phone: "(512) 555-0188"
+  });
+  const [employmentDetails, setEmploymentDetails] = useState({
+    gender: "Male",
+    ethnicity: "Asian",
+    veteranStatus: "No",
+    specialty: "ICU RN",
+    shifts: "Night Shift",
+    locations: "Austin Metro",
+    i9DocNum: "A12345678",
+    i9Expiry: "2029-05-15",
+    citizenStatus: "US Citizen",
+    degree: "Bachelor of Science in Nursing",
+    institution: "University of Texas at Austin",
+    gradYear: "2015",
+    lastEmployer: "St. David's Medical Center",
+    lastRole: "Charge Nurse",
+    yearsWorked: "4"
+  });
+  const [payrollDetails, setPayrollDetails] = useState({
+    filingStatus: "Single",
+    allowances: "0",
+    extraWithholding: "0",
+    stateFilingStatus: "Single",
+    paymentMethod: "Direct Deposit",
+    bankName: "Chase Bank",
+    routingNumber: "111000612",
+    accountNumber: "******8822"
+  });
+  const [benefitsDetails, setBenefitsDetails] = useState({
+    medicalSelected: true,
+    dentalSelected: true,
+    visionSelected: false,
+    benefitsWaived: false
+  });
+  const [documentsDetails, setDocumentsDetails] = useState({
+    signedHandbook: true,
+    signed401k: true,
+    signedOfferLetter: false,
+    signedDrugCheck: true,
+    signedPayrollAck: true,
+    signature: ""
+  });
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
@@ -48,16 +186,6 @@ export default function OnboardingPage() {
       }
     }
   }, []);
-
-  // Dashboard UI States
-  const [chatMessage, setChatMessage] = useState("");
-  
-  // Document uploading modal state
-  const [showUploadModal, setShowUploadModal] = useState(false);
-  const [uploadTargetStep, setUploadTargetStep] = useState<number>(3);
-  const [uploadFileName, setUploadFileName] = useState("Nursing_License_Mani.pdf");
-  const [uploading, setUploading] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
 
   const candidate = candidates.find((c) => {
     const cleanEmail = loggedInUser?.email?.toLowerCase();
@@ -68,7 +196,6 @@ export default function OnboardingPage() {
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-
     setOtpSent(true);
     setLoginError("");
   };
@@ -76,7 +203,6 @@ export default function OnboardingPage() {
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
     if (!otpCode) return;
-
     const emailToUse = email ? email : "candidate@healthcare.com";
     const success = login(emailToUse, "candidate");
     if (success) {
@@ -90,8 +216,8 @@ export default function OnboardingPage() {
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!chatMessage.trim() || !candidate) return;
-    sendCandidateMessage(candidate.id, chatMessage.trim(), "candidate");
+    if (!chatMessage || !candidate) return;
+    sendCandidateMessage(candidate.id, chatMessage, "candidate");
     setChatMessage("");
   };
 
@@ -106,15 +232,143 @@ export default function OnboardingPage() {
     setUploading(true);
     setTimeout(() => {
       uploadDocument(candidate.id, uploadTargetStep, uploadFileName, "1.6 MB");
+      updateCandidateStepStatus(candidate.id, uploadTargetStep, "completed");
       setUploading(false);
       setShowUploadModal(false);
     }, 1000);
   };
 
+  // Group completion check
+  const isGroupCompleted = (groupIndex: number) => {
+    if (!candidate) return false;
+    const group = ONBOARDING_GROUPS[groupIndex];
+    if (group.name === "Review") return false;
+    
+    return group.subSteps.every(sub => {
+      if (sub.isOptional) return true;
+      const stepState = candidate.onboardingSteps.find(st => st.number === sub.stepNumber);
+      return stepState?.status === "completed";
+    });
+  };
+
+  const getCompletedGroupsCount = () => {
+    let count = 0;
+    for (let i = 0; i < 5; i++) {
+      if (isGroupCompleted(i)) {
+        count++;
+      }
+    }
+    return count;
+  };
+
+  // Progress logic
+  const getRequiredStepsCompletedCount = () => {
+    if (!candidate) return 0;
+    const requiredStepNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14];
+    return requiredStepNumbers.filter(num => {
+      const step = candidate.onboardingSteps.find(s => s.number === num);
+      return step?.status === "completed";
+    }).length;
+  };
+
+  const getOverallProgressPercentage = () => {
+    const completed = getRequiredStepsCompletedCount();
+    return Math.round((completed / 12) * 100);
+  };
+
+  const findFirstIncompleteSubStep = () => {
+    if (!candidate) return { groupIndex: 0, subStepIndex: 0 };
+    for (let g = 0; g < ONBOARDING_GROUPS.length; g++) {
+      const group = ONBOARDING_GROUPS[g];
+      for (let s = 0; s < group.subSteps.length; s++) {
+        const sub = group.subSteps[s];
+        if (sub.id === "review_submit") continue;
+        const stepState = candidate.onboardingSteps.find(st => st.number === sub.stepNumber);
+        if (!sub.isOptional && stepState?.status !== "completed") {
+          return { groupIndex: g, subStepIndex: s };
+        }
+      }
+    }
+    return { groupIndex: 5, subStepIndex: 0 };
+  };
+
+  const getCurrentSubStepInfo = () => {
+    const { groupIndex, subStepIndex } = findFirstIncompleteSubStep();
+    const group = ONBOARDING_GROUPS[groupIndex];
+    const subStep = group.subSteps[subStepIndex];
+    return {
+      groupIndex,
+      subStepIndex,
+      groupName: group.name,
+      subStepName: subStep.name,
+      plainText: `Continue: ${group.name} ➔ ${subStep.name}`
+    };
+  };
+
+  const handleResumeOnboarding = () => {
+    const { groupIndex, subStepIndex } = findFirstIncompleteSubStep();
+    setActiveGroupIndex(groupIndex);
+    setActiveSubStepIndex(subStepIndex);
+    setActiveHeaderTab("onboard");
+  };
+
+  const handleGroupClick = (groupIndex: number) => {
+    setActiveGroupIndex(groupIndex);
+    const group = ONBOARDING_GROUPS[groupIndex];
+    if (!candidate) {
+      setActiveSubStepIndex(0);
+      return;
+    }
+    let targetIndex = 0;
+    for (let s = 0; s < group.subSteps.length; s++) {
+      const sub = group.subSteps[s];
+      const stepState = candidate.onboardingSteps.find(st => st.number === sub.stepNumber);
+      if (stepState?.status !== "completed") {
+        targetIndex = s;
+        break;
+      }
+    }
+    setActiveSubStepIndex(targetIndex);
+  };
+
+  const handleNextStep = (stepNumber: number) => {
+    if (candidate) {
+      updateCandidateStepStatus(candidate.id, stepNumber, "completed");
+    }
+    const currentGroup = ONBOARDING_GROUPS[activeGroupIndex];
+    if (activeSubStepIndex < currentGroup.subSteps.length - 1) {
+      setActiveSubStepIndex(prev => prev + 1);
+    } else if (activeGroupIndex < ONBOARDING_GROUPS.length - 1) {
+      setActiveGroupIndex(prev => prev + 1);
+      setActiveSubStepIndex(0);
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (activeSubStepIndex > 0) {
+      setActiveSubStepIndex(prev => prev - 1);
+    } else if (activeGroupIndex > 0) {
+      const prevGroupIdx = activeGroupIndex - 1;
+      const prevGroup = ONBOARDING_GROUPS[prevGroupIdx];
+      setActiveGroupIndex(prevGroupIdx);
+      setActiveSubStepIndex(prevGroup.subSteps.length - 1);
+    }
+  };
+
+  const getRemainingRequiredSteps = () => {
+    if (!candidate) return 12;
+    const requiredStepNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14];
+    const completed = requiredStepNumbers.filter(num => {
+      const step = candidate.onboardingSteps.find(s => s.number === num);
+      return step?.status === "completed";
+    }).length;
+    return 12 - completed;
+  };
+
   // Messages for this candidate
   const candidateMessages = messages.filter((m) => m.candidateId === candidate?.id);
 
-  // Filter emails for candidate, ensuring compliance anomalies or BGC flags never leak
+  // Filter emails
   const candidateEmails = notifications.filter(
     (n) => 
       n.candidateId === candidate?.id && 
@@ -127,7 +381,781 @@ export default function OnboardingPage() {
       !n.message.toLowerCase().includes("anomaly")
   );
 
-  // If not logged in, render Image 2 OTP Login
+  // Dynamic Forms rendering logic
+  const renderActiveSubForm = () => {
+    const group = ONBOARDING_GROUPS[activeGroupIndex];
+    const subStep = group.subSteps[activeSubStepIndex];
+
+    switch (subStep.id) {
+      case "personal_details":
+        return (
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Personal Details</h4>
+            <p className="text-[11px] text-slate-400 font-medium">Please verify your legal name and contact details.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-450 uppercase">Full Legal Name</label>
+                <input 
+                  type="text" 
+                  value={personalDetails.fullName}
+                  onChange={e => setPersonalDetails(p => ({ ...p, fullName: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Email Address</label>
+                <input 
+                  type="email" 
+                  value={personalDetails.email}
+                  onChange={e => setPersonalDetails(p => ({ ...p, email: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Phone Number</label>
+                <input 
+                  type="text" 
+                  value={personalDetails.phone}
+                  onChange={e => setPersonalDetails(p => ({ ...p, phone: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Social Security Number</label>
+                <input 
+                  type="text" 
+                  value={personalDetails.ssn}
+                  onChange={e => setPersonalDetails(p => ({ ...p, ssn: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case "addresses":
+        return (
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Permanent Address</h4>
+            <p className="text-[11px] text-slate-400 font-medium">Please provide your primary residence address details.</p>
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Street Address</label>
+                <input 
+                  type="text" 
+                  value={addressDetails.address1}
+                  onChange={e => setAddressDetails(p => ({ ...p, address1: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-455 uppercase">City</label>
+                  <input 
+                    type="text" 
+                    value={addressDetails.city}
+                    onChange={e => setAddressDetails(p => ({ ...p, city: e.target.value }))}
+                    className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-455 uppercase">State</label>
+                  <input 
+                    type="text" 
+                    value={addressDetails.state}
+                    onChange={e => setAddressDetails(p => ({ ...p, state: e.target.value }))}
+                    className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-455 uppercase">ZIP Code</label>
+                  <input 
+                    type="text" 
+                    value={addressDetails.zip}
+                    onChange={e => setAddressDetails(p => ({ ...p, zip: e.target.value }))}
+                    className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "emergency_contact":
+        return (
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Emergency Contact</h4>
+            <p className="text-[11px] text-slate-400 font-medium">Provide a contact in case of an medical or work emergency.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Contact Name</label>
+                <input 
+                  type="text" 
+                  value={emergencyDetails.contactName}
+                  onChange={e => setEmergencyDetails(p => ({ ...p, contactName: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Relationship</label>
+                <input 
+                  type="text" 
+                  value={emergencyDetails.relationship}
+                  onChange={e => setEmergencyDetails(p => ({ ...p, relationship: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Phone Number</label>
+                <input 
+                  type="text" 
+                  value={emergencyDetails.phone}
+                  onChange={e => setEmergencyDetails(p => ({ ...p, phone: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case "equal_employment":
+        return (
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Equal Employment Disclosures</h4>
+            <p className="text-[11px] text-slate-400 font-medium">Voluntary demographics statistics data requested under Federal regulations.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Gender Selection</label>
+                <select 
+                  value={employmentDetails.gender}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, gender: e.target.value }))}
+                  className="w-full px-3 py-2 text-xs border border-slate-205 rounded-lg focus:outline-none bg-slate-50 font-semibold"
+                >
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Decline">Decline to Self-Identify</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Race / Ethnicity</label>
+                <select 
+                  value={employmentDetails.ethnicity}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, ethnicity: e.target.value }))}
+                  className="w-full px-3 py-2 text-xs border border-slate-205 rounded-lg focus:outline-none bg-slate-50 font-semibold"
+                >
+                  <option value="Asian">Asian</option>
+                  <option value="White">White / Caucasian</option>
+                  <option value="Hispanic">Hispanic / Latino</option>
+                  <option value="Black">Black / African American</option>
+                  <option value="Decline">Decline to Self-Identify</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Veteran Status</label>
+                <select 
+                  value={employmentDetails.veteranStatus}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, veteranStatus: e.target.value }))}
+                  className="w-full px-3 py-2 text-xs border border-slate-205 rounded-lg focus:outline-none bg-slate-50 font-semibold"
+                >
+                  <option value="No">No, I am not a veteran</option>
+                  <option value="Yes">Yes, protected veteran</option>
+                  <option value="Decline">Decline to Self-Identify</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "client_onboarding":
+        return (
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Client Onboarding Preference</h4>
+            <p className="text-[11px] text-slate-400 font-medium">Verify your clinical specialty details for CDK Global assignment matching.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Clinical Specialty</label>
+                <input 
+                  type="text" 
+                  value={employmentDetails.specialty}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, specialty: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Shift Preference</label>
+                <input 
+                  type="text" 
+                  value={employmentDetails.shifts}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, shifts: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Placement Location</label>
+                <input 
+                  type="text" 
+                  value={employmentDetails.locations}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, locations: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case "i9_eligibility":
+        return (
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Form I-9 Eligibility Details</h4>
+            <p className="text-[11px] text-slate-400 font-medium">Submit verification document details matching your I-9 requirements.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Work Authorization Status</label>
+                <select 
+                  value={employmentDetails.citizenStatus}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, citizenStatus: e.target.value }))}
+                  className="w-full px-3 py-2 text-xs border border-slate-205 rounded-lg focus:outline-none bg-slate-50 font-semibold"
+                >
+                  <option value="US Citizen">Citizen of the United States</option>
+                  <option value="Noncitizen National">Noncitizen National of the United States</option>
+                  <option value="Permanent Resident">Lawful Permanent Resident</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">List A Document Number</label>
+                <input 
+                  type="text" 
+                  value={employmentDetails.i9DocNum}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, i9DocNum: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Expiration Date</label>
+                <input 
+                  type="date" 
+                  value={employmentDetails.i9Expiry}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, i9Expiry: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case "education_details":
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Education Details</h4>
+              <span className="text-[9px] font-black bg-blue-50 text-[#0052CC] border border-[#DEEAF7] px-2 py-0.5 rounded uppercase">Optional</span>
+            </div>
+            <p className="text-[11px] text-slate-400 font-medium">Add educational degrees or certifications to your candidate history (non-blocking).</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Degree / Certification</label>
+                <input 
+                  type="text" 
+                  value={employmentDetails.degree}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, degree: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Institution / School</label>
+                <input 
+                  type="text" 
+                  value={employmentDetails.institution}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, institution: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Graduation Year</label>
+                <input 
+                  type="text" 
+                  value={employmentDetails.gradYear}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, gradYear: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case "previous_employers":
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Previous Employers</h4>
+              <span className="text-[9px] font-black bg-blue-50 text-[#0052CC] border border-[#DEEAF7] px-2 py-0.5 rounded uppercase">Optional</span>
+            </div>
+            <p className="text-[11px] text-slate-400 font-medium">List prior employment assignments or hospital networks (non-blocking).</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Last Employer Name</label>
+                <input 
+                  type="text" 
+                  value={employmentDetails.lastEmployer}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, lastEmployer: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Role Title</label>
+                <input 
+                  type="text" 
+                  value={employmentDetails.lastRole}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, lastRole: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Years Worked</label>
+                <input 
+                  type="text" 
+                  value={employmentDetails.yearsWorked}
+                  onChange={e => setEmploymentDetails(p => ({ ...p, yearsWorked: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case "w4_withholding":
+        return (
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Federal IRS W-4 Withholding</h4>
+            <p className="text-[11px] text-slate-400 font-medium">Verify your IRS federal tax withholding allowances preference.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Filing Status</label>
+                <select 
+                  value={payrollDetails.filingStatus}
+                  onChange={e => setPayrollDetails(p => ({ ...p, filingStatus: e.target.value }))}
+                  className="w-full px-3 py-2 text-xs border border-slate-205 rounded-lg focus:outline-none bg-slate-50 font-semibold"
+                >
+                  <option value="Single">Single / Married Filing Separately</option>
+                  <option value="Married">Married Filing Jointly</option>
+                  <option value="HeadOfHousehold">Head of Household</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">W-4 Claim Dependents</label>
+                <input 
+                  type="text" 
+                  value={payrollDetails.allowances}
+                  onChange={e => setPayrollDetails(p => ({ ...p, allowances: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Extra Withholding Amount ($)</label>
+                <input 
+                  type="text" 
+                  value={payrollDetails.extraWithholding}
+                  onChange={e => setPayrollDetails(p => ({ ...p, extraWithholding: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case "state_withholding":
+        return (
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">State Tax Withholding Form</h4>
+            <p className="text-[11px] text-slate-400 font-medium">Verify your state-level income tax filing status details.</p>
+            <div className="space-y-3">
+              <div className="space-y-1.5 max-w-sm">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">State Tax Filing Status</label>
+                <select 
+                  value={payrollDetails.stateFilingStatus}
+                  onChange={e => setPayrollDetails(p => ({ ...p, stateFilingStatus: e.target.value }))}
+                  className="w-full px-3 py-2 text-xs border border-slate-205 rounded-lg focus:outline-none bg-slate-50 font-semibold"
+                >
+                  <option value="Single">Single / Separately</option>
+                  <option value="Jointly">Married Filing Jointly</option>
+                  <option value="Exempt">Exempt / No Income State</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "method_of_payment":
+        return (
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Method of Payment (Direct Deposit)</h4>
+            <p className="text-[11px] text-slate-400 font-medium">Verify bank account details for direct deposit placement disbursements.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Bank Name</label>
+                <input 
+                  type="text" 
+                  value={payrollDetails.bankName}
+                  onChange={e => setPayrollDetails(p => ({ ...p, bankName: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Routing Transit Number</label>
+                <input 
+                  type="text" 
+                  value={payrollDetails.routingNumber}
+                  onChange={e => setPayrollDetails(p => ({ ...p, routingNumber: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-455 uppercase">Account Number</label>
+                <input 
+                  type="text" 
+                  value={payrollDetails.accountNumber}
+                  onChange={e => setPayrollDetails(p => ({ ...p, accountNumber: e.target.value }))}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-semibold"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case "benefits_election":
+        return (
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Benefits Election Portal</h4>
+            <p className="text-[11px] text-slate-400 font-medium">Select your healthcare coverage and retirement plans, or submit a waiver.</p>
+            <div className="space-y-3.5">
+              <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
+                <input 
+                  type="checkbox" 
+                  checked={benefitsDetails.medicalSelected}
+                  onChange={e => setBenefitsDetails(p => ({ ...p, medicalSelected: e.target.checked, benefitsWaived: false }))}
+                  className="h-4 w-4 rounded border-slate-300 text-[#0052CC] focus:ring-[#0052CC]"
+                />
+                <div className="text-left">
+                  <span className="block text-xs font-bold text-slate-800">Standard Medical PPO Plan</span>
+                  <span className="block text-[10px] text-slate-450 mt-0.5">Comprehensive coverage includes inpatient, outpatient, and prescriptions.</span>
+                </div>
+              </label>
+
+              <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
+                <input 
+                  type="checkbox" 
+                  checked={benefitsDetails.dentalSelected}
+                  onChange={e => setBenefitsDetails(p => ({ ...p, dentalSelected: e.target.checked, benefitsWaived: false }))}
+                  className="h-4 w-4 rounded border-slate-300 text-[#0052CC] focus:ring-[#0052CC]"
+                />
+                <div className="text-left">
+                  <span className="block text-xs font-bold text-slate-800">Premier Dental Coverage</span>
+                  <span className="block text-[10px] text-slate-455 mt-0.5">Includes preventative diagnostic cleanings and basic/major restorative work.</span>
+                </div>
+              </label>
+
+              <label className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-100/50 transition-colors">
+                <input 
+                  type="checkbox" 
+                  checked={benefitsDetails.visionSelected}
+                  onChange={e => setBenefitsDetails(p => ({ ...p, visionSelected: e.target.checked, benefitsWaived: false }))}
+                  className="h-4 w-4 rounded border-slate-300 text-[#0052CC] focus:ring-[#0052CC]"
+                />
+                <div className="text-left">
+                  <span className="block text-xs font-bold text-slate-800">Basic Vision Care Plan</span>
+                  <span className="block text-[10px] text-slate-455 mt-0.5">Covers eye exams, corrective lenses, and allowance towards frames.</span>
+                </div>
+              </label>
+
+              <label className="flex items-center gap-3 p-3 bg-rose-50/30 border border-rose-100 rounded-xl cursor-pointer hover:bg-rose-50/50 transition-colors">
+                <input 
+                  type="checkbox" 
+                  checked={benefitsDetails.benefitsWaived}
+                  onChange={e => setBenefitsDetails(p => ({ 
+                    ...p, 
+                    benefitsWaived: e.target.checked,
+                    medicalSelected: !e.target.checked ? p.medicalSelected : false,
+                    dentalSelected: !e.target.checked ? p.dentalSelected : false,
+                    visionSelected: !e.target.checked ? p.visionSelected : false
+                  }))}
+                  className="h-4 w-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500"
+                />
+                <div className="text-left">
+                  <span className="block text-xs font-bold text-rose-800">Waive All Corporate Health Benefits</span>
+                  <span className="block text-[10px] text-rose-600/70 mt-0.5">Declining employer-sponsored health benefits. Proof of other coverage may be required.</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        );
+
+      case "agreements_signatures":
+        return (
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Agreements & Signatures Checklist</h4>
+            <p className="text-[11px] text-slate-400 font-medium">Review and sign standard agreements required for your onboarding.</p>
+            <div className="space-y-3">
+              <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-slate-800 block">1. Employee Handbook Acknowledgment</span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5">Acknowledged on file • Auto-Signed</span>
+                </div>
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+              </div>
+
+              <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-slate-800 block">2. 401(k) Voluntary Enrollment Form</span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5">Acknowledged on file • Auto-Signed</span>
+                </div>
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+              </div>
+
+              <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-slate-800 block">3. Employee Offer Letter - Hourly(Weekly)</span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5">
+                    {documentsDetails.signedOfferLetter ? "Signed Successfully" : "Action Required • Signature Pending"}
+                  </span>
+                </div>
+                {documentsDetails.signedOfferLetter ? (
+                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                ) : (
+                  <button 
+                    onClick={() => {
+                      const sig = prompt("Type your full name to sign your Employment Offer Letter contract:");
+                      if (sig) {
+                        setDocumentsDetails(d => ({ ...d, signedOfferLetter: true, signature: sig }));
+                        alert("Employee Offer Letter signed successfully.");
+                      }
+                    }}
+                    className="px-3 py-1 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold transition-all shadow-xs cursor-pointer"
+                  >
+                    Sign Contract
+                  </button>
+                )}
+              </div>
+
+              <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-slate-800 block">4. Drug Check Policy & Consent Form</span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5">Acknowledged on file • Auto-Signed</span>
+                </div>
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+              </div>
+
+              <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-slate-800 block">5. Payroll Procedures & Acknowledgment</span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5">Acknowledged on file • Auto-Signed</span>
+                </div>
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+              </div>
+
+              {documentsDetails.signedOfferLetter && (
+                <div className="pt-2 text-left space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-550 uppercase">Legal Signature Representation</label>
+                  <input 
+                    type="text" 
+                    value={documentsDetails.signature}
+                    onChange={e => setDocumentsDetails(p => ({ ...p, signature: e.target.value }))}
+                    className="w-full max-w-sm px-3.5 py-2 text-xs border border-slate-200 rounded-lg focus:border-[#0052CC] focus:outline-none bg-slate-50 font-serif italic font-semibold text-slate-700"
+                    placeholder="Typed Legal Name Signature"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      case "required_uploads":
+        return (
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Required Document Uploads</h4>
+            <p className="text-[11px] text-slate-400 font-medium">Upload physical files representing credential licenses or healthcare screenings.</p>
+            <div className="space-y-4">
+              {/* Professional License upload slot */}
+              <div className="border border-slate-200 bg-slate-50/50 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left">
+                <div>
+                  <h5 className="text-xs font-bold text-slate-800">Professional Nursing License</h5>
+                  <p className="text-[10px] text-slate-400 font-medium mt-0.5">State registered nursing license registry proof (PDF/JPEG).</p>
+                  
+                  {candidate?.onboardingSteps[13]?.status === "completed" ? (
+                    <div className="mt-2 text-emerald-600 text-[10px] font-bold flex items-center gap-1">
+                      <Check className="h-3.5 w-3.5 stroke-[3px]" /> 
+                      <span>License_Mani.pdf - Awaiting compliance review</span>
+                    </div>
+                  ) : candidate?.stepStatus === "stuck" ? (
+                    <div className="mt-2 bg-rose-50 border border-rose-100 rounded-lg p-2.5 text-[10px] text-rose-800 font-bold flex items-start gap-2 max-w-lg">
+                      <ShieldAlert className="h-4.5 w-4.5 text-rose-600 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="block uppercase tracking-wider text-[8px] font-black text-rose-700">Blocker Anomaly Flagged</span>
+                        <span>SSN and Name mismatches detected on uploaded file. Please click upload below to upload a verified copy.</span>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+
+                <div>
+                  {candidate?.onboardingSteps[13]?.status === "completed" ? (
+                    <div className="h-8 w-8 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 text-emerald-500">
+                      <Check className="h-4 w-4" />
+                    </div>
+                  ) : (
+                    <button 
+                      onClick={() => triggerUploadFile(14, "Nursing_License_Mani.pdf")}
+                      className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all cursor-pointer"
+                    >
+                      Upload File
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Immunization records upload slot */}
+              <div className="border border-slate-200 bg-slate-50/50 p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left">
+                <div>
+                  <h5 className="text-xs font-bold text-slate-800">Immunization Records</h5>
+                  <p className="text-[10px] text-slate-400 font-medium mt-0.5">Tuberculosis screening and Hepatitis B series records.</p>
+                </div>
+                <div>
+                  <button 
+                    onClick={() => triggerUploadFile(14, "Immunization_Records_Mani.pdf")}
+                    className="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-200 text-xs font-bold transition-all cursor-pointer"
+                  >
+                    Upload File
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "review_submit":
+        return (
+          <div className="space-y-5 text-left">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Review & Submit Onboarding</h4>
+            <p className="text-[11px] text-slate-400 font-medium">Verify your entered profile parameters before locking and exporting to CDK Global.</p>
+            
+            <div className="space-y-4 max-h-[380px] overflow-y-auto pr-2 no-scrollbar text-xs">
+              {/* Personal Details Group */}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 relative">
+                <button 
+                  onClick={() => { setActiveGroupIndex(0); setActiveSubStepIndex(0); }}
+                  className="absolute top-3.5 right-4 text-[10px] font-black text-[#0052CC] hover:underline uppercase tracking-wide cursor-pointer"
+                >
+                  Edit
+                </button>
+                <h5 className="font-extrabold text-slate-700 uppercase tracking-wider text-[10px]">Personal Information</h5>
+                <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600">
+                  <div><strong>Legal Name:</strong> {personalDetails.fullName}</div>
+                  <div><strong>Email:</strong> {personalDetails.email}</div>
+                  <div><strong>Phone:</strong> {personalDetails.phone}</div>
+                  <div><strong>Address:</strong> {addressDetails.address1}, {addressDetails.city}, {addressDetails.state} {addressDetails.zip}</div>
+                  <div><strong>Emergency Contact:</strong> {emergencyDetails.contactName} ({emergencyDetails.relationship}) — {emergencyDetails.phone}</div>
+                </div>
+              </div>
+
+              {/* Employment Group */}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 relative">
+                <button 
+                  onClick={() => { setActiveGroupIndex(1); setActiveSubStepIndex(0); }}
+                  className="absolute top-3.5 right-4 text-[10px] font-black text-[#0052CC] hover:underline uppercase tracking-wide cursor-pointer"
+                >
+                  Edit
+                </button>
+                <h5 className="font-extrabold text-slate-700 uppercase tracking-wider text-[10px]">Employment Parameters</h5>
+                <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600">
+                  <div><strong>Clinical Specialty:</strong> {employmentDetails.specialty}</div>
+                  <div><strong>Shift Preference:</strong> {employmentDetails.shifts}</div>
+                  <div><strong>Placement:</strong> {employmentDetails.locations}</div>
+                  <div><strong>I-9 Document:</strong> {employmentDetails.citizenStatus} ({employmentDetails.i9DocNum})</div>
+                  <div><strong>Degree (Optional):</strong> {employmentDetails.degree || "Not Provided"}</div>
+                  <div><strong>Last Employer (Optional):</strong> {employmentDetails.lastEmployer || "Not Provided"}</div>
+                </div>
+              </div>
+
+              {/* Payroll Group */}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 relative">
+                <button 
+                  onClick={() => { setActiveGroupIndex(2); setActiveSubStepIndex(0); }}
+                  className="absolute top-3.5 right-4 text-[10px] font-black text-[#0052CC] hover:underline uppercase tracking-wide cursor-pointer"
+                >
+                  Edit
+                </button>
+                <h5 className="font-extrabold text-slate-700 uppercase tracking-wider text-[10px]">Payroll & Taxes</h5>
+                <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600">
+                  <div><strong>Filing Status:</strong> {payrollDetails.filingStatus}</div>
+                  <div><strong>W-4 Dependents:</strong> {payrollDetails.allowances}</div>
+                  <div><strong>Method of Payment:</strong> {payrollDetails.paymentMethod}</div>
+                  <div><strong>Direct Deposit Account:</strong> {payrollDetails.bankName} (Acct: {payrollDetails.accountNumber})</div>
+                </div>
+              </div>
+
+              {/* Benefits Group */}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 relative">
+                <button 
+                  onClick={() => { setActiveGroupIndex(3); setActiveSubStepIndex(0); }}
+                  className="absolute top-3.5 right-4 text-[10px] font-black text-[#0052CC] hover:underline uppercase tracking-wide cursor-pointer"
+                >
+                  Edit
+                </button>
+                <h5 className="font-extrabold text-slate-700 uppercase tracking-wider text-[10px]">Benefits Selections</h5>
+                <div className="text-[11px] text-slate-600">
+                  {benefitsDetails.benefitsWaived ? (
+                    <span className="text-rose-600 font-bold uppercase">All benefits declined/waived</span>
+                  ) : (
+                    <span>Enrolled plans: {benefitsDetails.medicalSelected && "Medical PPO, "} {benefitsDetails.dentalSelected && "Dental, "} {benefitsDetails.visionSelected && "Vision"}</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Documents Group */}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 relative">
+                <button 
+                  onClick={() => { setActiveGroupIndex(4); setActiveSubStepIndex(0); }}
+                  className="absolute top-3.5 right-4 text-[10px] font-black text-[#0052CC] hover:underline uppercase tracking-wide cursor-pointer"
+                >
+                  Edit
+                </button>
+                <h5 className="font-extrabold text-slate-700 uppercase tracking-wider text-[10px]">Signatures & Agreements</h5>
+                <div className="text-[11px] text-slate-600 space-y-1">
+                  <div><strong>Signature:</strong> <span className="font-serif italic font-bold">{documentsDetails.signature || "Not Signed"}</span></div>
+                  <div><strong>Offer Letter Status:</strong> {documentsDetails.signedOfferLetter ? "Signed successfully" : "Pending signature"}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Gated Submit button */}
+            <div className="pt-4 border-t border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+              <div>
+                {getRemainingRequiredSteps() > 0 ? (
+                  <span className="text-[10px] font-black uppercase bg-rose-50 text-rose-600 border border-rose-100 rounded px-2.5 py-1 flex items-center gap-1 select-none">
+                    <Lock className="h-3 w-3" /> {getRemainingRequiredSteps()} required sections remaining
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100 rounded px-2.5 py-1 flex items-center gap-1 select-none">
+                    <Check className="h-3 w-3 stroke-[3px]" /> Checklist complete! Ready to submit.
+                  </span>
+                )}
+              </div>
+              <button
+                disabled={getRemainingRequiredSteps() > 0}
+                onClick={() => setShowSubmitSuccessModal(true)}
+                className="px-6 py-3 bg-[#007A5E] hover:bg-[#005E48] disabled:bg-slate-300 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 disabled:scale-100 disabled:shadow-none cursor-pointer"
+              >
+                Submit Onboarding
+              </button>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  // If not logged in, render OTP Login Form
   if (!loggedInUser || loggedInUser.role !== "candidate" || !candidate) {
     return (
       <main className="min-h-screen bg-[#F4F6FC] text-[#1E293B] flex flex-col font-sans antialiased">
@@ -171,7 +1199,7 @@ export default function OnboardingPage() {
 
         {/* OTP Card matching Image 2 */}
         <div className="grow flex items-center justify-center px-4 py-16 relative z-10">
-          <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-10 shadow-lg text-center">
+          <div className="w-full max-w-md bg-white border border-slate-205 rounded-2xl p-10 shadow-lg text-center">
             
             {/* Header Image/Icon representing Shield check document */}
             <div className="flex justify-center mb-6">
@@ -249,7 +1277,7 @@ export default function OnboardingPage() {
                       value={otpCode}
                       onChange={(e) => setOtpCode(e.target.value)}
                       placeholder="Enter 6-digit OTP"
-                      className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-850 placeholder-slate-400 focus:outline-none focus:border-[#0052CC] focus:ring-1 focus:ring-[#0052CC] transition-colors text-sm pl-11 text-center tracking-widest font-mono font-bold"
+                      className="w-full px-4 py-3 bg-white border border-slate-350 rounded-lg text-slate-850 placeholder-slate-400 focus:outline-none focus:border-[#0052CC] focus:ring-1 focus:ring-[#0052CC] transition-colors text-sm pl-11 text-center tracking-widest font-mono font-bold"
                     />
                     <KeyRound className="absolute left-4 top-3.5 h-4.5 w-4.5 text-slate-400" />
                   </div>
@@ -267,8 +1295,6 @@ export default function OnboardingPage() {
               </form>
             )}
 
-
-
             <div className="mt-6 text-center">
               <Link href="/" className="text-xs font-bold text-[#0052CC] hover:underline">
                 Go back to Search Jobs
@@ -276,93 +1302,14 @@ export default function OnboardingPage() {
             </div>
           </div>
         </div>
-
-        {/* HIPAA Compliant footer */}
-        <div className="bg-transparent py-8 text-center text-[10px] text-slate-400 font-medium z-10">
-          <div className="flex justify-center items-center gap-6 mb-3">
-            <span className="flex items-center gap-1 font-semibold">
-              <CheckCircle className="h-3.5 w-3.5 text-slate-400" />
-              Secure Portal
-            </span>
-            <span className="text-slate-300">|</span>
-            <span className="flex items-center gap-1 font-semibold">
-              <ShieldAlert className="h-3.5 w-3.5 text-slate-400" />
-              HIPAA Compliant
-            </span>
-          </div>
-          <div>
-            © 2026 Staff HC INC. All rights reserved.
-          </div>
-        </div>
       </main>
     );
   }
 
-  if (!candidate) {
-    return (
-      <main className="min-h-screen bg-[#F4F6FC] text-[#1E293B] flex flex-col font-sans antialiased">
-        <DemoNavbar />
-        <header className="bg-white border-b border-slate-100 shadow-sm sticky top-0 z-40">
-          <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img
-                src="/staffhc-logo.png"
-                alt="Staff HC Logo"
-                className="h-6.5 object-contain select-none pointer-events-none"
-              />
-              <span className="text-slate-350 font-normal text-lg">|</span>
-              <span className="text-xs font-bold text-[#0052CC] uppercase tracking-wider">Onboarding</span>
-            </div>
-            <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-slate-500">
-              <Link href="/jobs" className="hover:text-[#0052CC]">Find Jobs</Link>
-              <button onClick={() => alert("Please apply to a job first to view your dashboard.")} className="hover:text-[#0052CC]">Dashboard</button>
-              <button onClick={() => alert("Please apply to a job first to access the onboarding portal.")} className="hover:text-[#0052CC]">Onboard</button>
-            </nav>
-            <div className="flex items-center gap-4">
-              <button className="text-slate-400 hover:text-slate-600 transition-colors">
-                <Bell className="h-4.5 w-4.5" />
-              </button>
-              <button
-                onClick={() => logout()}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors"
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </button>
-            </div>
-          </div>
-        </header>
-
-        <div className="grow flex items-center justify-center p-6">
-          <div className="bg-white border border-slate-200 p-10 rounded-2xl shadow-sm text-center max-w-lg w-full">
-            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">📋</span>
-            </div>
-            <h2 className="text-xl font-bold text-slate-800 mb-2">You haven't applied to any jobs yet</h2>
-            <p className="text-slate-500 text-sm mb-8">Discover verified nursing opportunities and start your compliance journey.</p>
-            <Link 
-              href="/jobs"
-              className="inline-flex items-center justify-center px-6 py-3 bg-[#0052CC] hover:bg-[#0042A3] text-white font-bold rounded-xl shadow-sm transition-all text-sm"
-            >
-              Find Jobs
-            </Link>
-          </div>
-        </div>
-
-        <div className="bg-transparent py-8 text-center text-[10px] text-slate-400 font-medium z-10">
-          © 2026 Staff HC INC. All rights reserved.
-        </div>
-      </main>
-    );
-  }
-
-  // Candidate Dashboard Layout from Image 3
   return (
     <main className="min-h-screen bg-[#F4F6FC] text-[#1E293B] flex flex-col font-sans antialiased">
-      {/* Demo navigation helper */}
       <DemoNavbar />
 
-      {/* Corporate Dashboard Header */}
       <header className="bg-white border-b border-slate-100 shadow-sm z-30 shrink-0">
         <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -379,14 +1326,14 @@ export default function OnboardingPage() {
             <Link href="/jobs" className="hover:text-[#0052CC] transition-colors">Find Jobs</Link>
             <button
               onClick={() => { setActiveHeaderTab("dashboard"); setActiveMenu("overview"); }}
-              className={`transition-colors pb-5 mt-5 border-[#0052CC] ${activeHeaderTab === "dashboard" ? "text-[#0052CC] border-b-2 font-extrabold" : "hover:text-[#0052CC]"}`}
+              className={`transition-colors pb-5 mt-5 border-[#0052CC] cursor-pointer ${activeHeaderTab === "dashboard" ? "text-[#0052CC] border-b-2 font-extrabold" : "hover:text-[#0052CC]"}`}
             >
               Dashboard
             </button>
             {!candidate?.hasNoApplication && (
               <button
                 onClick={() => setActiveHeaderTab("onboard")}
-                className={`transition-colors pb-5 mt-5 border-[#0052CC] ${activeHeaderTab === "onboard" ? "text-[#0052CC] border-b-2 font-extrabold" : "hover:text-[#0052CC]"}`}
+                className={`transition-colors pb-5 mt-5 border-[#0052CC] cursor-pointer ${activeHeaderTab === "onboard" ? "text-[#0052CC] border-b-2 font-extrabold" : "hover:text-[#0052CC]"}`}
               >
                 Onboard
               </button>
@@ -397,7 +1344,7 @@ export default function OnboardingPage() {
             <div className="relative">
               <button 
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="text-slate-400 hover:text-slate-600 transition-colors relative p-1.5 hover:bg-slate-50 rounded-full"
+                className="text-slate-400 hover:text-slate-600 transition-colors relative p-1.5 hover:bg-slate-50 rounded-full cursor-pointer"
               >
                 <Bell className="h-4.5 w-4.5" />
                 <span className="absolute top-1 right-1 h-2 w-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
@@ -409,25 +1356,23 @@ export default function OnboardingPage() {
                     <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800">Notifications</h3>
                     <button 
                       onClick={() => setShowNotifications(false)}
-                      className="text-slate-400 hover:text-slate-600 text-xs font-bold"
+                      className="text-xs text-slate-400 hover:text-slate-600 font-bold"
                     >
-                      Dismiss
+                      Close
                     </button>
                   </div>
-                  <div className="space-y-3">
-                    <div className="bg-blue-50/50 border border-blue-105 rounded-xl p-3 space-y-1 text-[11px] font-semibold text-slate-655">
-                      <div className="flex justify-between items-center text-blue-700">
-                        <span className="font-extrabold">OTP Authentication Pin</span>
-                        <span className="text-slate-450 text-[10px] font-bold">09:12 AM</span>
+                  <div className="space-y-3.5 max-h-60 overflow-y-auto no-scrollbar text-xs font-semibold text-slate-600">
+                    {notifications.filter(n => n.candidateId === candidate.id).slice(0, 5).map(n => (
+                      <div key={n.id} className="pb-2 border-b border-slate-50 last:border-0">
+                        <span className="block text-slate-800">{n.subject}</span>
+                        <span className="block text-[10px] text-slate-400 mt-0.5">{n.message}</span>
                       </div>
-                      <p className="text-slate-600 text-[10px] leading-relaxed mt-1 font-medium">
-                        SMS: Your StaffHC onboarding login OTP code is 123456.
-                      </p>
-                    </div>
+                    ))}
                   </div>
                 </div>
               )}
             </div>
+
             {/* User Avatar Circle */}
             <div className="h-8 w-8 rounded-full overflow-hidden border border-slate-200">
               <img 
@@ -440,1039 +1385,654 @@ export default function OnboardingPage() {
         </div>
       </header>
 
-      {candidate?.hasNoApplication ? (
-        <div className="grow max-w-lg w-full mx-auto px-4 py-16 flex items-center justify-center">
-          <div className="w-full bg-white border border-slate-200 rounded-2xl p-10 shadow-lg text-center space-y-6">
-            <div className="flex justify-center">
-              <div className="h-16 w-16 bg-[#EBF3FC] rounded-full flex items-center justify-center text-[#0052CC]">
-                <Layout className="h-8 w-8" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-xl font-bold text-slate-800">You haven't applied to any jobs yet</h2>
-              <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                To start your onboarding journey and compliance tracking, find and apply to matching healthcare positions on our job board.
-              </p>
-            </div>
-            <div className="pt-2 flex flex-col gap-2">
-              <Link 
-                href="/jobs"
-                className="w-full py-3 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg uppercase tracking-wider transition-all shadow flex items-center justify-center gap-1.5"
-              >
-                Find Jobs
-              </Link>
-              <button 
-                onClick={() => logout()}
-                className="w-full py-3 border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-slate-800 text-xs font-bold rounded-lg transition-all"
-              >
-                Logout & Return
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* Mobile/Tablet tab switcher for responsive visibility */}
-          {activeHeaderTab === "dashboard" && (
-            <div className="lg:hidden bg-white border-b border-slate-200 flex justify-around py-3 text-xs font-bold text-slate-500">
-              <button 
-                onClick={() => { setActiveMenu("overview"); setMobileActiveTab("overview"); }}
-                className={`pb-1 px-3 ${activeMenu === "overview" ? "text-[#0052CC] border-b-2 border-[#0052CC]" : ""}`}
-              >
-                Overview
-              </button>
-              <button 
-                onClick={() => { setActiveMenu("documents"); setMobileActiveTab("documents"); }}
-                className={`pb-1 px-3 ${activeMenu === "documents" ? "text-[#0052CC] border-b-2 border-[#0052CC]" : ""}`}
-              >
-                Documents
-              </button>
-              <button 
-                onClick={() => { setActiveMenu("emails"); }}
-                className={`pb-1 px-3 ${activeMenu === "emails" ? "text-[#0052CC] border-b-2 border-[#0052CC]" : ""}`}
-              >
-                Emails ({candidateEmails.length})
-              </button>
-              <button 
-                onClick={() => { setActiveMenu("messages"); setMobileActiveTab("chat"); }}
-                className={`pb-1 px-3 ${activeMenu === "messages" ? "text-[#0052CC] border-b-2 border-[#0052CC]" : ""}`}
-              >
-                Recruiter Chat
-              </button>
-            </div>
-          )}
-
-          {/* Main dashboard content area split into sidebar, middle, and right columns */}
-          {activeHeaderTab === "dashboard" ? (
-            <div className="grow max-w-[1600px] w-full mx-auto px-6 py-8 flex flex-col lg:flex-row gap-8 items-start">
-              
-              {/* COLUMN 1: LEFT SIDEBAR (Always visible on large screens) */}
-              <aside className="w-full lg:w-60 bg-white border border-slate-200 rounded-2xl p-6 lg:flex flex-col h-[560px] shadow-sm justify-between shrink-0 hidden">
-                <div className="space-y-6">
-                  <div className="px-3">
-                    <span className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400 block">
-                      Hummingbird
-                    </span>
-                    <span className="text-xs font-semibold text-slate-550 block -mt-0.5">
-                      Candidate Portal
-                    </span>
-                  </div>
-
-                  <nav className="space-y-1.5">
-                    <button
-                      onClick={() => setActiveMenu("overview")}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                        activeMenu === "overview"
-                          ? "bg-[#EBF3FC] text-[#0052CC]"
-                          : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
-                      }`}
-                    >
-                      <Layout className="h-4.5 w-4.5" />
-                      Overview
-                    </button>
-                    <button
-                      onClick={() => setActiveMenu("documents")}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                        activeMenu === "documents"
-                          ? "bg-[#EBF3FC] text-[#0052CC]"
-                          : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
-                      }`}
-                    >
-                      <FileText className="h-4.5 w-4.5" />
-                      Documents
-                    </button>
-                    <button
-                      onClick={() => setActiveMenu("emails")}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                        activeMenu === "emails"
-                          ? "bg-[#EBF3FC] text-[#0052CC]"
-                          : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
-                      }`}
-                    >
-                      <Inbox className="h-4.5 w-4.5" />
-                      <span>Emails</span>
-                      {candidateEmails.length > 0 && (
-                        <span className="ml-auto bg-[#0052CC] text-white font-bold rounded-full text-[9px] w-4.5 h-4.5 flex items-center justify-center">
-                          {candidateEmails.length}
-                        </span>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => setActiveMenu("messages")}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                        activeMenu === "messages"
-                          ? "bg-[#EBF3FC] text-[#0052CC]"
-                          : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
-                      }`}
-                    >
-                      <Send className="h-4.5 w-4.5" />
-                      Recruiter Chat
-                    </button>
-                    <button
-                      onClick={() => setActiveMenu("settings")}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                        activeMenu === "settings"
-                          ? "bg-[#EBF3FC] text-[#0052CC]"
-                          : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
-                      }`}
-                    >
-                      <Settings className="h-4.5 w-4.5" />
-                      Settings
-                    </button>
-                  </nav>
-                </div>
-
-                <div className="space-y-3 pt-6 border-t border-slate-100">
-                  <button 
-                    onClick={() => alert("Simulating viewing profile details...")}
-                    className="w-full py-2.5 bg-[#002677] hover:bg-[#001D5B] text-white text-xs font-bold rounded-lg transition-all"
-                  >
-                    View Profile
-                  </button>
-            <button
-              onClick={() => logout()}
-              className="w-full flex items-center justify-center gap-2 py-2 text-slate-500 hover:text-slate-800 text-xs font-bold transition-all"
-            >
-              <LogOut className="h-4 w-4" />
-              Sign Out
-            </button>
-          </div>
-        </aside>
-
-        {/* COLUMN 2: MIDDLE CONTENT OR OTHER ACTIVE MENUS */}
-        <section className="flex-1 space-y-6 w-full text-left">
+      {/* Main dashboard content area split into sidebar, middle, and right columns */}
+      {activeHeaderTab === "dashboard" ? (
+        <div className="grow max-w-[1600px] w-full mx-auto px-6 py-8 flex flex-col lg:flex-row gap-8 items-start">
           
-          {/* Menu Panel 1: OVERVIEW (Standard candidate dashboard) */}
-          {activeMenu === "overview" && (
-            <div className="space-y-6 animate-fade-in">
-              {/* Welcome Header */}
-              <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
-                  Welcome back, {candidate?.name}
-                </h1>
-                <p className="text-xs text-slate-400 font-medium">
-                  Track your compliance progress and onboarding documents below.
-                </p>
+          {/* COLUMN 1: LEFT SIDEBAR */}
+          <aside className="w-full lg:w-60 bg-white border border-slate-200 rounded-2xl p-6 lg:flex flex-col h-[520px] shadow-sm justify-between shrink-0 hidden">
+            <div className="space-y-6">
+              <div className="px-3">
+                <span className="text-[10px] uppercase font-extrabold tracking-wider text-slate-400 block">
+                  Hummingbird
+                </span>
+                <span className="text-xs font-semibold text-slate-550 block -mt-0.5">
+                  Candidate Portal
+                </span>
               </div>
 
-              {/* ONBOARDING STATUS TIMELINE CARD */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <h3 className="font-bold text-slate-800 text-sm">Onboarding Status</h3>
-                    <p className="text-[11px] text-slate-450 font-semibold mt-1">
-                      You are currently at <span className="text-[#0052CC]">Step {candidate?.currentStep}: {candidate?.onboardingSteps[candidate?.currentStep - 1]?.name}</span>.
-                    </p>
-                  </div>
-
-                  {/* Pink action required banner inside Card header */}
-                  {candidate?.stepStatus === "stuck" && (
-                    <div className="bg-[#FFF0F0] border border-[#FFD5D5] px-3 py-1 rounded text-[10.5px] text-[#C53030] flex items-center gap-1.5 font-bold">
-                      <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
-                      Action required: Upload Nursing License
-                    </div>
+              <nav className="space-y-1.5">
+                <button
+                  onClick={() => setActiveMenu("overview")}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeMenu === "overview"
+                      ? "bg-[#EBF3FC] text-[#0052CC]"
+                      : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
+                  }`}
+                >
+                  <Layout className="h-4.5 w-4.5" />
+                  Overview
+                </button>
+                <button
+                  onClick={() => setActiveMenu("documents")}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeMenu === "documents"
+                      ? "bg-[#EBF3FC] text-[#0052CC]"
+                      : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
+                  }`}
+                >
+                  <FileText className="h-4.5 w-4.5" />
+                  Documents
+                </button>
+                <button
+                  onClick={() => setActiveMenu("emails")}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeMenu === "emails"
+                      ? "bg-[#EBF3FC] text-[#0052CC]"
+                      : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
+                  }`}
+                >
+                  <Inbox className="h-4.5 w-4.5" />
+                  <span>Emails</span>
+                  {candidateEmails.length > 0 && (
+                    <span className="ml-auto bg-[#0052CC] text-white font-bold rounded-full text-[9px] w-4.5 h-4.5 flex items-center justify-center">
+                      {candidateEmails.length}
+                    </span>
                   )}
-                </div>
-
-                {/* Horizontal Timeline (Two Rows for 13 steps) */}
-                <div className="space-y-6 py-4 relative">
-                  {/* Row 1: Steps 1 - 7 */}
-                  <div className="relative pt-6 pb-2">
-                    {/* Background bar line */}
-                    <div className="absolute top-[40px] left-[6%] right-[6%] h-[3px] bg-slate-100 -z-0"></div>
-                    {/* Blue progress bar line for Row 1 */}
-                    <div 
-                      className="absolute top-[40px] left-[6%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
-                      style={{
-                        width: `${Math.min(100, Math.max(0, (((candidate?.onboardingSteps?.slice(0, 7).filter(s => s.status === "completed").length || 0) - 0.5) / 6) * 88))}%`
-                      }}
-                    ></div>
-
-                    <div className="flex justify-between items-start relative z-10">
-                      {candidate?.onboardingSteps?.slice(0, 7).map((step) => {
-                        const isDone = step.status === "completed";
-                        const isActive = step.number === candidate?.currentStep;
-
-                        return (
-                          <div key={step.number} className="flex flex-col items-center text-center w-[12%]">
-                            <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
-                              isDone 
-                                ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10" 
-                                : isActive
-                                ? "bg-white border-2 border-[#0052CC] text-[#0052CC] ring-4 ring-[#0052CC]/15"
-                                : "bg-slate-100 border-slate-200 text-slate-400"
-                            }`}>
-                              {isDone ? <Check className="h-4 w-4 stroke-[3px]" /> : step.number}
-                            </div>
-                            <span className={`text-[9.5px] font-bold mt-2 truncate w-full ${isDone || isActive ? "text-slate-800" : "text-slate-400"}`}>
-                              {step.name}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Transition SVG connector between Row 1 and Row 2 */}
-                  <svg className="absolute inset-0 w-full h-[190px] pointer-events-none -z-10" viewBox="0 0 100 190" preserveAspectRatio="none">
-                    <path
-                      d="M 94 40 C 99 40, 99 95, 50 95 C 1 95, 1 150, 7 150"
-                      fill="none"
-                      stroke="#F1F5F9"
-                      strokeWidth="3"
-                      strokeDasharray="4 4"
-                    />
-                    {candidate?.onboardingSteps[7]?.status === "completed" && (
-                      <path
-                        d="M 94 40 C 99 40, 99 95, 50 95 C 1 95, 1 150, 7 150"
-                        fill="none"
-                        stroke="#0052CC"
-                        strokeWidth="3"
-                        className="transition-all duration-500"
-                      />
-                    )}
-                  </svg>
-
-                  {/* Row 2: Steps 8 - 13 */}
-                  <div className="relative pt-6 pb-2">
-                    {/* Background bar line */}
-                    <div className="absolute top-[40px] left-[7%] right-[7%] h-[3px] bg-slate-100 -z-0"></div>
-                    {/* Blue progress bar line for Row 2 */}
-                    <div 
-                      className="absolute top-[40px] left-[7%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
-                      style={{
-                        width: `${Math.min(100, Math.max(0, (((candidate?.onboardingSteps?.slice(7).filter(s => s.status === "completed").length || 0) - 0.5) / 5) * 86))}%`
-                      }}
-                    ></div>
-
-                    <div className="flex justify-between items-start relative z-10 px-1">
-                      {candidate?.onboardingSteps?.slice(7).map((step) => {
-                        const isDone = step.status === "completed";
-                        const isActive = step.number === candidate?.currentStep;
-                        const isStuck = step.status === "stuck";
-
-                        return (
-                          <div key={step.number} className="flex flex-col items-center text-center w-[14%]">
-                            <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
-                              isDone 
-                                ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10" 
-                                : isStuck
-                                ? "bg-rose-500 border-rose-500 text-white animate-pulse"
-                                : isActive
-                                ? "bg-white border-2 border-[#0052CC] text-[#0052CC] ring-4 ring-[#0052CC]/15"
-                                : "bg-slate-100 border-slate-200 text-slate-400"
-                            }`}>
-                              {isDone ? (
-                                <Check className="h-4 w-4 stroke-[3px]" />
-                              ) : isStuck ? (
-                                <span className="text-[10px] font-black">{step.number}</span>
-                              ) : (
-                                step.number
-                              )}
-                            </div>
-                            <span className={`text-[9.5px] font-bold mt-2 truncate w-full ${isDone || isActive || isStuck ? "text-slate-800 font-extrabold" : "text-slate-455"}`}>
-                              {step.name}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Soft SLA Deadline Nudge */}
-                <div className="mt-4 bg-[#EBF3FC] border border-[#DEEAF7] p-3 rounded-xl flex items-center justify-between text-xs text-[#0052CC] font-semibold text-left">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-[#0052CC]" />
-                    <span>Please complete Step {candidate?.currentStep}: {candidate?.onboardingSteps[candidate?.currentStep - 1]?.name} by **July 09, 2026**.</span>
-                  </div>
-                  <span className="text-[9.5px] uppercase font-bold bg-[#0052CC] text-white px-2 py-0.5 rounded">Action Required</span>
-                </div>
-
-              </div>
-
-              {/* Stuck detail panel or dynamic step instruction details */}
-              {candidate?.stepStatus === "stuck" && (
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-left">
-                  <div className="flex items-center gap-2 text-rose-600 mb-3">
-                    <AlertCircle className="h-5 w-5" />
-                    <h3 className="font-bold text-sm">Step 3 Stuck: {candidate?.stuckReason}</h3>
-                  </div>
-                  <p className="text-xs text-slate-500 font-medium leading-relaxed mb-6">
-                    {candidate?.stuckExplanation}
-                  </p>
-
-                  {/* Drag and drop upload zone representation */}
-                  <div className="border-2 border-dashed border-[#DEEAF7] bg-[#F8FAFC] hover:bg-[#F1F5F9] rounded-xl p-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all">
-                    <UploadCloud className="h-10 w-10 text-[#0052CC]" />
-                    <h4 className="text-xs font-bold text-slate-800">Upload Professional Nursing License</h4>
-                    <p className="text-[10px] text-slate-400 font-semibold">PDF, JPEG, or PNG up to 10MB</p>
-                    
-                    <div className="mt-4">
-                      {candidate?.onboardingSteps[8]?.status === "completed" ? (
-                        <div className="h-8 w-8 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 text-emerald-500">
-                          <Check className="h-4 w-4" />
-                        </div>
-                      ) : candidate?.onboardingSteps[8]?.status === "in_progress" ? (
-                        <span className="text-[10px] font-bold text-amber-500 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded">Awaiting Review</span>
-                      ) : (
-                        <button 
-                          onClick={() => triggerUploadFile(9, "Nursing_License_Mani.pdf")}
-                          className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all"
-                        >
-                          Upload File
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* REQUIRED DOCUMENTS LIST CARD */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-bold text-slate-800 text-sm">Required Documents</h3>
-                  <span className="bg-[#EBF3FC] text-[#0052CC] font-bold text-[10px] px-2.5 py-0.5 rounded-full uppercase">
-                    {(candidate?.onboardingSteps?.filter(s => s.status !== "completed" && s.number <= 9)?.length) || 0} Pending
-                  </span>
-                </div>
-
-                <div className="divide-y divide-slate-100">
-                  {/* Row 1 */}
-                  <div className="py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-red-50 text-red-500 rounded-lg flex items-center justify-center shrink-0 border border-red-100">
-                        <FileText className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-850">Professional Nursing License</h4>
-                        <p className="text-[10.5px] text-slate-400 mt-0.5 font-medium">Missing or expired license file.</p>
-                      </div>
-                    </div>
-                    <div>
-                      {candidate?.onboardingSteps[8]?.status === "completed" ? (
-                        <div className="h-8 w-8 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 text-emerald-500">
-                          <Check className="h-4 w-4" />
-                        </div>
-                      ) : candidate?.onboardingSteps[8]?.status === "in_progress" ? (
-                        <span className="text-[10px] font-bold text-amber-500 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded">Awaiting Review</span>
-                      ) : (
-                        <button 
-                          onClick={() => triggerUploadFile(9, "Nursing_License_Mani.pdf")}
-                          className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all"
-                        >
-                          Upload
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Row 2 */}
-                  <div className="py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-[#EBF3FC] text-[#0052CC] rounded-lg flex items-center justify-center shrink-0 border border-[#DEEAF7]">
-                        <FileText className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-850">Immunization Records</h4>
-                        <p className="text-[10.5px] text-slate-400 mt-0.5 font-medium">Update required for Hep B series.</p>
-                      </div>
-                    </div>
-                    <div>
-                      <button 
-                        onClick={() => triggerUploadFile(9, "Immunization_Records_Mani.pdf")}
-                        className="px-4 py-1.5 bg-[#EBF3FC] hover:bg-[#DEEAF7] text-[#0052CC] text-xs font-bold rounded-lg transition-all"
-                      >
-                        Review
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Row 3 */}
-                  <div className="py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-slate-50 text-slate-455 rounded-lg flex items-center justify-center shrink-0 border border-slate-100">
-                        <FileText className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-850">Background Check Consent</h4>
-                        <p className="text-[10.5px] text-slate-400 mt-0.5 font-medium">Completed on Oct 24, 2023</p>
-                      </div>
-                    </div>
-                    <div className="h-8 w-8 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 text-emerald-500">
-                      <CheckCircle2 className="h-5 w-5" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* PROFILE COMPLETION CTA CARD */}
-              <div className="bg-[#0052CC] text-white rounded-2xl p-6 shadow-md flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] opacity-5"></div>
-
-                <div className="max-w-md relative z-10 space-y-2">
-                  <h4 className="text-sm font-extrabold">Your Candidate Profile is 75% complete.</h4>
-                  <p className="text-[11px] text-slate-100 leading-relaxed font-semibold">
-                    Adding your specialty preferences helps us match you with the right high-paying assignments in your area.
-                  </p>
-                  <button 
-                    onClick={() => alert("Simulating finishing profile...")}
-                    className="mt-3 px-4 py-2 bg-white text-[#0052CC] hover:bg-slate-50 text-xs font-bold rounded-lg transition-all"
-                  >
-                    Finish Profile
-                  </button>
-                </div>
-                
-                <div className="aspect-[4/3] w-36 rounded-xl overflow-hidden shadow-inner border border-white/20 shrink-0 relative z-10">
-                  <img 
-                    src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=300&auto=format&fit=crop" 
-                    alt="Workspace laptop" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
+                </button>
+                <button
+                  onClick={() => setActiveMenu("messages")}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeMenu === "messages"
+                      ? "bg-[#EBF3FC] text-[#0052CC]"
+                      : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
+                  }`}
+                >
+                  <Send className="h-4.5 w-4.5" />
+                  Recruiter Chat
+                </button>
+                <button
+                  onClick={() => setActiveMenu("settings")}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeMenu === "settings"
+                      ? "bg-[#EBF3FC] text-[#0052CC]"
+                      : "text-slate-500 hover:bg-slate-55 hover:text-slate-800"
+                  }`}
+                >
+                  <Settings className="h-4.5 w-4.5" />
+                  Settings
+                </button>
+              </nav>
             </div>
-          )}
 
-          {/* Menu Panel 2: DOCUMENTS */}
-          {activeMenu === "documents" && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="font-bold text-slate-800 text-sm">Required Onboarding Credentials</h3>
-              <p className="text-xs text-slate-400 font-medium">Below is a checklist of all regulatory compliance documents required for your placement.</p>
-              
-              <div className="divide-y divide-slate-150 text-xs font-medium space-y-3">
-                {candidate.onboardingSteps.map((step) => (
-                  <div key={step.number} className="py-3 flex justify-between items-center">
-                    <div>
-                      <span className="font-bold block text-slate-800">Step {step.number}: {step.name}</span>
-                      <span className="text-[10px] text-slate-400">{step.description}</span>
-                    </div>
-                    <div>
-                      {step.status === "completed" ? (
-                        <span className="text-emerald-500 font-bold bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded">Completed</span>
-                      ) : (
-                        <button 
-                          onClick={() => triggerUploadFile(step.number, `${step.name.replace(/\s+/g, "_")}_doc.pdf`)}
-                          className="px-3 py-1 bg-[#0052CC] text-white rounded font-bold"
-                        >
-                          Upload File
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="space-y-3 pt-6 border-t border-slate-100">
+              <button 
+                onClick={() => alert("Candidate ID: " + candidate.candidateNo)}
+                className="w-full py-2.5 bg-[#002677] hover:bg-[#001D5B] text-white text-xs font-bold rounded-lg transition-all cursor-pointer"
+              >
+                View ID Profile
+              </button>
             </div>
-          )}
+          </aside>
 
-          {/* Menu Panel 3: EMAIL COMMUNICATIONS (NEW TAB FOR COMMUNICATION RECORDS) */}
-          {activeMenu === "emails" && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5">
-              <div>
-                <h3 className="font-bold text-[#162f55] text-sm flex items-center gap-2">
-                  <Inbox className="h-4.5 w-4.5 text-[#0052CC]" />
-                  Email Communications Ledger
-                </h3>
-                <p className="text-[11px] text-slate-400 mt-1 font-semibold">
-                  A history of all automated system messages, credential updates, and recruiter notifications sent to <strong className="text-slate-600">{candidate.email}</strong>.
-                </p>
-              </div>
-
-              {candidateEmails.length === 0 ? (
-                <div className="text-center py-12 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
-                  <Inbox className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-                  <p className="text-xs text-slate-550 font-bold">No email communications logged yet.</p>
-                  <p className="text-[10px] text-slate-400 mt-1 max-w-xs mx-auto">
-                    Reminders sent by the recruiter or compliance triggers will appear here in real-time.
+          {/* COLUMN 2: MIDDLE CONTENT */}
+          <section className="flex-1 space-y-6 w-full text-left">
+            
+            {activeMenu === "overview" && (
+              <div className="space-y-6 animate-fade-in">
+                {/* Welcome Header */}
+                <div className="flex flex-col gap-1">
+                  <h1 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
+                    Welcome back, {candidate.name}
+                  </h1>
+                  <p className="text-xs text-slate-400 font-medium">
+                    Track your compliance progress and onboarding documents below.
                   </p>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {candidateEmails.map((email) => (
-                    <div 
-                      key={email.id} 
-                      className={`border rounded-xl overflow-hidden hover:border-[#0052CC]/35 transition-all bg-white shadow-3xs ${
-                        email.isExternalSync 
-                          ? "border-blue-150 ring-1 ring-blue-50/50" 
-                          : "border-slate-200/80"
-                      }`}
+
+                {/* Compact Progress Summary (6 Groups Slim Horizontal Indicator) */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
+                    <div>
+                      <h3 className="font-extrabold text-slate-800 text-sm">Onboarding Progress</h3>
+                      <p className="text-[11px] text-slate-455 font-bold mt-0.5">
+                        {getCompletedGroupsCount()} of 6 sections complete ({getOverallProgressPercentage()}% total progress)
+                      </p>
+                    </div>
+                    {/* Status Chip */}
+                    <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 text-slate-455 rounded-full text-[10px] font-bold select-none">
+                      <Lock className="h-3 w-3 text-slate-400" />
+                      <span>Review & Submit unlocks after all sections are complete</span>
+                    </div>
+                  </div>
+
+                  {/* Slim horizontal bar segments */}
+                  <div className="grid grid-cols-6 gap-2 pt-1 h-3.5">
+                    {ONBOARDING_GROUPS.map((grp, idx) => {
+                      const isCompleted = isGroupCompleted(idx);
+                      const isCurrent = findFirstIncompleteSubStep().groupIndex === idx;
+                      return (
+                        <div 
+                          key={idx} 
+                          className={`rounded-full transition-all duration-300 ${
+                            isCompleted 
+                              ? "bg-[#0052CC]" 
+                              : isCurrent 
+                              ? "bg-blue-200 border border-[#0052CC]" 
+                              : "bg-slate-105 border border-slate-200"
+                          }`}
+                          title={`${grp.name} (${isCompleted ? "Complete" : isCurrent ? "Active" : "Pending"})`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Continue Onboarding Card */}
+                {getRemainingRequiredSteps() > 0 ? (
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-md transition-shadow">
+                    <div className="space-y-1">
+                      <span className="text-[9.5px] font-black uppercase text-[#0052CC] tracking-wider bg-[#EBF3FC] px-2 py-0.5 rounded border border-[#DEEAF7]">
+                        Next Action
+                      </span>
+                      <h3 className="text-sm font-extrabold text-slate-800 mt-2">
+                        {getCurrentSubStepInfo().plainText}
+                      </h3>
+                      <p className="text-[10.5px] text-slate-400 font-medium flex items-center gap-1 mt-1">
+                        <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                        <span>Please complete by July 09, 2026.</span>
+                      </p>
+                    </div>
+                    <button 
+                      onClick={handleResumeOnboarding}
+                      className="px-5 py-2.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-black rounded-xl transition-all shadow-xs active:scale-95 flex items-center gap-2 cursor-pointer uppercase tracking-wider shrink-0"
                     >
-                      <div className={`p-3.5 flex justify-between items-center text-[10.5px] font-bold border-b ${
-                        email.isExternalSync 
-                          ? "bg-blue-50/30 border-blue-100" 
-                          : "bg-slate-50 border-slate-100"
-                      }`}>
-                        <div className="space-y-0.5">
-                          <span className="text-slate-800 block">Subject: {email.subject}</span>
-                          <span className="text-[9.5px] text-slate-450 block font-semibold">
-                            From: {email.sender || "StaffHC Credentials Team <credentials@staffhc.com>"}
-                          </span>
+                      <span>Resume Onboarding</span>
+                      <ArrowRight className="h-3.5 w-3.5 stroke-[3px]" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="bg-emerald-50/20 border border-emerald-100 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                      <span className="text-[9.5px] font-black uppercase text-[#007A5E] tracking-wider bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                        Checklist Complete
+                      </span>
+                      <h3 className="text-sm font-extrabold text-slate-800 mt-2">
+                        All sections completed!
+                      </h3>
+                      <p className="text-[10.5px] text-slate-400 font-medium mt-1">
+                        Please proceed to the Review group to submit your onboarding packet.
+                      </p>
+                    </div>
+                    <button 
+                      onClick={handleResumeOnboarding}
+                      className="px-5 py-2.5 bg-[#007A5E] hover:bg-[#005E48] text-white text-xs font-black rounded-xl transition-all shadow-xs active:scale-95 flex items-center gap-2 cursor-pointer uppercase tracking-wider shrink-0"
+                    >
+                      <span>Proceed to Submit</span>
+                      <ArrowRight className="h-3.5 w-3.5 stroke-[3px]" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Offer Letter Card */}
+                <div className="bg-[#002677] text-white rounded-3xl p-6 shadow-md relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] opacity-5"></div>
+                  
+                  <div className="space-y-2 relative z-10 text-left">
+                    <span className="text-[9px] font-black uppercase tracking-wider bg-white/10 px-2.5 py-0.5 rounded border border-white/20 select-none">
+                      Contract Package
+                    </span>
+                    <h3 className="text-base font-extrabold mt-1">Employee Offer Letter — Hourly(Weekly)</h3>
+                    <p className="text-[11px] text-slate-200 leading-relaxed font-semibold max-w-lg">
+                      Legal employment offer contract specifying hourly travel rate, compliance terms, and CDK Global placement benefits.
+                    </p>
+                    
+                    <div className="pt-2">
+                      {candidate.onboardingSteps[7]?.status === "completed" || documentsDetails.signedOfferLetter ? (
+                        <div className="flex items-center gap-1.5 text-emerald-300 text-xs font-bold">
+                          <CheckCircle2 className="h-4.5 w-4.5" />
+                          <span>Offer Letter Signed & Accepted</span>
                         </div>
-                        <div className="flex items-center gap-2.5">
-                          <span className="text-[9px] text-slate-400 font-semibold">{email.timestamp}</span>
-                          {email.isExternalSync && (
-                            <span className="px-2 py-0.5 bg-blue-100 text-[#0052CC] border border-blue-200 rounded text-[8.5px] font-extrabold uppercase tracking-wide flex items-center gap-1 shadow-3xs">
-                              🔄 Outlook/Gmail Synced
-                            </span>
-                          )}
-                        </div>
+                      ) : (
+                        <button 
+                          onClick={() => {
+                            setActiveGroupIndex(4); // Documents index
+                            setActiveSubStepIndex(0); // Agreements sub-step index
+                            setActiveHeaderTab("onboard");
+                          }}
+                          className="px-5 py-2.5 bg-white hover:bg-slate-100 text-[#002677] text-xs font-black rounded-xl transition-all shadow-xs cursor-pointer uppercase tracking-wider"
+                        >
+                          Review & Sign Contract
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="h-28 w-28 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20 shrink-0 relative z-10 select-none">
+                    <FileText className="h-14 w-14 text-white/50" />
+                  </div>
+                </div>
+
+              </div>
+            )}
+
+            {/* Other sidebar views */}
+            {activeMenu === "documents" && (
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                <h3 className="font-bold text-slate-800 text-sm">Required Onboarding Credentials</h3>
+                <p className="text-xs text-slate-400 font-medium">Below is a checklist of all regulatory compliance documents required for your placement.</p>
+                <div className="divide-y divide-slate-150 text-xs font-medium space-y-3">
+                  {candidate.onboardingSteps.map((step) => (
+                    <div key={step.number} className="py-3 flex justify-between items-center">
+                      <div>
+                        <span className="font-bold block text-slate-800">Step {step.number}: {step.name}</span>
+                        <span className="text-[10px] text-slate-455">{step.description}</span>
                       </div>
-                      <div className="p-4 text-xs text-slate-650 bg-white font-mono leading-relaxed whitespace-pre-wrap">
-                        {email.message}
+                      <div>
+                        {step.status === "completed" ? (
+                          <span className="text-emerald-500 font-bold bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded uppercase">Completed</span>
+                        ) : (
+                          <button 
+                            onClick={() => triggerUploadFile(step.number, `${step.name.replace(/\s+/g, "_")}_doc.pdf`)}
+                            className="px-3 py-1 bg-[#0052CC] text-white rounded font-bold hover:bg-[#0042A3] transition-colors cursor-pointer"
+                          >
+                            Upload File
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
-          )}
-
-          {/* Menu Panel 4: MESSAGES (Chat box responsive fallback) */}
-          {activeMenu === "messages" && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col h-[480px] justify-between">
-              <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
-                <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-655">
-                  {candidate?.recruiterName?.substring(0, 1) || "A"}
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-slate-800">{candidate?.recruiterName || "Alex"}</h4>
-                  <span className="text-[10px] text-slate-400 font-bold block">Online • Your Recruiter</span>
-                </div>
               </div>
+            )}
 
-              <div className="grow overflow-y-auto py-3 space-y-3 no-scrollbar text-xs flex flex-col">
-                {candidateMessages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex flex-col max-w-[85%] ${
-                      msg.sender === "recruiter" ? "self-start" : "self-end items-end"
-                    }`}
-                  >
-                    <div className={`p-2.5 rounded-xl leading-relaxed text-left ${
-                      msg.sender === "recruiter"
-                        ? "bg-[#F0F4FA] text-slate-850 rounded-tl-none border border-[#E1EAF5]"
-                        : "bg-[#0052CC] text-white rounded-tr-none shadow-sm"
-                    }`}>
-                      {msg.text}
-                    </div>
-                    <span className="text-[8px] text-slate-450 mt-1 px-1">{msg.timestamp}</span>
-                  </div>
-                ))}
-              </div>
-
-              <form onSubmit={handleSendMessage} className="border-t border-slate-100 pt-3 flex gap-2">
-                <input
-                  type="text"
-                  value={chatMessage}
-                  onChange={(e) => setChatMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  className="grow px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-[#0052CC]"
-                />
-                <button type="submit" className="p-2 bg-[#0052CC] text-white rounded-lg"><Send className="h-3.5 w-3.5" /></button>
-              </form>
-            </div>
-          )}
-
-          {/* Menu Panel 6: SETTINGS */}
-          {activeMenu === "settings" && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-center py-16">
-              <Settings className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-              <p className="text-xs text-slate-500 font-bold">Menu item simulated.</p>
-              <p className="text-[10px] text-slate-400 mt-1">This section is not required in the active ERP onboarding prototype scope.</p>
-            </div>
-          )}
-
-        </section>
-
-        {/* COLUMN 3: RIGHT SIDEBAR (Chat and updates - Hidden if looking at messages/emails tab on mobile) */}
-        <aside className="w-full lg:w-80 space-y-6 shrink-0 hidden xl:block">
-          
-          {/* Recruiter Chat box */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col h-[360px] justify-between">
-            {/* Header */}
-            <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
-              <div className="relative">
-                <div className="h-10 w-10 rounded-full overflow-hidden border border-slate-100">
-                  <img 
-                    src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
-                    alt={candidate?.recruiterName || "Recruiter"} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 rounded-full border-2 border-white"></span>
-              </div>
-              <div className="text-left">
-                <h4 className="text-xs font-bold text-slate-800">{candidate?.recruiterName || "Alex"}</h4>
-                <span className="text-[10px] text-slate-400 font-bold block">Online • Your Recruiter</span>
-              </div>
-            </div>
-
-            {/* Chat Body */}
-            <div className="grow overflow-y-auto py-3 space-y-3 no-scrollbar text-xs flex flex-col">
-              {candidateMessages.map((msg) => {
-                const isRecruiter = msg.sender === "recruiter";
-                const isSystem = msg.sender === "system";
-
-                if (isSystem) {
-                  return (
-                    <div key={msg.id} className="text-center py-0.5">
-                      <span className="inline-block px-2 py-0.5 bg-slate-50 border border-slate-100 rounded text-[9px] text-slate-400 font-mono">
-                        {msg.text}
-                      </span>
-                    </div>
-                  );
-                }
-
-                return (
-                  <div
-                    key={msg.id}
-                    className={`flex flex-col max-w-[85%] ${
-                      isRecruiter ? "self-start" : "self-end items-end"
-                    }`}
-                  >
-                    <div className={`p-2.5 rounded-xl leading-relaxed text-left ${
-                      isRecruiter
-                        ? "bg-[#F0F4FA] text-slate-855 rounded-tl-none border border-[#E1EAF5]"
-                        : "bg-[#0052CC] text-white rounded-tr-none shadow-sm"
-                    }`}>
-                      {msg.text}
-                    </div>
-                    <span className="text-[8px] text-slate-450 mt-1 px-1">{msg.timestamp}</span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Input box */}
-            <form onSubmit={handleSendMessage} className="border-t border-slate-100 pt-3 flex gap-2">
-              <input
-                type="text"
-                value={chatMessage}
-                onChange={(e) => setChatMessage(e.target.value)}
-                placeholder="Type a message..."
-                className="grow px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-[#0052CC]"
-              />
-              <button
-                type="submit"
-                className="p-2 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg transition-all shrink-0"
-              >
-                <Send className="h-3.5 w-3.5" />
-              </button>
-            </form>
-          </div>
-
-          {/* Recent Updates Panel */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
-            <h4 className="text-[10px] uppercase font-extrabold tracking-wider text-slate-455 text-left">
-              Recent Updates
-            </h4>
-
-            <div className="space-y-4 text-left">
-              {/* Update 1 */}
-              <div className="relative pl-4 border-l border-indigo-200">
-                <span className="absolute left-[-4.5px] top-[4px] h-2 w-2 rounded-full bg-[#0052CC]"></span>
-                <h5 className="text-[11.5px] font-bold text-slate-800">Screening Step Completed</h5>
-                <p className="text-[10.5px] text-slate-455 mt-0.5 leading-relaxed font-semibold">
-                  Your initial screening was approved by clinical staff.
-                </p>
-                <span className="text-[9px] text-slate-450 block mt-1">2 hours ago</span>
-              </div>
-
-              {/* Update 2 */}
-              <div className="relative pl-4 border-l border-indigo-200">
-                <span className="absolute left-[-4.5px] top-[4px] h-2 w-2 rounded-full bg-[#0052CC]"></span>
-                <h5 className="text-[11.5px] font-bold text-slate-800">New Travel Job Match</h5>
-                <p className="text-[10.5px] text-slate-455 mt-0.5 leading-relaxed font-semibold">
-                  ICU Nurse needed in Austin, TX. $4,200/wk.
-                </p>
-                <span className="text-[9px] text-slate-455 block mt-1">Yesterday</span>
-              </div>
-
-              {/* Update 3 */}
-              <div className="relative pl-4 border-l border-indigo-200">
-                <span className="absolute left-[-4.5px] top-[4px] h-2 w-2 rounded-full bg-slate-300"></span>
-                <h5 className="text-[11.5px] font-bold text-slate-800">System Maintenance</h5>
-                <p className="text-[10.5px] text-slate-455 mt-0.5 leading-relaxed font-semibold">
-                  The portal will be down for 1 hour on Sunday.
-                </p>
-                <span className="text-[9px] text-slate-455 block mt-1">Oct 28</span>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </div>
-      ) : (
-        <div className="grow max-w-[1600px] w-full mx-auto px-6 py-8 flex flex-col lg:flex-row gap-8 items-start">
-          
-          {/* Stepper column */}
-          <section className="flex-1 space-y-6 w-full text-left">
-            {/* Header info */}
-            <div className="flex flex-col gap-1">
-              <h1 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
-                Onboarding Portal
-              </h1>
-              <p className="text-xs text-slate-400 font-medium">
-                Complete the 13-step compliance checks below to start your shift.
-              </p>
-            </div>
-
-            {/* ONBOARDING STATUS TIMELINE CARD */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-              {/* Timeline header */}
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <h3 className="font-bold text-slate-800 text-sm">Onboarding Status</h3>
-                  <p className="text-[11px] text-slate-450 font-semibold mt-1">
-                    You are currently at <span className="text-[#0052CC]">Step {candidate?.currentStep}: {candidate?.onboardingSteps[candidate?.currentStep - 1]?.name}</span>.
-                  </p>
-                </div>
-
-                {/* Pink action required banner */}
-                {candidate?.stepStatus === "stuck" && (
-                  <div className="bg-[#FFF0F0] border border-[#FFD5D5] px-3 py-1 rounded text-[10.5px] text-[#C53030] flex items-center gap-1.5 font-bold">
-                    <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
-                    Action required: Upload Nursing License
-                  </div>
-                )}
-              </div>
-
-              {/* Horizontal Timeline Circles (Two Rows for 13 steps) */}
-              <div className="space-y-6 py-4 relative">
-                {/* Row 1: Steps 1 - 7 */}
-                <div className="relative pt-6 pb-2">
-                  {/* Background bar line */}
-                  <div className="absolute top-[40px] left-[6%] right-[6%] h-[3px] bg-slate-100 -z-0"></div>
-                  {/* Blue progress bar line for Row 1 */}
-                  <div 
-                    className="absolute top-[40px] left-[6%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
-                    style={{
-                      width: `${Math.min(100, Math.max(0, (((candidate?.onboardingSteps?.slice(0, 7).filter(s => s.status === "completed").length || 0) - 0.5) / 6) * 88))}%`
-                    }}
-                  ></div>
-
-                  <div className="flex justify-between items-start relative z-10">
-                    {candidate?.onboardingSteps?.slice(0, 7).map((step) => {
-                      const isDone = step.status === "completed";
-                      const isActive = step.number === candidate?.currentStep;
-
-                      return (
-                        <div key={step.number} className="flex flex-col items-center text-center w-[12%]">
-                          <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
-                            isDone 
-                              ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10" 
-                              : isActive
-                              ? "bg-white border-2 border-[#0052CC] text-[#0052CC] ring-4 ring-[#0052CC]/15"
-                              : "bg-slate-100 border-slate-200 text-slate-400"
-                          }`}>
-                            {isDone ? <Check className="h-4 w-4 stroke-[3px]" /> : step.number}
-                          </div>
-                          <span className={`text-[9.5px] font-bold mt-2 truncate w-full ${isDone || isActive ? "text-slate-800" : "text-slate-400"}`}>
-                            {step.name}
-                          </span>
+            {activeMenu === "emails" && (
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5">
+                <h3 className="font-bold text-slate-800 text-sm">Communications Records</h3>
+                <p className="text-xs text-slate-400 font-medium">Official transactional email records sent to your profile email inbox.</p>
+                <div className="divide-y divide-slate-100 space-y-4">
+                  {candidateEmails.map(email => (
+                    <div key={email.id} className="pt-4 first:pt-0 text-left space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-800">{email.subject}</h4>
+                          <span className="text-[10px] text-slate-400 font-medium">To: {candidate.email} • {email.timestamp}</span>
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Transition SVG connector between Row 1 and Row 2 */}
-                <svg className="absolute inset-0 w-full h-[190px] pointer-events-none -z-10" viewBox="0 0 100 190" preserveAspectRatio="none">
-                  <path
-                    d="M 94 40 C 99 40, 99 95, 50 95 C 1 95, 1 150, 7 150"
-                    fill="none"
-                    stroke="#F1F5F9"
-                    strokeWidth="3"
-                    strokeDasharray="4 4"
-                  />
-                  {candidate?.onboardingSteps[7]?.status === "completed" && (
-                    <path
-                      d="M 94 40 C 99 40, 99 95, 50 95 C 1 95, 1 150, 7 150"
-                      fill="none"
-                      stroke="#0052CC"
-                      strokeWidth="3"
-                      className="transition-all duration-500"
-                    />
-                  )}
-                </svg>
-
-                {/* Row 2: Steps 8 - 13 */}
-                <div className="relative pt-6 pb-2">
-                  {/* Background bar line */}
-                  <div className="absolute top-[40px] left-[7%] right-[7%] h-[3px] bg-slate-100 -z-0"></div>
-                  {/* Blue progress bar line for Row 2 */}
-                  <div 
-                    className="absolute top-[40px] left-[7%] h-[3px] bg-[#0052CC] -z-0 transition-all duration-300"
-                    style={{
-                      width: `${Math.min(100, Math.max(0, (((candidate?.onboardingSteps?.slice(7).filter(s => s.status === "completed").length || 0) - 0.5) / 5) * 86))}%`
-                    }}
-                  ></div>
-
-                  <div className="flex justify-between items-start relative z-10 px-1">
-                    {candidate?.onboardingSteps?.slice(7).map((step) => {
-                      const isDone = step.status === "completed";
-                      const isActive = step.number === candidate?.currentStep;
-                      const isStuck = step.status === "stuck";
-
-                      return (
-                        <div key={step.number} className="flex flex-col items-center text-center w-[14%]">
-                          <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
-                            isDone 
-                              ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10" 
-                              : isStuck
-                              ? "bg-rose-500 border-rose-500 text-white animate-pulse"
-                              : isActive
-                              ? "bg-white border-2 border-[#0052CC] text-[#0052CC] ring-4 ring-[#0052CC]/15"
-                              : "bg-slate-100 border-slate-200 text-slate-400"
-                          }`}>
-                            {isDone ? (
-                              <Check className="h-4 w-4 stroke-[3px]" />
-                            ) : isStuck ? (
-                              <span className="text-[10px] font-black">{step.number}</span>
-                            ) : (
-                              step.number
-                            )}
-                          </div>
-                          <span className={`text-[9.5px] font-bold mt-2 truncate w-full ${isDone || isActive || isStuck ? "text-slate-800 font-extrabold" : "text-slate-455"}`}>
-                            {step.name}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Stuck detail panel or dynamic step instruction details */}
-            {candidate?.stepStatus === "stuck" && (
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-left">
-                <div className="flex items-center gap-2 text-rose-600 mb-3">
-                  <AlertCircle className="h-5 w-5" />
-                  <h3 className="font-bold text-sm">Step {candidate?.currentStep} Stuck: {candidate?.stuckReason}</h3>
-                </div>
-                <p className="text-xs text-slate-500 font-medium leading-relaxed mb-6">
-                  {candidate?.stuckExplanation}
-                </p>
-
-                {/* Drag and drop upload zone representation */}
-                <div className="border-2 border-dashed border-[#DEEAF7] bg-[#F8FAFC] hover:bg-[#F1F5F9] rounded-xl p-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all">
-                  <UploadCloud className="h-10 w-10 text-[#0052CC]" />
-                  <h4 className="text-xs font-bold text-slate-850">Upload Professional Nursing License</h4>
-                  <p className="text-[10px] text-slate-400 font-semibold">PDF, JPEG, or PNG up to 10MB</p>
-                  
-                  <div className="mt-4">
-                    {candidate?.onboardingSteps[2]?.status === "completed" ? (
-                      <div className="h-8 w-8 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 text-emerald-500">
-                        <Check className="h-4 w-4" />
+                        <span className="text-[9px] uppercase font-bold text-[#0052CC] bg-[#EBF3FC] px-2 py-0.5 rounded border border-[#DEEAF7]">Delivered</span>
                       </div>
-                    ) : candidate?.onboardingSteps[2]?.status === "in_progress" ? (
-                      <span className="text-[10px] font-bold text-amber-500 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded">Awaiting Review</span>
-                    ) : (
-                      <button 
-                        onClick={() => triggerUploadFile(3, "Nursing_License_Mani.pdf")}
-                        className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg transition-all"
-                      >
-                        Upload File
-                      </button>
-                    )}
-                  </div>
+                      <p className="text-[11px] text-slate-600 leading-relaxed bg-slate-50/50 p-3 rounded-lg border border-slate-100 whitespace-pre-line">{email.message}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
 
-            {/* Steps checklist Accordion */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-              <h3 className="font-bold text-slate-800 text-sm mb-4">Complete Onboarding Checklist</h3>
-              <div className="divide-y divide-slate-100">
-                {candidate?.onboardingSteps.map((step) => (
-                  <div key={step.number} className="py-3.5 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                        step.status === "completed" 
-                          ? "bg-emerald-50 text-emerald-600 border border-emerald-100" 
-                          : step.status === "stuck"
-                          ? "bg-rose-50 text-rose-600 border border-rose-100"
-                          : "bg-slate-50 text-slate-400 border border-slate-100"
-                      }`}>
-                        {step.number}
-                      </span>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-800">{step.name}</h4>
-                        <p className="text-[10.5px] text-slate-400 mt-0.5 font-medium">{step.description}</p>
-                      </div>
+            {activeMenu === "messages" && (
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col h-[520px] justify-between">
+                <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
+                  <div className="relative">
+                    <div className="h-10 w-10 rounded-full overflow-hidden border border-slate-100">
+                      <img 
+                        src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
+                        alt="Recruiter Alex"
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <div className="flex items-center gap-2">
-                      {step.status === "completed" && (
-                        <span className="text-[10px] font-extrabold text-emerald-600 uppercase bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-                          Completed
-                        </span>
-                      )}
-                      {step.status === "in_progress" && (
-                        <span className="text-[10px] font-extrabold text-[#0052CC] uppercase bg-[#EBF3FC] px-2 py-0.5 rounded border border-[#DEEAF7]">
-                          In Progress
-                        </span>
-                      )}
-                      {step.status === "stuck" && (
-                        <span className="text-[10px] font-extrabold text-rose-600 uppercase bg-rose-50 px-2 py-0.5 rounded border border-rose-100 animate-pulse">
-                          Stuck
-                        </span>
-                      )}
-                      {step.status === "pending" && (
-                        <span className="text-[10px] font-extrabold text-slate-400 uppercase bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
-                          Pending
-                        </span>
-                      )}
-                    </div>
+                    <span className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 rounded-full border-2 border-white"></span>
                   </div>
-                ))}
+                  <div className="text-left">
+                    <h4 className="text-xs font-bold text-slate-800">Alex (Recruiter)</h4>
+                    <span className="text-[10px] text-slate-455 font-bold block">Online • Onboarding Coordinator</span>
+                  </div>
+                </div>
+
+                <div className="grow overflow-y-auto py-3 space-y-3 no-scrollbar text-xs flex flex-col">
+                  {candidateMessages.map((msg) => {
+                    const isRecruiter = msg.sender === "recruiter";
+                    const isSystem = msg.sender === "system";
+                    if (isSystem) {
+                      return (
+                        <div key={msg.id} className="mx-auto bg-slate-100 text-slate-500 rounded px-2.5 py-1 text-[10px] font-semibold tracking-wide w-fit text-center my-1 select-none border border-slate-200">
+                          {msg.text}
+                        </div>
+                      );
+                    }
+                    return (
+                      <div 
+                        key={msg.id} 
+                        className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-left text-xs ${
+                          isRecruiter 
+                            ? "bg-slate-100 text-slate-700 self-start rounded-tl-none font-medium leading-relaxed" 
+                            : "bg-[#0052CC] text-white self-end rounded-tr-none font-medium leading-relaxed shadow-sm"
+                        }`}
+                      >
+                        <p>{msg.text}</p>
+                        <span className={`block text-[8.5px] mt-1 text-right font-semibold ${isRecruiter ? "text-slate-400" : "text-white/70"}`}>
+                          {msg.timestamp}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <form onSubmit={handleSendMessage} className="border-t border-slate-150 pt-3 flex gap-2">
+                  <input 
+                    type="text" 
+                    value={chatMessage}
+                    onChange={e => setChatMessage(e.target.value)}
+                    placeholder="Type your message to Alex..."
+                    className="grow px-4 py-2 text-xs border border-slate-205 rounded-xl bg-slate-50 focus:border-[#0052CC] focus:outline-none placeholder-slate-400 font-semibold"
+                  />
+                  <button 
+                    type="submit"
+                    className="px-4 py-2 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer"
+                  >
+                    Send
+                  </button>
+                </form>
               </div>
-            </div>
+            )}
+
+            {activeMenu === "settings" && (
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4 text-left">
+                <h3 className="font-bold text-slate-800 text-sm">Account Settings</h3>
+                <p className="text-xs text-slate-400 font-medium">Manage your portal preferences and notification delivery methods.</p>
+                <div className="space-y-4 max-w-md pt-2 text-xs">
+                  <div className="flex justify-between items-center p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                    <div>
+                      <span className="font-bold block text-slate-800">Email Alerts</span>
+                      <span className="text-[10px] text-slate-455">Receive SLA warnings via email</span>
+                    </div>
+                    <input type="checkbox" defaultChecked className="h-4.5 w-4.5 rounded text-[#0052CC]" />
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                    <div>
+                      <span className="font-bold block text-slate-800">SMS Notifications</span>
+                      <span className="text-[10px] text-slate-455">Receive direct text message pings</span>
+                    </div>
+                    <input type="checkbox" defaultChecked className="h-4.5 w-4.5 rounded text-[#0052CC]" />
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
 
-          {/* Chat Column on the Right */}
-          <aside className="w-full lg:w-80 space-y-6 shrink-0">
-            {/* Recruiter Contact card */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col h-[360px] justify-between">
-              {/* Header */}
+          {/* COLUMN 3: RECRUITER CONTACT ASIDE */}
+          <aside className="w-full lg:w-80 space-y-6 shrink-0 hidden lg:block">
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col h-[400px] justify-between">
               <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
                 <div className="relative">
                   <div className="h-10 w-10 rounded-full overflow-hidden border border-slate-100">
                     <img 
                       src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
-                      alt={candidate?.recruiterName || "Recruiter"} 
+                      alt="Recruiter Alex" 
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <span className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 rounded-full border-2 border-white"></span>
                 </div>
                 <div className="text-left">
-                  <h4 className="text-xs font-bold text-slate-800">{candidate?.recruiterName || "Alex"}</h4>
-                  <span className="text-[10px] text-slate-400 font-bold block">Online • Your Recruiter</span>
+                  <h4 className="text-xs font-bold text-slate-800">Alex (Recruiter)</h4>
+                  <span className="text-[10px] text-slate-455 font-bold block">Online • Onboarding Coordinator</span>
                 </div>
               </div>
 
-              {/* Chat Body */}
               <div className="grow overflow-y-auto py-3 space-y-3 no-scrollbar text-xs flex flex-col">
-                {candidateMessages.map((msg) => {
+                {candidateMessages.slice(-4).map((msg) => {
                   const isRecruiter = msg.sender === "recruiter";
                   const isSystem = msg.sender === "system";
-
-                  if (isSystem) {
-                    return (
-                      <div key={msg.id} className="text-center py-0.5">
-                        <span className="inline-block px-2 py-0.5 bg-slate-50 border border-slate-100 rounded text-[9px] text-slate-400 font-mono">
-                          {msg.text}
-                        </span>
-                      </div>
-                    );
-                  }
-
+                  if (isSystem) return null;
                   return (
-                    <div
-                      key={msg.id}
-                      className={`flex flex-col max-w-[85%] ${
-                        isRecruiter ? "self-start" : "self-end items-end"
+                    <div 
+                      key={msg.id} 
+                      className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-left text-[11px] ${
+                        isRecruiter 
+                          ? "bg-slate-100 text-slate-700 self-start rounded-tl-none font-medium leading-normal" 
+                          : "bg-[#0052CC] text-white self-end rounded-tr-none font-medium leading-normal shadow-2xs"
                       }`}
                     >
-                      <div
-                        className={`p-2.5 rounded-2xl ${
-                          isRecruiter
-                            ? "bg-slate-50 border border-slate-150 text-slate-800 rounded-tl-none text-left"
-                            : "bg-[#0052CC] text-white rounded-tr-none text-right"
-                        }`}
-                      >
-                        <p className="leading-relaxed font-semibold">{msg.text}</p>
-                      </div>
-                      <span className="text-[9px] text-slate-450 mt-1 px-1">{msg.timestamp}</span>
+                      <p>{msg.text}</p>
                     </div>
                   );
                 })}
               </div>
 
-              {/* Send chat footer */}
               <form onSubmit={handleSendMessage} className="relative mt-2 border-t border-slate-100 pt-3">
                 <input 
                   type="text" 
                   value={chatMessage}
-                  onChange={(e) => setChatMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  className="w-full pl-3 pr-10 py-2 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-[#0052CC]"
+                  onChange={e => setChatMessage(e.target.value)}
+                  placeholder="Quick message to recruiter..."
+                  className="w-full pl-3 pr-10 py-2 border border-slate-205 rounded-xl bg-slate-50 text-[11px] focus:outline-none placeholder-slate-400 font-semibold"
                 />
-                <button type="submit" className="absolute right-2 top-5 text-[#0052CC] hover:text-[#0042A3]">
-                  <Send className="h-4 w-4" />
+                <button 
+                  type="submit" 
+                  className="absolute right-2.5 top-[21px] text-[#0052CC] hover:text-[#0042A3] transition-colors cursor-pointer"
+                >
+                  <Send className="h-4.5 w-4.5" />
+                </button>
+              </form>
+            </div>
+          </aside>
+        </div>
+      ) : (
+        /* ONBOARD WORKSPACE TAB VIEW */
+        <div className="grow max-w-[1600px] w-full mx-auto px-6 py-8 flex flex-col lg:flex-row gap-8 items-start">
+          
+          <section className="flex-1 space-y-6 w-full text-left">
+            <div className="flex flex-col gap-1">
+              <h1 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
+                Candidate Work Area
+              </h1>
+              <p className="text-xs text-slate-400 font-medium">
+                Verify and complete each of the 6 core compliance groups below to authorize assignment export.
+              </p>
+            </div>
+
+            {/* 6-Group Top-level Stepper */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+              <div className="flex justify-between items-center gap-2 overflow-x-auto pb-1.5 no-scrollbar">
+                {ONBOARDING_GROUPS.map((group, idx) => {
+                  const isCompleted = isGroupCompleted(idx);
+                  const isActive = activeGroupIndex === idx;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => handleGroupClick(idx)}
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all text-xs font-bold shrink-0 cursor-pointer ${
+                        isActive
+                          ? "bg-[#0052CC] border-[#0052CC] text-white shadow shadow-indigo-500/10 scale-[1.01]"
+                          : isCompleted
+                          ? "bg-emerald-50 border-emerald-100 text-[#007A5E] hover:bg-emerald-100/30"
+                          : "bg-slate-50 border-slate-200 text-slate-455 hover:bg-slate-100/50"
+                      }`}
+                    >
+                      <span className={`h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-black ${
+                        isActive
+                          ? "bg-white text-[#0052CC]"
+                          : isCompleted
+                          ? "bg-[#007A5E] text-white"
+                          : "bg-slate-200 text-slate-600"
+                      }`}>
+                        {idx + 1}
+                      </span>
+                      <span>{group.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Sub-form container card */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+              {/* Horizontal pills for active group sub-steps */}
+              <div className="flex flex-wrap gap-2 border-b border-slate-100 pb-4">
+                {ONBOARDING_GROUPS[activeGroupIndex].subSteps.map((sub, idx) => {
+                  const stepState = candidate.onboardingSteps.find(st => st.number === sub.stepNumber);
+                  const isCompleted = stepState?.status === "completed";
+                  const isActive = activeSubStepIndex === idx;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveSubStepIndex(idx)}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition-all uppercase tracking-wider cursor-pointer flex items-center gap-1.5 ${
+                        isActive
+                          ? "bg-[#EBF3FC] text-[#0052CC] border border-[#DEEAF7] font-black"
+                          : isCompleted
+                          ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                          : "bg-slate-50 text-slate-400 border border-slate-200"
+                      }`}
+                    >
+                      {isCompleted && <Check className="h-3 w-3 text-emerald-600 stroke-[3px]" />}
+                      <span>{sub.name}</span>
+                      {sub.isOptional && (
+                        <span className="text-[8px] font-black bg-[#0052CC] text-white px-1.5 py-0.5 rounded ml-0.5 select-none">
+                          OPTIONAL
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Dynamic subform area */}
+              <div className="py-1">
+                {renderActiveSubForm()}
+              </div>
+
+              {/* Stepper Navigation */}
+              <div className="flex justify-between items-center border-t border-slate-100 pt-5">
+                <button
+                  onClick={handlePrevStep}
+                  disabled={activeGroupIndex === 0 && activeSubStepIndex === 0}
+                  className="px-4 py-2 border border-slate-200 hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-transparent text-slate-600 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                >
+                  Back
+                </button>
+
+                {ONBOARDING_GROUPS[activeGroupIndex].subSteps[activeSubStepIndex].id !== "review_submit" ? (
+                  <button
+                    onClick={() => handleNextStep(ONBOARDING_GROUPS[activeGroupIndex].subSteps[activeSubStepIndex].stepNumber)}
+                    className="px-5 py-2.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
+                  >
+                    {activeGroupIndex === 4 && activeSubStepIndex === ONBOARDING_GROUPS[activeGroupIndex].subSteps.length - 1 ? "Save & View Review" : "Save & Next"}
+                  </button>
+                ) : null}
+              </div>
+            </div>
+
+            {/* Collapsed view full checklist accordion */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+              <button 
+                onClick={() => setShowFullChecklist(!showFullChecklist)}
+                className="w-full flex justify-between items-center font-bold text-slate-800 text-sm focus:outline-none cursor-pointer"
+              >
+                <span>View full checklist</span>
+                <span className="text-xs text-[#0052CC] hover:underline font-extrabold uppercase tracking-wide">
+                  {showFullChecklist ? "Collapse Checklist" : "Expand Checklist"}
+                </span>
+              </button>
+              {showFullChecklist && (
+                <div className="mt-5 divide-y divide-slate-100 text-xs font-semibold text-slate-655 space-y-4">
+                  {ONBOARDING_GROUPS.map((group, gIdx) => (
+                    <div key={gIdx} className="pt-4 first:pt-0">
+                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2.5">{group.name}</h4>
+                      <div className="pl-4 space-y-2.5">
+                        {group.subSteps.map((sub, sIdx) => {
+                          const stepState = candidate.onboardingSteps.find(st => st.number === sub.stepNumber);
+                          const isOptional = sub.isOptional;
+                          const isDone = stepState?.status === "completed";
+                          const isStuck = stepState?.status === "stuck";
+                          return (
+                            <div key={sIdx} className="flex justify-between items-center">
+                              <span className="text-slate-800 font-bold">
+                                {sub.name} {isOptional && <span className="text-[8px] font-black bg-blue-50 text-[#0052CC] border border-[#DEEAF7] px-1.5 py-0.5 rounded ml-1 uppercase">Optional</span>}
+                              </span>
+                              <span className={`text-[9.5px] font-extrabold px-2 py-0.5 rounded uppercase border ${
+                                isDone 
+                                  ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
+                                  : isStuck
+                                  ? "bg-rose-50 text-rose-600 border-rose-100 animate-pulse"
+                                  : "bg-slate-50 text-slate-400 border-slate-100"
+                              }`}>
+                                {stepState?.status || "Pending"}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+          </section>
+
+          {/* COLUMN 2: RECRUITER CONTACT CHAT */}
+          <aside className="w-full lg:w-80 space-y-6 shrink-0">
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col h-[480px] justify-between">
+              <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
+                <div className="relative">
+                  <div className="h-10 w-10 rounded-full overflow-hidden border border-slate-100">
+                    <img 
+                      src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
+                      alt="Recruiter Alex" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 rounded-full border-2 border-white"></span>
+                </div>
+                <div className="text-left">
+                  <h4 className="text-xs font-bold text-slate-800">Alex (Recruiter)</h4>
+                  <span className="text-[10px] text-slate-455 font-bold block">Online • Onboarding Coordinator</span>
+                </div>
+              </div>
+
+              <div className="grow overflow-y-auto py-3 space-y-3 no-scrollbar text-xs flex flex-col">
+                {candidateMessages.slice(-6).map((msg) => {
+                  const isRecruiter = msg.sender === "recruiter";
+                  const isSystem = msg.sender === "system";
+                  if (isSystem) return null;
+                  return (
+                    <div 
+                      key={msg.id} 
+                      className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-left text-[11px] ${
+                        isRecruiter 
+                          ? "bg-slate-100 text-slate-700 self-start rounded-tl-none font-medium leading-normal" 
+                          : "bg-[#0052CC] text-white self-end rounded-tr-none font-medium leading-normal shadow-2xs"
+                      }`}
+                    >
+                      <p>{msg.text}</p>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <form onSubmit={handleSendMessage} className="relative mt-2 border-t border-slate-100 pt-3">
+                <input 
+                  type="text" 
+                  value={chatMessage}
+                  onChange={e => setChatMessage(e.target.value)}
+                  placeholder="Ask a question..."
+                  className="w-full pl-3 pr-10 py-2.5 border border-slate-205 rounded-xl bg-slate-50 text-[11px] focus:outline-none placeholder-slate-400 font-semibold"
+                />
+                <button 
+                  type="submit" 
+                  className="absolute right-2.5 top-[23px] text-[#0052CC] hover:text-[#0042A3] transition-colors cursor-pointer"
+                >
+                  <Send className="h-4.5 w-4.5" />
                 </button>
               </form>
             </div>
           </aside>
         </div>
       )}
-      </>
-    )}
 
       {/* Simulated Upload modal */}
       {showUploadModal && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4">
+          <div className="bg-white border border-slate-205 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4">
             <div>
               <h3 className="font-bold text-slate-800 text-sm">Simulate Document Upload</h3>
               <p className="text-xs text-slate-400 mt-1">Select a mock document for credential approval.</p>
@@ -1491,18 +2051,45 @@ export default function OnboardingPage() {
             <div className="flex gap-3 justify-end text-xs">
               <button
                 onClick={() => setShowUploadModal(false)}
-                className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg font-bold transition-all"
+                className="px-4 py-2 border border-slate-205 hover:bg-slate-55 text-slate-600 rounded-lg font-bold transition-all cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUploadSubmit}
                 disabled={uploading}
-                className="px-4 py-2 bg-[#0052CC] hover:bg-[#0042A3] disabled:bg-slate-400 text-white rounded-lg font-bold transition-all"
+                className="px-4 py-2 bg-[#0052CC] hover:bg-[#0042A3] disabled:bg-slate-400 text-white rounded-lg font-bold transition-all cursor-pointer"
               >
                 {uploading ? "Uploading..." : "Upload File"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Submit Success Modal */}
+      {showSubmitSuccessModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white border border-slate-200 rounded-3xl p-8 w-full max-w-md shadow-2xl text-center space-y-6">
+            <div className="h-16 w-16 bg-emerald-50 text-emerald-500 border border-emerald-100 rounded-full flex items-center justify-center mx-auto">
+              <Check className="h-8 w-8 stroke-[3px]" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-black text-slate-800 tracking-tight">Onboarding Submitted Successfully!</h3>
+              <p className="text-xs text-slate-455 leading-relaxed font-semibold">
+                Your credentials and document packages have been submitted for final client verification. Our compliance auditors will review the packet shortly.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setShowSubmitSuccessModal(false);
+                setActiveHeaderTab("dashboard");
+                setActiveMenu("overview");
+              }}
+              className="w-full py-3 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-black rounded-xl transition-all shadow-md active:scale-95 uppercase tracking-wider cursor-pointer"
+            >
+              Back to Dashboard
+            </button>
           </div>
         </div>
       )}
