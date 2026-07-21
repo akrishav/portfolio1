@@ -10,7 +10,7 @@ import {
   Smartphone, Mail, Check, RefreshCw, MessageSquare, ArrowRight, 
   Settings, Clock, Bell, Filter, Award, ChevronRight, Search, 
   Plus, Edit2, Download, Eye, ArrowLeft, Calendar, LayoutGrid, 
-  Building2, ShieldCheck, DollarSign, HelpCircle, HardDrive, ListCollapse, X, ChevronDown, Lock
+  Building2, ShieldCheck, DollarSign, HelpCircle, HardDrive, ListCollapse, X, ChevronDown, Lock, Info
 } from "lucide-react";
 
 export default function RecruiterDashboard() {
@@ -72,6 +72,7 @@ export default function RecruiterDashboard() {
   // Role perspective switcher: recruiter | onboarder
   const [currentRole, setCurrentRole] = useState<"recruiter" | "onboarder">("recruiter");
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+  const [pendingSimChange, setPendingSimChange] = useState<number | null>(null);
 
   // Left sidebar navigation view state
   const [currentView, setCurrentView] = useState<"dashboard" | "candidates" | "matrix" | "agencies">("candidates");
@@ -850,19 +851,55 @@ export default function RecruiterDashboard() {
                             <div className="flex items-center gap-2 bg-[#EBF3FC] border border-[#DEEAF7] rounded-lg px-3 py-1.5 text-[11px] text-[#0052CC]">
                               <Clock className="h-3.5 w-3.5 animate-pulse" />
                               <span className="font-bold">Simulated Time: +{simulationOffsetDays} Days</span>
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); advanceSimulationTime(1); }}
-                                className="ml-2 px-2.5 py-0.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold shadow-xs transition-all active:scale-95"
-                              >
-                                +1 Day
-                              </button>
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); advanceSimulationTime(-1); }}
-                                disabled={simulationOffsetDays <= 0}
-                                className="px-2.5 py-0.5 bg-slate-200 text-slate-500 rounded text-[10px] font-bold shadow-xs transition-all hover:bg-slate-300 disabled:opacity-50 disabled:pointer-events-none"
-                              >
-                                -1 Day
-                              </button>
+                              
+                              {/* Info tooltip icon */}
+                              <div className="relative group flex items-center">
+                                <Info className="h-3.5 w-3.5 text-[#0052CC]/70 hover:text-[#0052CC] cursor-pointer" />
+                                <div className="absolute bottom-full mb-2 hidden group-hover:block bg-slate-800 text-white text-[10px] font-medium p-2.5 rounded-lg shadow-xl w-[220px] text-center z-50 leading-normal">
+                                  Simulates time passing for candidate onboarding SLA checks. Use this to test warning durations, breach notifications, and escalations.
+                                </div>
+                              </div>
+
+                              {pendingSimChange === null ? (
+                                <>
+                                  <button 
+                                    onClick={(e) => { e.stopPropagation(); setPendingSimChange(1); }}
+                                    className="ml-2 px-2.5 py-0.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold shadow-xs transition-all active:scale-95 cursor-pointer"
+                                  >
+                                    +1 Day
+                                  </button>
+                                  <button 
+                                    onClick={(e) => { e.stopPropagation(); setPendingSimChange(-1); }}
+                                    disabled={simulationOffsetDays <= 0}
+                                    className="px-2.5 py-0.5 bg-slate-200 text-slate-500 rounded text-[10px] font-bold shadow-xs transition-all hover:bg-slate-300 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+                                  >
+                                    -1 Day
+                                  </button>
+                                </>
+                              ) : (
+                                <span className="font-extrabold text-[10px] text-[#0052CC] flex items-center gap-1.5 animate-pulse ml-2">
+                                  Confirm {pendingSimChange > 0 ? "+1d" : "-1d"}?
+                                  <button 
+                                    onClick={(e) => { 
+                                      e.stopPropagation(); 
+                                      advanceSimulationTime(pendingSimChange); 
+                                      setPendingSimChange(null); 
+                                    }}
+                                    className="px-1.5 py-0.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded font-black text-[9px] cursor-pointer"
+                                  >
+                                    ✓
+                                  </button>
+                                  <button 
+                                    onClick={(e) => { 
+                                      e.stopPropagation(); 
+                                      setPendingSimChange(null); 
+                                    }}
+                                    className="px-1.5 py-0.5 bg-rose-500 hover:bg-rose-600 text-white rounded font-black text-[9px] cursor-pointer"
+                                  >
+                                    ✗
+                                  </button>
+                                </span>
+                              )}
                             </div>
 
                             <span className={`px-2 py-0.5 rounded text-[9.5px] font-bold uppercase ${
