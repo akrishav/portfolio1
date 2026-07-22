@@ -13,6 +13,15 @@ import {
   Building2, ShieldCheck, DollarSign, HelpCircle, HardDrive, ListCollapse, X, ChevronDown, Lock, Info
 } from "lucide-react";
 
+const APPROVED_CLIENT_EMAILS = [
+  { email: "client.contact@cdkglobal.com", label: "client.contact@cdkglobal.com — CDK Global MSP Portal (Approved)" },
+  { email: "msp.compliance@ascension.org", label: "msp.compliance@ascension.org — Ascension Health MSP (Approved)" },
+  { email: "hca.transfer@hcahealthcare.com", label: "hca.transfer@hcahealthcare.com — HCA Healthcare Credentialing (Approved)" },
+  { email: "st-davids.onboarding@stdavids.com", label: "st-davids.onboarding@stdavids.com — St. David's Medical Center (Approved)" },
+  { email: "arun.c@staffhc.com", label: "arun.c@staffhc.com — Arun Chikkaveerappa (StaffHC Account Mgr)" },
+  { email: "compliance.approved@staffhc.com", label: "compliance.approved@staffhc.com — StaffHC Compliance Ops (Approved)" }
+];
+
 export default function RecruiterDashboard() {
   const { 
     candidates, 
@@ -1171,20 +1180,31 @@ export default function RecruiterDashboard() {
                                 </div>
                               )}
 
-                              {/* Client Contact Email Field */}
+                              {/* Client Contact Email Select Dropdown (Approved List) */}
                               <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-slate-700 block">
-                                  Client Contact Email <span className="text-rose-500">*</span>
-                                </label>
+                                <div className="flex justify-between items-center">
+                                  <label className="text-xs font-bold text-slate-700 block">
+                                    Client Contact Email <span className="text-rose-500">*</span>
+                                  </label>
+                                  <span className="text-[9.5px] text-emerald-600 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded flex items-center gap-1">
+                                    <Check className="h-3 w-3 text-emerald-600" />
+                                    Approved Client List
+                                  </span>
+                                </div>
                                 <div className="relative">
-                                  <Mail className="h-4 w-4 text-slate-400 absolute left-3 top-2.5" />
-                                  <input
-                                    type="email"
+                                  <Mail className="h-4 w-4 text-slate-400 absolute left-3 top-2.5 z-10 pointer-events-none" />
+                                  <select
                                     value={clientContactEmail}
                                     onChange={(e) => setClientContactEmail(e.target.value)}
-                                    placeholder="e.g. client.contact@cdkglobal.com"
-                                    className="w-full pl-9 pr-3 h-9 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#0052CC] bg-slate-50/50"
-                                  />
+                                    className="w-full pl-9 pr-8 h-9 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#0052CC] bg-slate-50/50 appearance-none cursor-pointer"
+                                  >
+                                    {APPROVED_CLIENT_EMAILS.map((item) => (
+                                      <option key={item.email} value={item.email}>
+                                        {item.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <ChevronDown className="h-4 w-4 text-slate-400 absolute right-3 top-2.5 pointer-events-none" />
                                 </div>
                               </div>
 
@@ -2894,14 +2914,27 @@ export default function RecruiterDashboard() {
                 <span className="text-[10px] text-emerald-600 font-bold block">✓ Verified Hash Integrity</span>
               </div>
 
-              <div className="space-y-1">
-                <label className="font-bold text-slate-700 block">Client Contact Email</label>
-                <input
-                  type="email"
-                  value={clientContactEmail}
-                  onChange={(e) => setClientContactEmail(e.target.value)}
-                  className="w-full p-2.5 border border-slate-250 rounded-xl focus:outline-none focus:border-[#0052CC] font-semibold text-slate-800 text-xs"
-                />
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <label className="font-bold text-slate-700 block">Client Contact Email</label>
+                  <span className="text-[9.5px] text-emerald-600 font-bold bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
+                    Approved List
+                  </span>
+                </div>
+                <div className="relative">
+                  <select
+                    value={clientContactEmail}
+                    onChange={(e) => setClientContactEmail(e.target.value)}
+                    className="w-full p-2.5 pr-8 border border-slate-250 rounded-xl focus:outline-none focus:border-[#0052CC] font-semibold text-slate-800 text-xs bg-slate-50/50 appearance-none cursor-pointer"
+                  >
+                    {APPROVED_CLIENT_EMAILS.map((item) => (
+                      <option key={item.email} value={item.email}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="h-4 w-4 text-slate-400 absolute right-3 top-3 pointer-events-none" />
+                </div>
               </div>
             </div>
 
