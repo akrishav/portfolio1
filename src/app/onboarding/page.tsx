@@ -1642,41 +1642,118 @@ export default function OnboardingPage() {
                   </p>
                 </div>
 
-                {/* Compact Progress Summary (6 Groups Slim Horizontal Indicator) */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
+                {/* Compact Stepper Progress Card (Reusing Stepper Design System Component) */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+                  {/* Progress Header & Non-Contradictory Metrics */}
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
-                      <h3 className="font-extrabold text-slate-800 text-sm">Onboarding Progress</h3>
-                      <p className="text-[11px] text-slate-455 font-bold mt-0.5">
-                        {getCompletedGroupsCount()} of 6 sections complete ({getOverallProgressPercentage()}% total progress)
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-extrabold text-slate-800 text-sm">Onboarding Progress</h3>
+                        <span className="px-2.5 py-0.5 bg-[#EBF3FC] text-[#0052CC] border border-[#DEEAF7] rounded-full text-xs font-black">
+                          {getOverallProgressPercentage()}% Complete
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 font-semibold mt-1">
+                        {getRequiredStepsCompletedCount()} of 12 required tasks completed ({getCompletedGroupsCount()} of 5 sections finished)
                       </p>
                     </div>
+
                     {/* Status Chip */}
-                    <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 text-slate-455 rounded-full text-[10px] font-bold select-none">
-                      <Lock className="h-3 w-3 text-slate-400" />
-                      <span>Review & Submit unlocks after all sections are complete</span>
-                    </div>
+                    {getRemainingRequiredSteps() > 0 ? (
+                      <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 rounded-full text-[11px] font-bold select-none">
+                        <Clock className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+                        <span>Active: Section {findFirstIncompleteSubStep().groupIndex + 1} ({ONBOARDING_GROUPS[findFirstIncompleteSubStep().groupIndex].name})</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-full text-[11px] font-bold select-none">
+                        <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                        <span>All Required Sections Finished</span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Slim horizontal bar segments */}
-                  <div className="grid grid-cols-6 gap-2 pt-1 h-3.5">
-                    {ONBOARDING_GROUPS.map((grp, idx) => {
-                      const isCompleted = isGroupCompleted(idx);
-                      const isCurrent = findFirstIncompleteSubStep().groupIndex === idx;
-                      return (
-                        <div 
-                          key={idx} 
-                          className={`rounded-full transition-all duration-300 ${
-                            isCompleted 
-                              ? "bg-[#0052CC]" 
-                              : isCurrent 
-                              ? "bg-blue-200 border border-[#0052CC]" 
-                              : "bg-slate-105 border border-slate-200"
-                          }`}
-                          title={`${grp.name} (${isCompleted ? "Complete" : isCurrent ? "Active" : "Pending"})`}
-                        />
-                      );
-                    })}
+                  {/* Compact 6-Group Connected Stepper with Explicit Labels */}
+                  <div className="overflow-x-auto no-scrollbar pt-2 pb-1">
+                    <div className="relative flex justify-between items-start w-full min-w-[650px] px-2">
+                      {ONBOARDING_GROUPS.map((grp, idx) => {
+                        const isCompleted = isGroupCompleted(idx);
+                        const isCurrent = findFirstIncompleteSubStep().groupIndex === idx;
+
+                        const totalGroupSteps = grp.subSteps.filter(s => !s.isOptional && s.id !== "review_submit").length;
+                        const completedGroupSteps = grp.subSteps.filter(s => {
+                          if (s.isOptional || s.id === "review_submit") return false;
+                          const st = candidate.onboardingSteps.find(step => step.number === s.stepNumber);
+                          return st?.status === "completed";
+                        }).length;
+
+                        return (
+                          <div key={idx} className="flex-1 flex flex-col items-center relative z-10">
+                            {/* Connection Line */}
+                            {idx < ONBOARDING_GROUPS.length - 1 && (
+                              <div 
+                                className={`absolute top-4 left-[calc(50%+16px)] right-[calc(-50%+16px)] h-0.5 z-0 transition-colors duration-200 ${
+                                  isCompleted ? "bg-[#0052CC]" : "bg-slate-200"
+                                }`} 
+                              />
+                            )}
+
+                            {/* Node Button */}
+                            <button
+                              onClick={() => {
+                                handleGroupClick(idx);
+                                setActiveHeaderTab("onboard");
+                              }}
+                              className="flex flex-col items-center focus:outline-none cursor-pointer group"
+                              title={`Click to view ${grp.name}`}
+                            >
+                              <div 
+                                className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-black transition-all duration-200 border-2 relative ${
+                                  isCompleted
+                                    ? "border-[#0052CC] bg-[#0052CC] text-white shadow-2xs"
+                                    : isCurrent
+                                    ? "border-[#0052CC] bg-blue-50 text-[#0052CC] ring-4 ring-blue-100 shadow-sm scale-105"
+                                    : "border-slate-200 bg-slate-100 text-slate-400"
+                                }`}
+                              >
+                                {isCompleted ? (
+                                  <Check className="h-4 w-4 stroke-[3px]" />
+                                ) : isCurrent ? (
+                                  <span className="flex items-center justify-center">
+                                    <span className="h-2 w-2 rounded-full bg-[#0052CC] animate-pulse" />
+                                  </span>
+                                ) : (
+                                  <span>{idx + 1}</span>
+                                )}
+                              </div>
+
+                              {/* Section Title Label */}
+                              <span 
+                                className={`mt-2 text-[11px] leading-tight text-center whitespace-nowrap transition-colors ${
+                                  isCurrent 
+                                    ? "font-extrabold text-[#0052CC]"
+                                    : isCompleted
+                                    ? "font-bold text-slate-800"
+                                    : "font-semibold text-slate-400"
+                                }`}
+                              >
+                                {grp.name}
+                              </span>
+
+                              {/* Status Sub-label */}
+                              <span className="text-[9.5px] font-semibold text-slate-400 mt-0.5">
+                                {isCompleted 
+                                  ? "Complete" 
+                                  : isCurrent 
+                                  ? totalGroupSteps > 0 ? `${completedGroupSteps}/${totalGroupSteps} done` : "In Progress"
+                                  : idx === 5
+                                  ? "Locked"
+                                  : "Pending"}
+                              </span>
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 
