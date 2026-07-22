@@ -94,6 +94,61 @@ export default function RecruiterDashboard() {
   const [agencySearch, setAgencySearch] = useState("");
   const [expandedCandidateId, setExpandedCandidateId] = useState<string | null>(null);
 
+  // Toast notification state
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
+  const triggerToast = (msg: string) => {
+    setToastMessage(msg);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3500);
+  };
+
+  // Reach Out Modal state
+  const [showReachOutModal, setShowReachOutModal] = useState(false);
+  const [reachOutTo, setReachOutTo] = useState("");
+  const [reachOutSubject, setReachOutSubject] = useState("");
+  const [reachOutBody, setReachOutBody] = useState("");
+  const [reachOutTargetCandidate, setReachOutTargetCandidate] = useState<Candidate | null>(null);
+
+  // Client Transfer Send Document state
+  const [clientContactEmail, setClientContactEmail] = useState("client.contact@cdkglobal.com");
+  const [selectedDocsForTransfer, setSelectedDocsForTransfer] = useState<string[]>([
+    "Professional Nursing License",
+    "Background Check Consent",
+    "Form W-4 Tax Withholding",
+    "Form I-9 Eligibility",
+    "State Tax Withholding"
+  ]);
+  const [showSendDocModal, setShowSendDocModal] = useState(false);
+  const [docToSendModalItem, setDocToSendModalItem] = useState<string | null>(null);
+
+  const openReachOutModal = (cand: Candidate | undefined | null, anomaly?: any) => {
+    if (!cand) return;
+    setReachOutTargetCandidate(cand);
+    setReachOutTo(cand.email);
+    if (anomaly) {
+      setReachOutSubject(`[Action Required] Compliance Clarification: ${anomaly.title}`);
+      setReachOutBody(
+        `Hi ${cand.name},\n\nDuring your onboarding compliance check for ${cand.jobTitle} at ${cand.clientName}, our verification team noticed a discrepancy requiring your attention:\n\n• Issue: ${anomaly.title}\n• Details: ${anomaly.description}\n\nPlease log in to your candidate onboarding portal or respond directly to this email to resolve this item so we can finalize your placement.\n\nBest regards,\n${cand.recruiterName || "Recruiting Operations"}\nStaffHC INC.`
+      );
+    } else {
+      setReachOutSubject(`[Action Required] StaffHC Onboarding Update for ${cand.name}`);
+      setReachOutBody(
+        `Hi ${cand.name},\n\nPlease log in to your candidate onboarding portal to review and complete your pending onboarding requirements for your ${cand.jobTitle} placement at ${cand.clientName}.\n\nIf you have any questions or need assistance, feel free to reply directly to this email.\n\nBest regards,\n${cand.recruiterName || "Recruiting Operations"}\nStaffHC INC.`
+      );
+    }
+    setShowReachOutModal(true);
+  };
+
+  const handleSendReachOutEmail = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reachOutTargetCandidate || !reachOutBody.trim()) return;
+    sendCandidateMessage(reachOutTargetCandidate.id, reachOutBody.trim(), "recruiter");
+    setShowReachOutModal(false);
+    triggerToast(`Email sent to ${reachOutTo} successfully.`);
+  };
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
@@ -624,8 +679,15 @@ export default function RecruiterDashboard() {
                   {/* Actions Bar */}
                   <div className="flex items-center gap-2">
                     <button 
+                      onClick={() => openReachOutModal(activeCandidate)}
+                      className="px-3.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-lg shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Mail className="h-3.5 w-3.5 text-[#0052CC]" />
+                      Reach Out
+                    </button>
+                    <button 
                       onClick={() => triggerReminder(activeCandidate?.id, activeCandidate?.currentStep, "candidate", "email")}
-                      className="px-3.5 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg shadow-sm transition-all"
+                      className="px-3.5 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white text-xs font-bold rounded-lg shadow-sm transition-all cursor-pointer"
                     >
                       Trigger Reminder
                     </button>
@@ -755,11 +817,10 @@ export default function RecruiterDashboard() {
                                     </div>
                                     <div className="flex items-center gap-2">
                                       <button
-                                        onClick={() => {
-                                          alert(`Sent request to ${activeCandidate?.name} to clarify "${anom.title}"`);
-                                        }}
-                                        className="px-2.5 py-1 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold transition-all shadow-xs"
+                                        onClick={() => openReachOutModal(activeCandidate, anom)}
+                                        className="px-2.5 py-1 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1"
                                       >
+                                        <Mail className="h-3 w-3" />
                                         Reach Out
                                       </button>
                                       {anom.severity === "hard-block" && activeRole === "recruiter" ? (
@@ -917,12 +978,21 @@ export default function RecruiterDashboard() {
                           const stepName = activeStep ? activeStep.name : "Onboarding Step";
                           const ageDays = 3 + simulationOffsetDays;
                           return (
-                            <div className="bg-rose-50 border border-rose-100 rounded-xl p-4 flex items-center gap-3 text-rose-800 text-xs font-bold my-2 shadow-2xs">
-                              <AlertCircle className="h-5 w-5 text-rose-600 shrink-0 animate-bounce" />
-                              <div>
-                                <span className="block text-rose-700 uppercase tracking-wider text-[9px] font-black">Action Required: Candidate is currently blocked</span>
-                                <span className="text-[13px] font-black block mt-0.5">Stuck at Step {stepNum}: {stepName} — {ageDays} days</span>
+                            <div className="bg-rose-50 border border-rose-100 rounded-xl p-4 flex items-center justify-between gap-3 text-rose-800 text-xs font-bold my-2 shadow-2xs">
+                              <div className="flex items-center gap-3">
+                                <AlertCircle className="h-5 w-5 text-rose-600 shrink-0 animate-bounce" />
+                                <div>
+                                  <span className="block text-rose-700 uppercase tracking-wider text-[9px] font-black">Action Required: Candidate is currently blocked</span>
+                                  <span className="text-[13px] font-black block mt-0.5">Stuck at Step {stepNum}: {stepName} — {ageDays} days</span>
+                                </div>
                               </div>
+                              <button
+                                onClick={() => openReachOutModal(activeCandidate)}
+                                className="px-3 py-1.5 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5 shrink-0"
+                              >
+                                <Mail className="h-3.5 w-3.5" />
+                                Reach Out
+                              </button>
                             </div>
                           );
                         })()}
@@ -1049,57 +1119,165 @@ export default function RecruiterDashboard() {
                         </div>
                       </div>
 
-                      {/* CDK Global MSP Client Transfer Gate */}
-                      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 text-left space-y-3">
-                        <div className="flex justify-between items-center">
+                      {/* Client Transfer — Send Document Gate */}
+                      <div className="bg-white border border-slate-200 rounded-xl p-5 text-left space-y-4 shadow-2xs">
+                        <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                           <div>
                             <h3 className="font-extrabold text-xs text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                              <ArrowRight className="h-4 w-4 text-[#007A5E]" />
-                              Layer 3: Client Transfer MSP Export Gate
+                              <Send className="h-4 w-4 text-[#007A5E]" />
+                              Client Transfer — Send Document
                             </h3>
-                            <p className="text-[10px] text-slate-450 mt-0.5 font-normal font-sans">Secure system-to-system upload of onboarding records to CDK Global MSP portal.</p>
+                            <p className="text-[10.5px] text-slate-500 font-normal mt-0.5">
+                              Select candidate onboarding documents to dispatch directly to the client contact email.
+                            </p>
                           </div>
+                          <span className={`px-2 py-0.5 rounded text-[9.5px] font-bold uppercase ${
+                            activeRole === "audit" ? "bg-purple-50 text-purple-700 border border-purple-200" : "bg-slate-100 text-slate-600 border border-slate-200"
+                          }`}>
+                            Role: {activeRole === "audit" ? "Audit (Downloads Enabled)" : "Recruiter (No Download)"}
+                          </span>
                         </div>
 
                         {(() => {
                           const hardBlockers = anomalies.filter(a => a.candidateId === activeCandidate?.id && a.severity === "hard-block" && a.status === "open");
                           const isBlocked = hardBlockers.length > 0;
+                          
+                          const candidateDocs = [
+                            { name: "Professional Nursing License", file: "Nursing_License_Mani.pdf", status: "Completed" },
+                            { name: "Background Check Consent", file: "Background_Consent_Signed.pdf", status: "Completed" },
+                            { name: "Form W-4 Tax Withholding", file: "W4_Federal_Tax.pdf", status: "Completed" },
+                            { name: "Form I-9 Eligibility", file: "I9_Eligibility_Doc.pdf", status: "Completed" },
+                            { name: "State Tax Withholding", file: "StateW4_MN.pdf", status: "Completed" },
+                            { name: "Employee Offer Letter", file: "Offer_Letter_Signed.pdf", status: "Completed" },
+                            { name: "Immunization Records", file: "Immunization_Records.pdf", status: "Completed" },
+                            { name: "401(k) Enrollment Form", file: "401K_Benefit.pdf", status: "Completed" }
+                          ];
 
                           return (
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                               {isBlocked ? (
                                 <div className="bg-rose-50 border border-rose-200 rounded-lg p-3 text-xs text-rose-800 font-semibold flex items-center gap-2">
                                   <ShieldAlert className="h-4.5 w-4.5 text-rose-600 shrink-0" />
                                   <span>
-                                    <strong>Transfer Blocked:</strong> {hardBlockers.length} active hard-block anomaly items must be resolved/waived first.
+                                    <strong>Transfer Blocked:</strong> {hardBlockers.length} active hard-block anomaly items must be resolved/waived first before document transfer.
                                   </span>
                                 </div>
                               ) : (
                                 <div className="bg-emerald-50 border border-emerald-250 rounded-lg p-3 text-xs text-emerald-800 font-semibold flex items-center gap-2">
-                                  <Check className="h-4.5 w-4.5 text-emerald-600 shrink-0 animate-bounce" />
+                                  <Check className="h-4.5 w-4.5 text-emerald-600 shrink-0" />
                                   <span>
-                                    <strong>Clear for Export:</strong> Document integrity hashes match golden records. Safe to transfer.
+                                    <strong>Clear for Transfer:</strong> All hard-block anomalies resolved. Select documents to send below.
                                   </span>
                                 </div>
                               )}
 
+                              {/* Client Contact Email Field */}
+                              <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-slate-700 block">
+                                  Client Contact Email <span className="text-rose-500">*</span>
+                                </label>
+                                <div className="relative">
+                                  <Mail className="h-4 w-4 text-slate-400 absolute left-3 top-2.5" />
+                                  <input
+                                    type="email"
+                                    value={clientContactEmail}
+                                    onChange={(e) => setClientContactEmail(e.target.value)}
+                                    placeholder="e.g. client.contact@cdkglobal.com"
+                                    className="w-full pl-9 pr-3 h-9 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#0052CC] bg-slate-50/50"
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Select Documents Sub-section */}
+                              <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                  <label className="text-xs font-bold text-slate-700">Select Documents to Send</label>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (selectedDocsForTransfer.length === candidateDocs.length) {
+                                        setSelectedDocsForTransfer([]);
+                                      } else {
+                                        setSelectedDocsForTransfer(candidateDocs.map(d => d.name));
+                                      }
+                                    }}
+                                    className="text-[10px] font-bold text-[#0052CC] hover:underline cursor-pointer"
+                                  >
+                                    {selectedDocsForTransfer.length === candidateDocs.length ? "Deselect All" : "Select All"}
+                                  </button>
+                                </div>
+
+                                <div className="border border-slate-200 rounded-xl divide-y divide-slate-100 bg-slate-50/30 max-h-56 overflow-y-auto pr-1">
+                                  {candidateDocs.map((doc, idx) => {
+                                    const isChecked = selectedDocsForTransfer.includes(doc.name);
+                                    return (
+                                      <div key={idx} className="p-2.5 flex items-center justify-between hover:bg-slate-100/50 transition-colors text-xs">
+                                        <label className="flex items-center gap-2.5 cursor-pointer select-none flex-1 min-w-0 pr-2">
+                                          <input
+                                            type="checkbox"
+                                            checked={isChecked}
+                                            onChange={(e) => {
+                                              if (e.target.checked) {
+                                                setSelectedDocsForTransfer(prev => [...prev, doc.name]);
+                                              } else {
+                                                setSelectedDocsForTransfer(prev => prev.filter(n => n !== doc.name));
+                                              }
+                                            }}
+                                            className="h-4 w-4 rounded border-slate-300 text-[#0052CC] focus:ring-[#0052CC]"
+                                          />
+                                          <div className="truncate">
+                                            <span className="font-bold text-slate-800 block truncate">{doc.name}</span>
+                                            <span className="text-[10px] text-slate-400 font-mono block truncate">{doc.file}</span>
+                                          </div>
+                                        </label>
+
+                                        {/* Download policy: no-download for non-audit, download for audit */}
+                                        <div>
+                                          {activeRole === "audit" ? (
+                                            <button
+                                              type="button"
+                                              onClick={() => triggerToast(`Downloaded "${doc.file}" for audit review.`)}
+                                              className="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 rounded text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer"
+                                              title="Download audit copy"
+                                            >
+                                              <Download className="h-3 w-3 text-slate-600" />
+                                              Download
+                                            </button>
+                                          ) : (
+                                            <span 
+                                              className="px-2 py-1 bg-slate-100 text-slate-400 border border-slate-200/80 rounded text-[9.5px] font-semibold flex items-center gap-1 select-none"
+                                              title="File downloading restricted for non-audit role"
+                                            >
+                                              <Lock className="h-3 w-3 text-slate-400" />
+                                              No Download
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+
+                              {/* Send Button */}
                               <button
+                                disabled={isBlocked || selectedDocsForTransfer.length === 0 || !clientContactEmail.trim()}
                                 onClick={() => {
                                   const res = transferToClient(activeCandidate!.id);
                                   if (res.success) {
-                                    alert("Export Successful: Onboarding file pushed secure system-to-system packet to client portal. Action logged.");
+                                    triggerToast(`Successfully sent ${selectedDocsForTransfer.length} document(s) to ${clientContactEmail}.`);
                                   } else {
                                     alert(res.error);
                                   }
                                 }}
-                                className={`w-full py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-xs ${
-                                  isBlocked 
-                                    ? "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-350"
+                                className={`w-full py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer ${
+                                  isBlocked || selectedDocsForTransfer.length === 0 || !clientContactEmail.trim()
+                                    ? "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300"
                                     : "bg-[#007A5E] hover:bg-[#005E48] text-white active:scale-[0.99]"
                                 }`}
                               >
                                 <Send className="h-3.5 w-3.5" />
-                                Export Securely to Client MSP
+                                Send {selectedDocsForTransfer.length} Selected Document(s) to Client Email
                               </button>
                             </div>
                           );
@@ -1241,33 +1419,46 @@ export default function RecruiterDashboard() {
                                   )}
                                 </td>
                                 <td className="p-4 text-center pr-6">
-                                  <div className="flex justify-center gap-2">
+                                  <div className="flex justify-center gap-2 items-center">
                                     {isUploaded && activeRole === "audit" && (
                                       <button 
                                         onClick={() => {
-                                          alert(`Securely downloaded "${doc.fileName}" for audit purposes. Action logged.`);
+                                          triggerToast(`Downloaded "${doc.fileName}" for audit review.`);
                                         }}
-                                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded text-[10px] font-bold transition-all active:scale-95"
+                                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded text-[10px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1"
                                       >
+                                        <Download className="h-3 w-3" />
                                         Download Audit Copy
                                       </button>
+                                    )}
+                                    {isUploaded && activeRole === "recruiter" && (
+                                      <span 
+                                        className="px-2 py-1 bg-slate-100 text-slate-400 border border-slate-200/80 rounded text-[9.5px] font-semibold flex items-center gap-1 select-none"
+                                        title="File downloading restricted for non-audit role"
+                                      >
+                                        <Lock className="h-3 w-3 text-slate-400" />
+                                        No Download
+                                      </span>
                                     )}
                                     {isUploaded && (
                                       <button 
                                         onClick={() => {
-                                          alert(`Transferred "${doc.fileName}" secure system-to-system packet to client portal. Code logged.`);
+                                          setDocToSendModalItem(doc.fileName || doc.name);
+                                          setShowSendDocModal(true);
                                         }}
-                                        className="px-2.5 py-1 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold transition-all active:scale-95 shadow-xs"
+                                        className="px-2.5 py-1 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded text-[10px] font-bold transition-all active:scale-95 shadow-xs cursor-pointer flex items-center gap-1"
                                       >
-                                        Forward System-to-System
+                                        <Send className="h-3 w-3" />
+                                        Send Document
                                       </button>
                                     )}
                                     {!isUploaded && (
                                       <button 
-                                        onClick={() => alert("Notification reminder alert routed to candidate via SMS.")}
-                                        className="px-2.5 py-1 bg-[#007A5E] hover:bg-[#005E48] text-white rounded text-[10px] font-bold transition-all"
+                                        onClick={() => openReachOutModal(activeCandidate)}
+                                        className="px-2.5 py-1 bg-[#007A5E] hover:bg-[#005E48] text-white rounded text-[10px] font-bold transition-all cursor-pointer flex items-center gap-1"
                                       >
-                                        Send Reminder
+                                        <Mail className="h-3 w-3" />
+                                        Reach Out
                                       </button>
                                     )}
                                   </div>
@@ -2593,6 +2784,155 @@ export default function RecruiterDashboard() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Reach Out Email Modal Overlay */}
+      {showReachOutModal && reachOutTargetCandidate && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden text-left">
+            {/* Modal Header */}
+            <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+              <div>
+                <h3 className="font-bold text-sm text-slate-800 flex items-center gap-2">
+                  <Mail className="h-4.5 w-4.5 text-[#0052CC]" />
+                  Reach Out to Candidate
+                </h3>
+                <p className="text-[10.5px] text-slate-450 font-normal mt-0.5">
+                  Send an editable email notification directly to {reachOutTargetCandidate.name}.
+                </p>
+              </div>
+              <button 
+                onClick={() => setShowReachOutModal(false)}
+                className="p-1 hover:bg-slate-200/60 rounded-full text-slate-400 cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Form Content */}
+            <form onSubmit={handleSendReachOutEmail} className="p-6 space-y-4 text-xs">
+              {/* Recipient To */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700 block">To (Candidate Email)</label>
+                <input
+                  type="email"
+                  value={reachOutTo}
+                  onChange={(e) => setReachOutTo(e.target.value)}
+                  required
+                  className="w-full px-3 h-10 border border-slate-250 rounded-xl focus:outline-none focus:border-[#0052CC] font-semibold text-slate-800 bg-slate-50/50"
+                />
+              </div>
+
+              {/* Subject */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700 block">Subject Line</label>
+                <input
+                  type="text"
+                  value={reachOutSubject}
+                  onChange={(e) => setReachOutSubject(e.target.value)}
+                  required
+                  className="w-full px-3 h-10 border border-slate-205 rounded-xl focus:outline-none focus:border-[#0052CC] font-semibold text-slate-800"
+                />
+              </div>
+
+              {/* Body Textarea */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700 block">Message Body</label>
+                <textarea
+                  value={reachOutBody}
+                  onChange={(e) => setReachOutBody(e.target.value)}
+                  rows={7}
+                  required
+                  className="w-full p-3 border border-slate-205 rounded-xl focus:outline-none focus:border-[#0052CC] font-sans text-xs text-slate-800 leading-relaxed font-normal"
+                />
+              </div>
+
+              {/* Footer Action Strip */}
+              <div className="bg-slate-50 border-t border-slate-200 -mx-6 -mb-6 px-6 py-4 flex justify-end gap-3 rounded-b-2xl mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowReachOutModal(false)}
+                  className="px-4 py-2 border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg font-bold transition-all cursor-pointer bg-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
+                >
+                  <Send className="h-3.5 w-3.5" />
+                  Send Email
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Send Single Document Modal Overlay */}
+      {showSendDocModal && docToSendModalItem && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 text-left space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+              <h3 className="font-bold text-sm text-slate-800 flex items-center gap-2">
+                <Send className="h-4.5 w-4.5 text-[#0052CC]" />
+                Send Document to Client
+              </h3>
+              <button 
+                onClick={() => { setShowSendDocModal(false); setDocToSendModalItem(null); }}
+                className="p-1 hover:bg-slate-100 rounded-full text-slate-400 cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="text-xs space-y-3">
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Target Document</span>
+                <span className="font-extrabold text-slate-800 block text-xs">{docToSendModalItem}</span>
+                <span className="text-[10px] text-emerald-600 font-bold block">✓ Verified Hash Integrity</span>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700 block">Client Contact Email</label>
+                <input
+                  type="email"
+                  value={clientContactEmail}
+                  onChange={(e) => setClientContactEmail(e.target.value)}
+                  className="w-full p-2.5 border border-slate-250 rounded-xl focus:outline-none focus:border-[#0052CC] font-semibold text-slate-800 text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 text-xs font-bold pt-2">
+              <button
+                onClick={() => { setShowSendDocModal(false); setDocToSendModalItem(null); }}
+                className="px-4 py-2 border border-slate-250 hover:bg-slate-50 text-slate-700 rounded-lg transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowSendDocModal(false);
+                  setDocToSendModalItem(null);
+                  triggerToast(`Document "${docToSendModalItem}" sent to ${clientContactEmail} successfully.`);
+                }}
+                className="px-4 py-2 bg-[#0052CC] hover:bg-[#0042A3] text-white rounded-lg shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <Send className="h-3.5 w-3.5" />
+                Send Document
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-2xl z-[999] flex items-center gap-2.5 border border-slate-700">
+          <Check className="h-4.5 w-4.5 text-emerald-400 stroke-[3px]" />
+          <span>{toastMessage}</span>
         </div>
       )}
 
