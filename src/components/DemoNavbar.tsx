@@ -8,6 +8,9 @@ import { Bell, RefreshCw, Smartphone, Mail, ShieldAlert, Laptop, Eye, HelpCircle
 
 export default function DemoNavbar() {
   const pathname = usePathname();
+  if (pathname === "/" || pathname?.startsWith("/case-studies") || pathname?.startsWith("/work")) {
+    return null;
+  }
   const { notifications, resetDemoState } = useOnboarding();
   const [isOpen, setIsOpen] = useState(false);
   const [showNotifDrawer, setShowNotifDrawer] = useState(false);
