@@ -1,137 +1,58 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  /* Primary Brand (blue) */
-  --primary-100: #1A73E8;
-  --primary-80: #488FED;
-  --primary-60: #76ABF1;
-  --primary-40: #A3C7F6;
-  --primary-20: #D1E3FA;
-
-  /* Text Colors */
-  --text-100: #1F1F1F;
-  --text-80: #4C4C4C;
-  --text-60: #797979;
-  --text-40: #A5A5A5;
-  --text-20: #D2D2D2;
-
-  /* Grayscale */
-  --gray-100: #A4A7AE;
-  --gray-80: #B6B9BE;
-  --gray-60: #C8CACE;
-  --gray-40: #D9D9D9;
-  --gray-20: #EDEDEF;
-
-  /* Surfaces & Strokes */
-  --surface-white: #F8F9FA;
-  --bg-blue: #E8F4FF;
-  --blue-stroke: #DFEAF2;
-
-  /* Shadows */
-  --shadow-100: 0 4px 4px -2px rgba(24,39,75,.08), 0 2px 4px -2px rgba(24,39,75,.12);
-  --shadow-200: 0 8px 8px -4px rgba(24,39,75,.08), 0 4px 6px -4px rgba(24,39,75,.12);
-  --shadow-300: 0 8px 16px -6px rgba(24,39,75,.08), 0 6px 8px -6px rgba(24,39,75,.12);
-  --shadow-400: 0 8px 24px -4px rgba(24,39,75,.08), 0 6px 12px -6px rgba(24,39,75,.12);
-  --shadow-500: 0 10px 32px -4px rgba(24,39,75,.10), 0 6px 14px -6px rgba(24,39,75,.12);
-  --shadow-600: 0 12px 42px -4px rgba(24,39,75,.12), 0 8px 18px -6px rgba(24,39,75,.12);
+  --background: #FAFAFD;
+  --foreground: #090914;
+  --primary: #6366F1;
+  --secondary: #7C3AED;
+  --muted: #475569;
+  --glass-border: rgba(99, 102, 241, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --accent: #0284C7;
 }
 
-html {
-  scroll-behavior: smooth;
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-glass-border: var(--glass-border);
+  --color-glass-bg: var(--glass-bg);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+.dark {
+  --background: #0A0A1A;
+  --foreground: #FFFFFF;
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --primary: #7C3AED;
+  --secondary: #A78BFA;
+  --muted: #94A3B8;
+  --accent: #38BDF8;
 }
 
 body {
-  background-color: #F8F9FA;
-  color: #1F1F1F;
-  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--background);
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(2, 132, 199, 0.04) 0%, transparent 35%);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
   min-height: 100vh;
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 }
 
-/* Custom Scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #111827;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #374151;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Glow & Glass Utilities */
-.glass-panel {
-  background: rgba(17, 24, 39, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.glass-panel-interactive {
-  background: rgba(17, 24, 39, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.2s ease-in-out;
-}
-
-.glass-panel-interactive:hover {
-  border-color: rgba(59, 130, 246, 0.4);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
-
-.glow-cyan {
-  box-shadow: 0 0 15px rgba(6, 182, 212, 0.35);
-}
-
-.glow-purple {
-  box-shadow: 0 0 15px rgba(147, 51, 234, 0.35);
-}
-
-.glow-rose {
-  box-shadow: 0 0 15px rgba(244, 63, 94, 0.35);
-}
-
-.pulse-dot {
-  animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-}
-
-@keyframes pulse-ring {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+@utility no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
   }
-  70% {
-    transform: scale(1.1);
-    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
-  }
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-  }
-}
-
-/* Hide stray development widgets */
-iframe#netlify-identity-widget,
-#netlify-modal,
-[class*="netlify"],
-[id*="netlify"],
-next-route-announcer,
-.netlify-backup {
-  display: none !important;
 }
